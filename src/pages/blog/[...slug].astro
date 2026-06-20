@@ -1,0 +1,44 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import PostLayout from "@/layouts/PostLayout.astro";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post: CollectionEntry<"blog">) => ({
+    params: { slug: post.slug },
+    props: post,
+  }));
+}
+
+const post = Astro.props as CollectionEntry<"blog">;
+const { Content } = await post.render();
+
+// Get all posts and sort by publish date
+const allPosts: CollectionEntry<"blog">[] = await getCollection("blog");
+const sortedPosts = allPosts.sort((a, b) => b.data.order - a.data.order);
+
+// Find current post index
+const currentIndex = sortedPosts.findIndex((p: CollectionEntry<"blog">) => p.slug === post.slug);
+
+// Get previous and next posts
+const prevPost = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+---
+
+<PostLayout
+  title={post.data.title}
+  description={post.data.description}
+  publishDate={post.data.publishDate}
+  contentModifiedDate={post.data.contentModifiedDate}
+  prevPost={prevPost}
+  nextPost={nextPost}
+>
+  <Content />
+</PostLayout>
+
+<script is:inline define:vars={{ postSlug: post.slug, postTitle: post.data.title }}>
+  window.posthog?.capture("post_viewed", {
+    post_slug: postSlug,
+    post_title: postTitle,
+  });
+</script>

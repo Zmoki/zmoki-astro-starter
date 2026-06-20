@@ -1,0 +1,75 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Time from "@/components/Time.astro";
+import BrevoForm from "@/components/BrevoForm.astro";
+
+export interface Props {
+  type: "page" | "link";
+  title: string;
+  description?: string;
+  publishDate: Date;
+  contentModifiedDate: Date;
+  form?: {
+    brevoFormId: string;
+    buttonText: string;
+    title: string;
+    description: string;
+  };
+}
+
+const { title, description, publishDate, contentModifiedDate, form } = Astro.props;
+const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  publishDate={publishDate}
+  contentModifiedDate={contentModifiedDate}
+>
+  <article class="space-y-4">
+    <!-- Post Header -->
+    <header
+      class="flex flex-col gap-6 rounded-xl bg-zmoki-surface px-4 py-8 outline-dashed outline-8 -outline-offset-2 outline-zmoki-action-500 md:items-center md:p-16 md:text-center lg:p-20 lg:pb-16"
+    >
+      <h1 class="text-5xl font-semibold xl:text-6xl" set:html={title} />
+      {description && <p class="text-2xl xl:text-3xl" set:html={description} />}
+
+      <p
+        class="order-first flex flex-col gap-2 font-mono text-xs uppercase tracking-normal opacity-70 md:flex-row lg:gap-4 xl:text-sm"
+      >
+        <span>Published on <Time datetime={publishDate} /></span>
+        {
+          isContentModified && (
+            <span>
+              [updated on <Time datetime={contentModifiedDate} />]
+            </span>
+          )
+        }
+      </p>
+    </header>
+
+    <div class="flex flex-col gap-4">
+      <!-- Post Content -->
+      <div
+        class="prose prose-xl max-w-none rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 xl:prose-2xl prose-headings:font-semibold md:p-16 xl:px-32 xl:py-16 [&_a]:text-zmoki-primary-500"
+      >
+        <slot />
+      </div>
+      {
+        form && (
+          <div class="order-first">
+            <BrevoForm brevoFormId={form.brevoFormId} buttonText={form.buttonText}>
+              <h2 set:html={form.title} />
+              <p set:html={form.description} />
+              <p>
+                You'll also join my occasional newsletter with new tools and ideas, you can
+                unsubscribe at any time though.
+              </p>
+            </BrevoForm>
+          </div>
+        )
+      }
+    </div>
+  </article>
+</BaseLayout>

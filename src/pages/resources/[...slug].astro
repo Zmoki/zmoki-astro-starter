@@ -1,0 +1,21 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import ResourceLayout from "@/layouts/ResourceLayout.astro";
+
+export async function getStaticPaths() {
+  const items: CollectionEntry<"resources">[] = await getCollection(
+    "resources",
+    ({ data }: { data: CollectionEntry<"resources">["data"] }) => data.type === "page",
+  );
+
+  return items.map((item) => ({
+    params: { slug: item.slug },
+    props: item,
+  }));
+}
+
+const item = Astro.props as CollectionEntry<"resources">;
+const { Content } = await item.render();
+---
+
+<ResourceLayout {...item.data}><Content /></ResourceLayout>

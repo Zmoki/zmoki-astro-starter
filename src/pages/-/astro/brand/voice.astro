@@ -1,0 +1,327 @@
+---
+import BrandLayout from "@/layouts/BrandLayout.astro";
+
+// A neutral, product-oriented voice — edit it to match your own project.
+// The four pillars: one principle each, with a short gloss and detail.
+const pillars = [
+  {
+    label: "Clear",
+    summary: "Say what you mean, simply.",
+    detail:
+      "Prefer the short word over the impressive one. Define any term a newcomer might not know, on the spot. If a sentence needs two reads, rewrite it.",
+  },
+  {
+    label: "Honest",
+    summary: "No hype, no overpromising.",
+    detail:
+      "Describe what the product actually does. Skip superlatives and buzzwords. If something is rough or unfinished, say so plainly.",
+  },
+  {
+    label: "Helpful",
+    summary: "Lead with what the reader needs.",
+    detail:
+      "Put the useful thing first and anticipate the next question. Write to get someone unstuck, not to impress them.",
+  },
+  {
+    label: "Human",
+    summary: "Write like a person, not a brand.",
+    detail:
+      "Use “you” and “we”. A warm, direct tone beats a corporate one. Talk to the reader the way you would help a colleague.",
+  },
+];
+
+// Mechanical house rules — the easy-to-miss habits that keep the voice
+// consistent. The page itself models each one.
+const mechanics = [
+  {
+    rule: "Write headings in sentence case",
+    right: "Getting started with the API",
+    wrong: "Getting Started With The API",
+  },
+  {
+    rule: "Say it straight",
+    right: "It saves you a step.",
+    wrong: "It’s not just a tool, it’s a workflow.",
+  },
+  {
+    rule: "Go easy on dashes and colons",
+    right: "The goal is simple. Ship something useful.",
+    wrong: "The goal is simple: ship something useful.",
+  },
+];
+
+// Side-by-side rewrites. The "wrong" is the generic marketing default;
+// the "right" is the voice in practice.
+const examples = [
+  {
+    context: "Opening a page",
+    wrong: "In today’s fast-paced digital landscape, leveraging synergies is paramount.",
+    right: "We kept hitting the same wall, so we built this.",
+    note: "Open on a real reason, not a buzzword.",
+  },
+  {
+    context: "Explaining a feature",
+    wrong: "A next-generation, AI-powered productivity paradigm.",
+    right: "It turns your notes into a searchable list.",
+    note: "Say what it does in plain terms.",
+  },
+  {
+    context: "Setting expectations",
+    wrong: "New features shipped daily, guaranteed.",
+    right: "We ship when it’s ready, and we tell you what changed.",
+    note: "Promise only what you can keep.",
+  },
+  {
+    context: "Inviting feedback",
+    wrong: "Please submit all inquiries via the contact form below.",
+    right: "Spotted a bug or have an idea? Email us — we read everything.",
+    note: "Make it a conversation.",
+  },
+];
+
+// FAQ-style questions worth answering, modelled on the example post.
+const sampleQuestions = [
+  "What does My Project X do?",
+  "How do I get started?",
+  "How much does it cost?",
+  "How does it work for teams?",
+];
+
+// Words that carry the voice vs. words that quietly break it.
+const lexicon = {
+  use: [
+    "you / we",
+    "simple",
+    "get started",
+    "for example",
+    "here’s how",
+    "in plain terms",
+    "honestly",
+    "ship",
+    "help",
+    "step by step",
+  ],
+  avoid: [
+    "leverage",
+    "synergy",
+    "paradigm",
+    "seamless",
+    "supercharge",
+    "unlock",
+    "10x",
+    "game-changer",
+    "best-in-class",
+    "thought leadership",
+  ],
+};
+
+// How the voice shows up in interface copy, not just prose.
+const microcopy = [
+  {
+    pattern: "Actions are plain verbs",
+    example: "“Get started”, “Copy”, “Read the docs”",
+    note: "Name the action and skip the marketing verbs.",
+  },
+  {
+    pattern: "Links describe their destination",
+    example: "“the pricing page”, never “click here”",
+    note: "The link text should make sense read aloud on its own.",
+  },
+  {
+    pattern: "Empty states stay honest",
+    example: "“No projects yet”, “Coming soon”",
+    note: "Don’t dress up a gap as a feature.",
+  },
+  {
+    pattern: "Errors are kind and human",
+    example: "“That page doesn’t exist” over “404 Not Found”",
+    note: "Talk to the person who hit the error.",
+  },
+];
+
+// A quick self-check that folds the whole guide into one pre-publish pass.
+const checklist = [
+  "It sounds like a person talking to the reader.",
+  "Headings and the title are in sentence case.",
+  "Every term a newcomer might not know is defined on the spot.",
+  "Each point is said straight, with no “not this, but that” setup.",
+  "Dashes and colons are rare, and the sentences still read well.",
+  "Headings and FAQ entries lead with What, Why, or How.",
+  "Links say where they go.",
+  "No hype words — nothing you’d roll your eyes at.",
+];
+---
+
+<BrandLayout
+  title="Brand — Voice & tone"
+  description="How My Project X sounds: clear, honest, helpful, and human"
+>
+  <header
+    class="mb-8 rounded-xl border-2 border-zmoki-ink bg-zmoki-external-500 px-6 py-10 text-zmoki-surface md:px-10"
+  >
+    <a
+      href="/-/astro/brand/"
+      class="font-mono text-xs uppercase tracking-normal opacity-80 hover:opacity-100"
+      >← My Project X brand</a
+    >
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Voice &amp; tone</h1>
+    <p class="mt-4 max-w-2xl text-xl md:text-2xl">
+      How My Project X sounds: clear, honest, helpful, and human. Edit this page to match your own
+      product’s voice.
+    </p>
+  </header>
+
+  <!-- Who's speaking -->
+  <section class="mb-10 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <h2 class="mb-3 text-2xl font-semibold md:text-3xl">Who&rsquo;s speaking</h2>
+    <p class="max-w-2xl text-lg opacity-80">
+      Write as the team behind My Project X, talking directly to the people who use it. One clear,
+      helpful voice — the same whether it’s a blog post, a button label, or an error message.
+      Replace this with your own product’s persona.
+    </p>
+  </section>
+
+  <!-- Voice pillars -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Voice pillars</h2>
+  <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    {
+      pillars.map((pillar) => (
+        <section class="flex flex-col gap-3 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+          <span class="h-2 w-12 bg-zmoki-ink" />
+          <h3 class="text-2xl font-semibold md:text-3xl">{pillar.label}</h3>
+          <p class="font-medium opacity-90">{pillar.summary}</p>
+          <p class="opacity-70">{pillar.detail}</p>
+        </section>
+      ))
+    }
+  </div>
+
+  <!-- Writing mechanics -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">House style</h2>
+  <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
+    {
+      mechanics.map((m) => (
+        <section class="flex flex-col gap-3 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+          <h3 class="text-lg font-semibold">{m.rule}</h3>
+          <div class="flex items-start gap-2 border-2 border-zmoki-ink px-3 py-2 text-sm">
+            <span class="font-mono text-xs font-bold uppercase">Do</span>
+            <span>{m.right}</span>
+          </div>
+          <div class="flex items-start gap-2 bg-zmoki-ink px-3 py-2 text-sm text-zmoki-surface">
+            <span class="font-mono text-xs font-bold uppercase">Don’t</span>
+            <span class="line-through opacity-90">{m.wrong}</span>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <!-- Do / don't -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Rewrites</h2>
+  <div class="mb-10 space-y-4">
+    {
+      examples.map((ex) => (
+        <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+          <p class="mb-4 font-mono text-xs uppercase tracking-normal opacity-60">{ex.context}</p>
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div class="bg-zmoki-ink p-4 text-zmoki-surface">
+              <p class="mb-1 font-mono text-xs uppercase tracking-normal">Don’t</p>
+              <p class="line-through opacity-90">{ex.wrong}</p>
+            </div>
+            <div class="border-2 border-zmoki-ink p-4">
+              <p class="mb-1 font-mono text-xs uppercase tracking-normal">Do</p>
+              <p>{ex.right}</p>
+            </div>
+          </div>
+          <p class="mt-3 text-sm opacity-60">{ex.note}</p>
+        </section>
+      ))
+    }
+  </div>
+
+  <!-- Asking good questions -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">
+    Asking good questions
+  </h2>
+  <section class="mb-10 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <p class="max-w-2xl opacity-80">
+      Questions make strong headings and FAQ entries. Open questions that start with What, Why, or
+      How invite a full answer and let each section stand on its own. Closed yes or no questions
+      stop at a fact, so save them for the rare moment a fact is all you need. For a worked example,
+      see
+      <a href="/blog/2-example-post/" class="font-medium underline">the example post</a>.
+    </p>
+    <ul class="mt-5 flex flex-wrap gap-2">
+      {
+        sampleQuestions.map((q) => (
+          <li class="border-2 border-zmoki-ink px-3 py-1 font-mono text-sm">{q}</li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Lexicon -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Words</h2>
+  <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <h3 class="mb-4 text-xl font-semibold">Use</h3>
+      <ul class="flex flex-wrap gap-2">
+        {
+          lexicon.use.map((word) => (
+            <li class="border-2 border-zmoki-ink px-3 py-1 font-mono text-sm">{word}</li>
+          ))
+        }
+      </ul>
+    </section>
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <h3 class="mb-4 text-xl font-semibold">Avoid</h3>
+      <ul class="flex flex-wrap gap-2">
+        {
+          lexicon.avoid.map((word) => (
+            <li class="bg-zmoki-ink px-3 py-1 font-mono text-sm text-zmoki-surface line-through">
+              {word}
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <!-- UI microcopy -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">UI copy</h2>
+  <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <p class="mb-5 max-w-2xl opacity-80">
+      The same voice runs through interface copy, from buttons and links to empty states and errors.
+    </p>
+    <div class="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2">
+      {
+        microcopy.map((item) => (
+          <div>
+            <h3 class="font-semibold">{item.pattern}</h3>
+            <p class="mt-1 font-mono text-sm">{item.example}</p>
+            <p class="mt-1 text-sm opacity-60">{item.note}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Pre-publish checklist -->
+  <h2 class="mb-4 mt-10 px-1 font-mono text-sm uppercase tracking-normal opacity-60">
+    Before you publish
+  </h2>
+  <section
+    class="rounded-xl border-2 border-zmoki-ink bg-zmoki-primary-900 p-6 text-slate-50 md:p-8"
+  >
+    <ul class="space-y-3">
+      {
+        checklist.map((item) => (
+          <li class="flex items-start gap-3">
+            <span class="mt-1 h-4 w-4 shrink-0 border-2 border-zmoki-primary-300" />
+            <span class="opacity-90">{item}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BrandLayout>

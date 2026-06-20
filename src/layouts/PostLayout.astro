@@ -1,0 +1,202 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import type { CollectionEntry } from "astro:content";
+import Time from "@/components/Time.astro";
+import { site } from "@/site.config";
+
+export interface Props {
+  title: string;
+  description?: string;
+  publishDate: Date;
+  contentModifiedDate: Date;
+  prevPost?: CollectionEntry<"blog"> | null;
+  nextPost?: CollectionEntry<"blog"> | null;
+}
+
+const { title, description, publishDate, contentModifiedDate, prevPost, nextPost } = Astro.props;
+const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  publishDate={publishDate}
+  contentModifiedDate={contentModifiedDate}
+>
+  <article class="space-y-4">
+    <!-- Post Header -->
+    <header
+      class="flex flex-col gap-6 rounded-xl bg-zmoki-surface px-4 py-8 outline-dashed outline-8 -outline-offset-2 outline-zmoki-primary-500 md:items-center md:p-16 md:text-center lg:p-20"
+    >
+      <h1 class="text-4xl font-semibold xl:text-6xl" set:html={title} />
+      {description && <p class="text-2xl xl:text-3xl" set:html={description} />}
+      <p
+        class="order-first flex flex-col gap-2 font-mono text-xs uppercase tracking-normal opacity-70 md:flex-row lg:gap-4 xl:text-sm"
+      >
+        {
+          isContentModified ? (
+            <>
+              <span>
+                Updated on <Time datetime={contentModifiedDate} />
+              </span>
+              <span>
+                [published on <Time datetime={publishDate} />]
+              </span>
+            </>
+          ) : (
+            <span>
+              Published on <Time datetime={publishDate} />
+            </span>
+          )
+        }
+      </p>
+    </header>
+
+    <!-- Post Content -->
+    <div
+      class="prose prose-xl max-w-none rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 2xl:prose-2xl prose-headings:font-semibold md:p-16 xl:pb-24 2xl:px-28 2xl:py-16"
+    >
+      <slot />
+    </div>
+
+    <!-- About Author -->
+    <aside
+      class="space-y-2 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 leading-normal text-zmoki-ink md:bg-zmoki-accent-500 md:p-16 md:text-slate-50 xl:p-20"
+    >
+      <h2 class="pb-4 text-3xl font-medium xl:text-4xl">Written by {site.author.name}</h2>
+      <p>
+        A short author bio goes here — say who you are and what you do. Edit it in <code
+          >src/layouts/PostLayout.astro</code
+        >. You can read more on the <a
+          href={`/blog/${site.author.aboutSlug}/`}
+          class="border-b-4 border-dotted border-current">about</a
+        > page.
+      </p>
+    </aside>
+
+    <!-- Navigation -->
+    <nav class="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+      <!-- Previous Post -->
+      {
+        prevPost && (
+          <a
+            href={`/blog/${prevPost.slug}/`}
+            data-nav-direction="prev"
+            data-nav-slug={prevPost.slug}
+            class="flex flex-col gap-2 rounded-xl border-2 border-l-8 border-solid border-zmoki-ink border-zmoki-primary-500 bg-zmoki-surface px-6 pb-10 pt-8"
+          >
+            <div class="font-mono text-sm uppercase tracking-normal opacity-70">Previous</div>
+            <div class="text-2xl font-medium leading-normal">
+              <span
+                set:html={prevPost.data.title}
+                class="border-b-4 border-dotted border-current"
+              />
+            </div>
+          </a>
+        )
+      }
+
+      <!-- Next Post -->
+      {
+        nextPost && (
+          <a
+            href={`/blog/${nextPost.slug}/`}
+            data-nav-direction="next"
+            data-nav-slug={nextPost.slug}
+            class="flex flex-col gap-2 rounded-xl border-2 border-r-8 border-solid border-zmoki-ink border-zmoki-primary-500 bg-zmoki-surface px-6 pb-10 pt-8 text-right md:col-start-2"
+          >
+            <div class="font-mono text-sm uppercase tracking-normal opacity-70">Next</div>
+            <div class="text-2xl font-medium leading-normal">
+              <span
+                set:html={nextPost.data.title}
+                class="border-b-4 border-dotted border-current"
+              />
+            </div>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+
+  <script is:inline>
+    document.querySelectorAll("a[data-nav-direction]").forEach(function (el) {
+      el.addEventListener("click", function () {
+        window.posthog?.capture("post_navigation_clicked", {
+          direction: this.dataset.navDirection,
+          destination_slug: this.dataset.navSlug,
+        });
+      });
+    });
+
+    document.querySelectorAll('[data-copy-button="true"]').forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var wrapper = btn.closest(".relative");
+        var codeBlock = wrapper && wrapper.querySelector("pre code");
+        window.posthog?.capture("code_block_copied", {
+          snippet_length: codeBlock ? (codeBlock.textContent || "").length : 0,
+        });
+      });
+    });
+  </script>
+
+  <script>
+    // Handle copy button functionality for code blocks
+    document.addEventListener("DOMContentLoaded", () => {
+      const copyButtons = document.querySelectorAll('[data-copy-button="true"]');
+
+      copyButtons.forEach((button) => {
+        button.addEventListener("click", async () => {
+          // Find the code block element (the <pre><code> that's a sibling in the wrapper)
+          const wrapper = button.closest(".relative");
+          const codeBlock = wrapper?.querySelector("pre code");
+
+          if (!codeBlock) {
+            return;
+          }
+
+          // Extract text content directly from the code element
+          // This preserves all formatting including line breaks
+          const codeContent = codeBlock.textContent;
+          const originalText = button.textContent;
+
+          if (!codeContent) {
+            return;
+          }
+
+          try {
+            // Copy to clipboard
+            await navigator.clipboard.writeText(codeContent);
+
+            // Update button text to "Copied"
+            button.textContent = "Copied";
+
+            // Revert to "Copy" after 2 seconds
+            setTimeout(() => {
+              button.textContent = originalText;
+            }, 2000);
+          } catch (err) {
+            // Fallback for older browsers
+            console.error("Failed to copy code:", err);
+            // Try fallback method
+            const textArea = document.createElement("textarea");
+            textArea.value = codeContent;
+            textArea.style.position = "fixed";
+            textArea.style.opacity = "0";
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand("copy");
+              button.textContent = "Copied";
+              setTimeout(() => {
+                button.textContent = originalText;
+              }, 2000);
+            } catch (fallbackErr) {
+              console.error("Fallback copy failed:", fallbackErr);
+            }
+            document.body.removeChild(textArea);
+          }
+        });
+      });
+    });
+  </script>
+</BaseLayout>

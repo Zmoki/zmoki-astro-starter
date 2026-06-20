@@ -1,0 +1,18 @@
+---
+type: "page"
+name: "Example resource"
+title: "Example resource"
+description: "A starter resource page. Replace or delete it."
+publishDate: "2025-01-01"
+contentModifiedDate: "2025-01-01"
+order: 1
+---
+
+Resources show up in the **Resources** sidebar panel and each get their own page at `/resources/{slug}/`.
+
+Use them for things worth linking to on their own: a downloadable file, a guide, a template, a tool you made.
+
+- `type: "page"` renders a full page like this one.
+- `type: "link"` is just an outbound link (set the `url` field) — no page is generated.
+
+You can also attach a Brevo email form to a resource via the optional `form` field in the frontmatter. See `src/content/config.ts` for the shape.

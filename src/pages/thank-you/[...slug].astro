@@ -1,0 +1,74 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { site } from "@/site.config";
+
+export async function getStaticPaths() {
+  const allResources: CollectionEntry<"resources">[] = await getCollection(
+    "resources",
+    ({ data }: { data: CollectionEntry<"resources">["data"] }) => data.type === "page",
+  );
+
+  return allResources.map((resource) => ({
+    params: { slug: `resources/${resource.slug}/` },
+    props: { name: resource.data.name, url: `/resources/${resource.slug}/` },
+  }));
+}
+
+const { name, url } = Astro.props;
+
+// Get 3 random feed posts
+const allFeedPosts: CollectionEntry<"blog">[] = await getCollection("blog");
+const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3);
+---
+
+<BaseLayout
+  title={`Thank You! Your ${name} is on its way.`}
+  description={`Confirmation for downloading ${name}. Check your inbox for the link and find other useful resources while you wait.`}
+>
+  <section class="space-y-4">
+    <header
+      class="flex flex-col gap-6 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 md:items-center md:p-16 md:text-center lg:p-20"
+    >
+      <h1
+        class="bg-zmoki-action-500 text-5xl font-semibold lg:text-6xl"
+        set:html={`Your ${name} is on its way`}
+      />
+    </header>
+
+    <section
+      class="prose prose-xl max-w-none rounded-xl border border-zmoki-ink bg-zmoki-surface px-4 py-8 lg:prose-2xl prose-headings:font-semibold md:p-16 lg:px-28 lg:py-16 [&_a]:text-zmoki-primary-500"
+    >
+      <p>Thank you for signing up!</p>
+      <p>I've just sent <a href={url} set:html={name} /> to the email address you provided.</p>
+      <p>It should arrive in your inbox in the next minute or two.</p>
+      <p>
+        <b>Important:</b> If you don't see the email, please check your <em>spam</em> or <em
+          >Promotions</em
+        > folder, as it can sometimes end up there. If you need help, please contact me at <a
+          href={`mailto:${site.contact.email}`}>{site.contact.email}</a
+        >.
+      </p>
+      <section>
+        <h2>While you wait...</h2>
+        <p>You might also find these posts useful:</p>
+        <ul>
+          {
+            randomFeedPosts.map((post) => (
+              <li>
+                <a href={`/blog/${post.slug}/`} set:html={post.data.title} />
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </section>
+  </section>
+</BaseLayout>
+
+<script is:inline define:vars={{ resourceName: name, resourceUrl: url }}>
+  window.posthog?.capture("resource_download_confirmed", {
+    resource_name: resourceName,
+    resource_url: resourceUrl,
+  });
+</script>

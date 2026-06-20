@@ -1,0 +1,184 @@
+---
+import BrandLayout from "@/layouts/BrandLayout.astro";
+import { accents, neutrals } from "@/design-tokens.mjs";
+
+// Pull the real tokens straight from the shared design-tokens module so
+// this page can never drift from what Tailwind actually generates.
+const accentScales = accents as Record<string, Record<string, string>>;
+const neutralTokens = neutrals as Record<string, string>;
+
+// Human-readable metadata layered on top of the raw token values.
+const families = [
+  {
+    key: "zmoki-primary",
+    label: "Primary",
+    role: "Primary — links, nav, hero, CTA, ink (900)",
+    base: 500,
+  },
+  {
+    key: "zmoki-accent",
+    label: "Accent",
+    role: "Secondary accent — brand pages",
+    base: 500,
+  },
+  {
+    key: "zmoki-action",
+    label: "Action",
+    role: "Action buttons — form submit, copy",
+    base: 500,
+  },
+  {
+    key: "zmoki-external",
+    label: "External",
+    role: "External links, brand headers",
+    base: 500,
+  },
+  {
+    key: "zmoki-highlight",
+    label: "Highlight",
+    role: "Highlight — marker behind headings (404, callouts).",
+    base: 500,
+  },
+] as const;
+
+const neutralRoles = [
+  { key: "zmoki-bg", label: "Background", role: "Page background" },
+  { key: "zmoki-surface", label: "Surface", role: "Cards & panels" },
+  { key: "zmoki-ink", label: "Ink", role: "Primary text" },
+  { key: "zmoki-muted", label: "Muted", role: "Meta & secondary text" },
+];
+
+const swatchesFor = (key: string) =>
+  Object.entries(accentScales[key] ?? {})
+    .map(([shade, hex]) => ({ shade: Number(shade), hex }))
+    .sort((a, b) => a.shade - b.shade);
+---
+
+<BrandLayout title="Brand — Color" description="My Project X brand color palette and tokens">
+  <header
+    class="mb-8 rounded-xl border-2 border-zmoki-ink bg-zmoki-accent-500 px-6 py-10 text-zmoki-surface md:px-10"
+  >
+    <a href="/-/astro/brand/" class="font-mono text-xs uppercase tracking-normal opacity-80"
+      >← My Project X brand</a
+    >
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Color</h1>
+    <p class="mt-4 max-w-2xl text-xl md:text-2xl">
+      The starter palette is flat and <strong>monochrome</strong> — every token resolves to black, white,
+      or grey. Five accent families and four neutrals, all from tokens, no inline hex. The names persist
+      so you can give one family real hues to re-skin.
+    </p>
+  </header>
+
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Accents</h2>
+  <div class="space-y-6">
+    {
+      families.map((family) => {
+        const swatches = swatchesFor(family.key);
+        const base = accentScales[family.key]?.[String(family.base)];
+        return (
+          <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+            <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div class="flex items-center gap-4">
+                <span
+                  class="inline-block h-12 w-12 shrink-0 rounded-lg"
+                  style={`background-color: ${base}`}
+                />
+                <div>
+                  <h3 class="text-2xl font-semibold md:text-3xl">{family.label}</h3>
+                  <p class="font-mono text-xs uppercase tracking-normal opacity-60">{family.key}</p>
+                </div>
+              </div>
+              <p class="text-base opacity-80 md:max-w-sm md:text-right">{family.role}</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
+              {swatches.map(({ shade, hex }) => (
+                <div class="overflow-hidden rounded-lg border border-slate-200">
+                  <div class="h-20" style={`background-color: ${hex}`} />
+                  <div class="space-y-0.5 px-3 py-2 font-mono text-xs">
+                    <p
+                      class:list={["font-medium", shade === family.base && "text-zmoki-accent-600"]}
+                    >
+                      {shade}
+                      {shade === family.base && " ·base"}
+                    </p>
+                    <p class="uppercase tracking-normal opacity-60">{hex}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <!-- Neutrals -->
+  <h2 class="mb-4 mt-10 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Neutrals</h2>
+  <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      {
+        neutralRoles.map(({ key, label, role }) => (
+          <div class="overflow-hidden rounded-lg border border-slate-200">
+            <div class="h-20" style={`background-color: ${neutralTokens[key]}`} />
+            <div class="space-y-0.5 px-3 py-2">
+              <p class="text-sm font-semibold">{label}</p>
+              <p class="font-mono text-xs lowercase opacity-60">{key}</p>
+              <p class="font-mono text-xs uppercase tracking-normal opacity-60">
+                {neutralTokens[key]}
+              </p>
+              <p class="pt-1 text-xs opacity-70">{role}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+    <p class="mt-4 text-sm opacity-60">
+      Supporting greys (borders, dark panels, code blocks) use Tailwind <code class="font-mono"
+        >slate-*</code
+      > directly.
+    </p>
+  </section>
+
+  <!-- Usage in code -->
+  <section
+    class="mt-6 rounded-xl border-2 border-zmoki-ink bg-slate-700 p-6 text-zmoki-surface md:p-8"
+  >
+    <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
+    <p class="mb-4 opacity-90">
+      Reference tokens as Tailwind utilities. Reach for the <code
+        class="rounded bg-slate-900 px-1.5 py-0.5 font-mono text-base">-500</code
+      > base unless a panel needs more contrast.
+    </p>
+    <ul class="space-y-2 font-mono text-sm">
+      <li>
+        <span class="text-zmoki-primary-300">bg-zmoki-primary-500</span>
+        <span class="opacity-60">— hero, primary links, nav button, CTA</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-300">bg-zmoki-accent-500</span>
+        <span class="opacity-60">— brand-page accents</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-300">bg-zmoki-action-500</span>
+        <span class="opacity-60">— action buttons (form submit, copy)</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-300">text-zmoki-external-500</span>
+        <span class="opacity-60">— external links, brand headers</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-300">bg-zmoki-highlight-500</span>
+        <span class="opacity-60">— heading highlight / marker</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-300">border-2 border-zmoki-ink</span>
+        <span class="opacity-60">— hard borders on cards, nav, footer</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-300">bg-zmoki-surface</span>
+        <span class="opacity-60">— cards & panels (text-zmoki-ink / -muted)</span>
+      </li>
+    </ul>
+  </section>
+</BrandLayout>

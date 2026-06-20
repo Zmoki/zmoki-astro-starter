@@ -1,0 +1,355 @@
+---
+import BrandLayout from "@/layouts/BrandLayout.astro";
+import { accents, neutrals } from "@/design-tokens.mjs";
+
+// Pull real tokens so the link-treatment swatches can never drift from
+// what Tailwind actually generates (mirrors the Color page approach).
+const accentScales = accents as Record<string, Record<string, string>>;
+const neutralTokens = neutrals as Record<string, string>;
+
+// ---------------------------------------------------------------------------
+// Part 1 — Design typography (UI type scale)
+// Each step renders live with the exact utility classes used in the real
+// layouts/components, so the specimen is the source of truth.
+// ---------------------------------------------------------------------------
+const typeScale = [
+  {
+    label: "Hero",
+    classes: "text-4xl font-semibold xl:text-6xl",
+    sample: "My Project X",
+    usage: "Post titles (PostLayout h1)",
+  },
+  {
+    label: "Lede",
+    classes: "text-2xl xl:text-3xl",
+    sample: "Ideas, art, and research, kept in the open.",
+    usage: "Post descriptions (PostLayout)",
+  },
+  {
+    label: "Section heading",
+    classes: "text-3xl font-medium md:text-4xl",
+    sample: "What you get",
+    usage: "Landing sections & author bio (h2)",
+  },
+  {
+    label: "Card title",
+    classes: "text-2xl font-semibold leading-normal xl:text-3xl",
+    sample: "An example post",
+    usage: "PostCard (h3)",
+  },
+  {
+    label: "Body",
+    classes: "text-lg xl:text-xl",
+    sample: "The base reading size — Google Sans Flex, set tight.",
+    usage: "Global body (BaseLayout)",
+  },
+] as const;
+
+// Mono-set UI labels — small, uppercase, tracked normal.
+const monoLabels = [
+  {
+    label: "Eyebrow / meta",
+    classes: "font-mono text-xs uppercase tracking-normal",
+    sample: "20 Jun 2026",
+    usage: "Dates, eyebrows (PostCard, PostLayout)",
+  },
+  {
+    label: "Previous / Next",
+    classes: "font-mono text-sm uppercase tracking-normal",
+    sample: "Previous",
+    usage: "Post navigation (PostLayout)",
+  },
+  {
+    label: "Button text",
+    classes: "font-mono text-xs font-medium uppercase tracking-normal",
+    sample: "Copy",
+    usage: "Copy / action buttons",
+  },
+] as const;
+
+// Tracking & leading conventions — the analysis flagged drift between
+// tracking-tight / -tighter / -normal. This documents the intended rule.
+const trackingRules = [
+  {
+    token: "tracking-tight",
+    rule: "Default — headings, body, nav & footer labels",
+    where: "Global body, nav, footer",
+  },
+  {
+    token: "tracking-normal",
+    rule: "In-content mono labels — eyebrows, meta, buttons",
+    where: "Dates, Previous/Next, copy button",
+  },
+];
+
+const leadingRules = [
+  { token: "leading-tight", rule: "Body copy & headings", where: "Global body (BaseLayout)" },
+  { token: "leading-normal", rule: "Multi-line titles", where: "PostCard, prev/next titles" },
+];
+
+// ---------------------------------------------------------------------------
+// Part 2 — Prose typography (MDX .prose content)
+// Link treatments sourced from real tokens.
+// ---------------------------------------------------------------------------
+const linkTreatments = [
+  {
+    label: "Base link",
+    attr: "a",
+    color: accentScales["zmoki-primary"]["500"],
+    border: "dotted 4px",
+    token: "zmoki-primary-500",
+  },
+  {
+    label: "External",
+    attr: "[data-external]",
+    color: accentScales["zmoki-external"]["500"],
+    border: "dotted 4px",
+    token: "zmoki-external-500",
+  },
+  {
+    label: "Resource",
+    attr: "[data-resource]",
+    color: accentScales["zmoki-action"]["500"],
+    border: "dotted 4px",
+    token: "zmoki-action-500",
+  },
+  {
+    label: "Anchor",
+    attr: "[data-anchor]",
+    color: neutralTokens["zmoki-ink"],
+    border: "dashed 2px",
+    token: "zmoki-ink",
+  },
+];
+---
+
+<BrandLayout
+  title="Brand — Typography"
+  description="My Project X typography scale and prose styles"
+>
+  <header
+    class="mb-8 rounded-xl border-2 border-zmoki-ink bg-zmoki-primary-900 px-6 py-10 text-slate-50 md:px-10"
+  >
+    <a
+      href="/-/astro/brand/"
+      class="font-mono text-xs uppercase tracking-normal opacity-80 hover:opacity-100"
+      >← My Project X brand</a
+    >
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Typography</h1>
+    <p class="mt-4 max-w-2xl text-xl md:text-2xl">
+      Three faces: Space Grotesk for headings, Google Sans Flex for body, and Space Mono for labels
+      — plus a tuned <code class="font-mono">.prose</code> layer for written content. Every specimen below
+      renders with its real utility classes.
+    </p>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- Part 1 — Design typography                                            -->
+  <!-- ===================================================================== -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">
+    Part 1 · Design typography
+  </h2>
+
+  <!-- Font pairing -->
+  <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <p class="font-mono text-xs uppercase tracking-normal opacity-60">Headings · font-heading</p>
+      <p class="mt-2 font-heading text-5xl font-bold">Space Grotesk</p>
+      <p class="mt-3 text-lg opacity-80">All headings (h1–h6) and the wordmark. Weights 400–700.</p>
+      <p class="mt-4 font-heading text-2xl">AaBbCc 0123 — æ ß ç</p>
+    </section>
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <p class="font-mono text-xs uppercase tracking-normal opacity-60">Body · font-sans</p>
+      <p class="mt-2 text-5xl font-semibold">Google Sans Flex</p>
+      <p class="mt-3 text-lg opacity-80">Body copy and prose. Variable weight, 400–700.</p>
+      <p class="mt-4 font-sans text-2xl">AaBbCc 0123 — æ ß ç</p>
+    </section>
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <p class="font-mono text-xs uppercase tracking-normal opacity-60">Labels · font-mono</p>
+      <p class="mt-2 font-mono text-4xl font-bold">Space Mono</p>
+      <p class="mt-3 text-lg opacity-80">
+        Eyebrows, dates, nav, footer, buttons — always uppercase.
+      </p>
+      <p class="mt-4 font-mono text-2xl">AaBbCc 0123 — æ ß ç</p>
+    </section>
+  </div>
+
+  <!-- Type scale -->
+  <section class="mb-6 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <h3 class="mb-5 text-2xl font-semibold md:text-3xl">Type scale</h3>
+    <div class="divide-y divide-slate-200">
+      {
+        typeScale.map((step) => (
+          <div class="grid items-baseline gap-2 py-5 md:grid-cols-[10rem_1fr]">
+            <div>
+              <p class="font-medium">{step.label}</p>
+              <p class="mt-1 font-mono text-xs opacity-60">{step.usage}</p>
+            </div>
+            <div>
+              <p class={step.classes}>{step.sample}</p>
+              <p class="mt-2 font-mono text-xs lowercase opacity-50">{step.classes}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+
+    <h3 class="mb-5 mt-8 text-2xl font-semibold md:text-3xl">Mono labels</h3>
+    <div class="divide-y divide-slate-200">
+      {
+        monoLabels.map((step) => (
+          <div class="grid items-baseline gap-2 py-5 md:grid-cols-[10rem_1fr]">
+            <div>
+              <p class="font-medium">{step.label}</p>
+              <p class="mt-1 font-mono text-xs opacity-60">{step.usage}</p>
+            </div>
+            <div>
+              <p class={step.classes}>{step.sample}</p>
+              <p class="mt-2 font-mono text-xs lowercase opacity-50">{step.classes}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Tracking & leading -->
+  <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <h3 class="mb-4 text-2xl font-semibold">Tracking</h3>
+      <ul class="space-y-4">
+        {
+          trackingRules.map((r) => (
+            <li>
+              <code class="font-mono text-sm font-medium text-zmoki-primary-600">{r.token}</code>
+              <p class="text-base opacity-80">{r.rule}</p>
+              <p class="font-mono text-xs opacity-50">{r.where}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+    <section class="rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+      <h3 class="mb-4 text-2xl font-semibold">Leading</h3>
+      <ul class="space-y-4">
+        {
+          leadingRules.map((r) => (
+            <li>
+              <code class="font-mono text-sm font-medium text-zmoki-primary-600">{r.token}</code>
+              <p class="text-base opacity-80">{r.rule}</p>
+              <p class="font-mono text-xs opacity-50">{r.where}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- Part 2 — Prose typography                                             -->
+  <!-- ===================================================================== -->
+  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">
+    Part 2 · Prose typography
+  </h2>
+
+  <!-- Prose config -->
+  <section class="mb-6 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <h3 class="mb-4 text-2xl font-semibold md:text-3xl">.prose configuration</h3>
+    <p class="mb-4 opacity-80">
+      MDX content renders inside <code class="font-mono">prose prose-xl</code> (stepping up to
+      <code class="font-mono">2xl:prose-2xl</code>). Overrides live in
+      <code class="font-mono">tailwind.config.mjs</code> via <code class="font-mono"
+        >typography()</code
+      >.
+    </p>
+    <ul class="space-y-2 font-mono text-sm">
+      <li>
+        <span class="text-zmoki-primary-600">--tw-prose-headings</span>
+        <span class="opacity-60">→ zmoki-ink</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-600">--tw-prose-body</span>
+        <span class="opacity-60">→ zmoki-ink</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-600">--tw-prose-bold</span>
+        <span class="opacity-60">→ zmoki-ink</span>
+      </li>
+      <li>
+        <span class="text-zmoki-primary-600">prose-headings:font-semibold</span>
+        <span class="opacity-60">→ heading weight (PostLayout)</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Link treatments -->
+  <section class="mb-6 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+    <h3 class="mb-5 text-2xl font-semibold md:text-3xl">In-prose links</h3>
+    <p class="mb-5 opacity-80">
+      Link color is driven by data attributes added by the <code class="font-mono"
+        >rehypeExternalLinks</code
+      > plugin. Each renders with its real token.
+    </p>
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {
+        linkTreatments.map((link) => (
+          <div class="rounded-lg border border-slate-200 p-4">
+            <span
+              class="text-lg font-medium"
+              style={`color: ${link.color}; border-bottom: ${link.border} ${link.color};`}
+            >
+              {link.label}
+            </span>
+            <p class="mt-3 font-mono text-xs opacity-60">{link.attr}</p>
+            <p class="font-mono text-xs uppercase tracking-normal opacity-50">
+              {link.token} · {link.border}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Live prose specimen -->
+  <section class="mb-10">
+    <h3 class="mb-4 px-1 text-2xl font-semibold md:text-3xl">Live specimen</h3>
+    <div
+      class="prose prose-xl max-w-none rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 prose-headings:font-semibold md:p-12"
+    >
+      <h1>The shape of a sentence</h1>
+      <p>
+        Prose body is set in Google Sans Flex at <code>prose-xl</code>, with Space Grotesk headings
+        and <strong>ink-colored bold</strong>. This is a base <a href="/">internal link</a>, an
+        <a href="https://example.com" data-external="true">external link</a>, a
+        <a href="/resources/" data-resource="true">resource link</a>, and an
+        <a href="#lists" data-anchor="true">anchor link</a>.
+      </p>
+      <h2 id="lists">Lists</h2>
+      <ul>
+        <li>Unordered items use the prose default marker.</li>
+        <li>Inline <code>code</code> picks up the mono face.</li>
+      </ul>
+      <ol>
+        <li>Ordered items count up.</li>
+        <li>Then carry on.</li>
+      </ol>
+      <blockquote>
+        <p>A blockquote sets quoted material apart with a left rule and italic body.</p>
+      </blockquote>
+      <h2>Definition list</h2>
+      <dl>
+        <dt>Design token</dt>
+        <dd>A named value (like a color) defined once and reused everywhere.</dd>
+        <dt>Definition list</dt>
+        <dd>A term paired with its description, like this one.</dd>
+      </dl>
+      <h2>Code block</h2>
+      <p>
+        Fenced blocks are highlighted with Shiki (<code>catppuccin-latte</code>) and get a copy
+        button at build time. Hand-written here, they fall back to prose code styling:
+      </p>
+      <pre><code>const garden = ["posts", "resources", "now"];
+garden.forEach((bed) =&gt; tend(bed));</code></pre>
+    </div>
+  </section>
+</BrandLayout>

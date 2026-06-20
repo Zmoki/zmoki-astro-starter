@@ -1,0 +1,17 @@
+---
+import { execSync } from "child_process";
+
+const commit = execSync("git rev-parse --short HEAD").toString().trim();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Health</title>
+  </head>
+  <body>
+    <p>ok</p>
+    <p>{commit}</p>
+  </body>
+</html>

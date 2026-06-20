@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /cdn-cgi/
+Allow: /
+
+# Sitemap — update the domain to match site.config.ts / astro.config.mjs
+Sitemap: https://example.com/sitemap.xml

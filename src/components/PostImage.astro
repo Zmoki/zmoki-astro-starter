@@ -1,0 +1,43 @@
+---
+import { Image, getImage } from "astro:assets";
+import type { LocalImageProps } from "astro:assets";
+import { site } from "@/site.config";
+
+interface Props {
+  src: LocalImageProps["src"];
+  alt: string;
+}
+
+const { src, alt } = Astro.props;
+
+const licenseUrl = new URL("/terms#1-content-images--text", Astro.url).href;
+---
+
+<figure
+  class="!my-0 flex w-full flex-col items-center"
+  itemscope
+  itemtype="https://schema.org/ImageObject"
+>
+  <Image
+    src={src}
+    alt={alt}
+    width={1200}
+    height={800}
+    layout="constrained"
+    loading="lazy"
+    class="max-w-[min(600px,100%)] rounded-lg border-2 border-zmoki-ink"
+    itemprop="contentUrl"
+  />
+
+  <meta itemprop="license" content={licenseUrl} />
+  <meta itemprop="acquireLicensePage" content={licenseUrl} />
+  <meta itemprop="creditText" content={site.author.name} />
+  <meta itemprop="copyrightNotice" content="CC BY-NC 4.0" />
+
+  <span itemprop="creator" itemscope itemtype="https://schema.org/Person">
+    <meta itemprop="name" content={site.author.name} />
+  </span>
+  <figcaption class="!mt-0 max-w-[520px] text-center text-sm text-zmoki-muted">
+    <slot />
+  </figcaption>
+</figure>

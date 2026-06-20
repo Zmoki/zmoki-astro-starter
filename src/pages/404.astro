@@ -1,0 +1,18 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { site } from "@/site.config";
+---
+
+<BaseLayout title={`Page not found on ${site.name}`} description="Sorry, that page is not found.">
+  <section
+    class="flex flex-col gap-6 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 md:items-center md:p-16 md:text-center lg:p-20"
+  >
+    <h1 class="bg-zmoki-highlight-500 text-5xl font-semibold lg:text-6xl">Page not found (404)</h1>
+    <div class="xl:prose-3xl prose prose-2xl">
+      <p>Sorry, the page you are looking for doesn't exist or has been moved.</p>
+      <p>
+        <a href="/"> Go to homepage </a>
+      </p>
+    </div>
+  </section>
+</BaseLayout>
