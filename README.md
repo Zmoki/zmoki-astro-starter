@@ -13,14 +13,35 @@ An Astro starter for personal websites — posts, projects, and resources. Built
 - One config file (`src/site.config.ts`) for everything site-specific
 - CI (format, type check, lint, build) and Lighthouse CI
 
-## Quick start
+## Create a site from this template
+
+**With `npm create astro`** — scaffold the files into a new folder:
 
 ```bash
-npm install
-npm run dev          # http://localhost:4321
+npm create astro@latest my-new-site -- --template Zmoki/zmoki-website-starter
 ```
 
-Then follow **[SETUP.md](./SETUP.md)** to make it yours.
+(The `--` passes `--template` through to create-astro. It will offer to install dependencies and init git.)
+
+**With GitHub** — click **Use this template → Create a new repository** on the [repo page](https://github.com/Zmoki/zmoki-website-starter). Best when you want a hosted repo + remote from the start (e.g. to wire up Cloudflare Pages).
+
+**By cloning** — grab it and detach the history:
+
+```bash
+git clone https://github.com/Zmoki/zmoki-website-starter.git my-new-site
+cd my-new-site && rm -rf .git && git init
+```
+
+## Make it yours
+
+```bash
+cd my-new-site
+npm install
+cp .env.example .env   # optional: PostHog / Brevo keys
+npm run dev            # http://localhost:4321
+```
+
+Then follow **[SETUP.md](./SETUP.md)**: edit `src/site.config.ts` (name, domain, nav, hero, CTA), set the domain in `astro.config.mjs`, drop your content into `src/content/blog/`, and re-skin the palette in `src/design-tokens.mjs`.
 
 ## Scripts
 
