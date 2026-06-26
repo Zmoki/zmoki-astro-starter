@@ -1,19 +1,12 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
-import { accents, neutrals } from "@/design-tokens.mjs";
+import { colors } from "@/design-tokens.mjs";
 
-const accentScales = accents as Record<string, Record<string, string>>;
-const neutralTokens = neutrals as Record<string, string>;
+const neutral = colors["zmoki-neutral"] as Record<string, string>;
 
-// A light→dark monochrome ramp for the hero strip — surface, highlight, muted,
-// accent, ink — so it reads as an intentional greyscale, not four black bars.
-const palettePreview = [
-  neutralTokens["zmoki-surface"],
-  accentScales["zmoki-highlight"]["500"],
-  neutralTokens["zmoki-muted"],
-  accentScales["zmoki-accent"]["500"],
-  neutralTokens["zmoki-ink"],
-];
+// A light→dark monochrome ramp for the hero strip — white through the neutral
+// scale to near-black — so it reads as an intentional greyscale.
+const palettePreview = ["#ffffff", neutral["200"], neutral["400"], neutral["600"], neutral["900"]];
 
 // Sections of the design system. `href` null = not built yet.
 const sections = [
@@ -21,31 +14,31 @@ const sections = [
     title: "Color",
     summary: "A flat, monochrome token system — black, white, and grey.",
     href: "/-/astro/brand/color/",
-    accent: "bg-zmoki-ink",
+    accent: "bg-zmoki-neutral-900",
   },
   {
     title: "Typography",
     summary: "Space Grotesk headings, Google Sans Flex body, Space Mono labels.",
     href: "/-/astro/brand/typography/",
-    accent: "bg-zmoki-ink",
+    accent: "bg-zmoki-neutral-900",
   },
   {
     title: "Forms",
     summary: "Inputs, labels, the action button, focus and error states.",
     href: "/-/astro/brand/forms/",
-    accent: "bg-zmoki-ink",
+    accent: "bg-zmoki-neutral-900",
   },
   {
     title: "Components",
     summary: "Nav, footer, hero, cards, links, and buttons as reusable blocks.",
     href: "/-/astro/brand/components/",
-    accent: "bg-zmoki-ink",
+    accent: "bg-zmoki-neutral-900",
   },
   {
     title: "Voice & tone",
     summary: "How My Project X sounds. Clear, honest, helpful, human.",
     href: "/-/astro/brand/voice/",
-    accent: "bg-zmoki-ink",
+    accent: "bg-zmoki-neutral-900",
   },
 ];
 ---
@@ -55,7 +48,7 @@ const sections = [
   description="The brand and design system guideline for My Project X"
 >
   <header
-    class="mb-8 overflow-hidden rounded-xl border-2 border-zmoki-ink bg-zmoki-primary-900 text-slate-50"
+    class="mb-8 overflow-hidden rounded-xl border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 text-slate-50"
   >
     <div class="px-6 py-10 md:px-10 md:py-14">
       <p class="font-mono text-xs uppercase tracking-normal opacity-70">My Project X</p>
@@ -76,7 +69,7 @@ const sections = [
         section.href ? (
           <a
             href={section.href}
-            class="group flex flex-col gap-3 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 transition-transform hover:-translate-y-1 md:p-8"
+            class="group flex flex-col gap-3 rounded-xl border-2 border-zmoki-neutral-900 bg-white p-6 transition-transform hover:-translate-y-1 md:p-8"
           >
             <span class={`h-2 w-12 rounded-full ${section.accent}`} />
             <h2 class="text-2xl font-semibold md:text-3xl">
@@ -86,7 +79,7 @@ const sections = [
             <span class="mt-2 font-mono text-xs uppercase tracking-normal opacity-60">View →</span>
           </a>
         ) : (
-          <div class="flex flex-col gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-zmoki-surface/50 p-6 md:p-8">
+          <div class="flex flex-col gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-white/50 p-6 md:p-8">
             <span class={`h-2 w-12 rounded-full opacity-30 ${section.accent}`} />
             <h2 class="text-2xl font-semibold opacity-50 md:text-3xl">{section.title}</h2>
             <p class="opacity-50">{section.summary}</p>

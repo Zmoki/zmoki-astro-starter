@@ -224,45 +224,49 @@ Exist but follow the same `BaseLayout` wrapper pattern.
 
 ### `BrandLayout.astro`
 
-Standalone layout for the internal brand pages under `/-/astro/brand/`. Like `BaseLayout` but **without** the sidebars/header/footer chrome — a single-column canvas. Sets `noindex`, loads the same fonts, uses `bg-zmoki-bg` / `text-zmoki-ink`. Props: `title`, `description?`.
+Standalone layout for the internal brand pages under `/-/astro/brand/`. Like `BaseLayout` but **without** the sidebars/header/footer chrome — a single-column canvas. Sets `noindex`, loads the same fonts, uses `bg-zmoki-neutral-200` / `text-zmoki-neutral-900`. Props: `title`, `description?`.
 
 ---
 
 ## Color system
 
-All colors are tokens defined in **`src/design-tokens.mjs`** — the single source of truth, imported by both `tailwind.config.mjs` (to generate utilities) and the brand reference page. Templates use `zmoki-*` utility classes only; **no inline hex**. Live reference: `/-/astro/brand/color/`.
+All colors come from **`src/design-tokens.mjs`** — the single source of truth, imported by both `tailwind.config.mjs` (to generate utilities) and the brand reference page. It re-exports Tailwind's default color palettes under the **`zmoki-`** prefix, so every group is a namespaced full 50→950 scale: `zmoki-slate`, `zmoki-gray`, `zmoki-zinc`, `zmoki-neutral`, `zmoki-stone`, plus the chromatic ramps (`zmoki-red`, `zmoki-orange`, … `zmoki-rose`). Templates use these `zmoki-*` utility classes; **no inline hex**. Live reference: `/-/astro/brand/color/`.
 
-The starter palette is flat and **monochrome** (brutalist) — every token resolves to black, white, or grey. Token names are **semantic roles**, not colors, so they survive a re-skin: to introduce real color, give one family hues in `src/design-tokens.mjs`.
+The starter palette is flat and **monochrome** (brutalist): templates reach for **`zmoki-neutral`** (and Tailwind's built-in `white` / `slate-*`) only — every chromatic group is generated and available, but unused until you want color.
 
-### Accent families (`zmoki-*`) — semantic roles, all ink in the starter
+### Conventions (monochrome starter)
 
-| Token             | Base    | Role                                                        |
-| ----------------- | ------- | ----------------------------------------------------------- |
-| `zmoki-primary`   | #111111 | Links, nav button, hero, CTA. Full 200–950 scale; 900 = ink |
-| `zmoki-accent`    | #3a3a3a | Secondary accent — brand-page headers                       |
-| `zmoki-action`    | #111111 | Action buttons — form submit, copy                          |
-| `zmoki-external`  | #111111 | External / outbound links, brand headers                    |
-| `zmoki-highlight` | #d4d4d4 | Highlight — marker behind headings (404, callouts)          |
+| Usage                      | Class                                                                   |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Ink — text, borders, fills | `zmoki-neutral-900` (links, nav button, hero, CTA, action/copy buttons) |
+| Darkest fill / hover       | `zmoki-neutral-950`                                                     |
+| Meta / secondary text      | `zmoki-neutral-600`                                                     |
+| Page background            | `zmoki-neutral-200`                                                     |
+| Cards & panels             | `white` + `border-2 border-zmoki-neutral-900`                           |
+| Marker / highlight         | `zmoki-neutral-300`                                                     |
+| Inverse text on ink fills  | `text-white` / `text-slate-50`                                          |
 
-### Neutrals (single-value tokens)
+To introduce real color, swap a role to a chromatic group (e.g. `bg-zmoki-red-600`, `text-zmoki-blue-600`) — the utilities already exist.
 
-| Token           | Hex     | Role                                          |
-| --------------- | ------- | --------------------------------------------- |
-| `zmoki-bg`      | #ececec | Page background (light grey)                  |
-| `zmoki-surface` | #ffffff | Cards & panels (white, defined by borders)    |
-| `zmoki-ink`     | #111111 | Primary text & borders (mirrors -primary-900) |
-| `zmoki-muted`   | #555555 | Meta / secondary text                         |
+### Changing the palette (re-skin)
 
-Flat + brutalist is enforced globally in `tailwind.config.mjs`: the `borderRadius` and `boxShadow` scales are overridden to `0` / `none`, so every `rounded-*` is sharp and every `shadow-*` is flat. Cards/panels are defined by `border-2 border-zmoki-ink` instead of shadows. Supporting greys use Tailwind `slate-*` directly (borders, code-block bg, inverse `slate-50` text on ink fills).
+When the user wants to shift the site to a different color (e.g. "make it red/green"), there are two paths — pick based on whether the target color is a Tailwind default:
+
+1. **Built-in Tailwind color** — no token edits needed; every group is already generated. To recolor the whole site, find/replace `zmoki-neutral` → the new group (e.g. `zmoki-blue`) across `src/`. To color only accents, change it just on the relevant elements (links, nav button, hero, CTA, action buttons). Confirm scope with the user before a blanket find/replace.
+2. **Custom brand color** (not in Tailwind's defaults) — define a full `50`→`950` scale in `customPalettes` inside **`src/design-tokens.mjs`** (a commented `zmoki-brand` example is in place). Build the scale from the user's base color on **colorhexa.com** (the user's preferred tool): enter the base hex as `500`, then use the **"Shades and Tints"** section — lighter tints fill `400 300 200 100 50`, darker shades fill `600 700 800 900 950`. Pick by eye for even, Tailwind-like spacing. The new scale auto-generates `zmoki-<name>-*` utilities and auto-appears on `/-/astro/brand/color/` (via the `customPaletteNames` export). Then point the relevant templates at it.
+
+After any palette change, run `npm run build` and check `/-/astro/brand/color/`.
+
+Flat + brutalist is enforced globally in `tailwind.config.mjs`: the `borderRadius` and `boxShadow` scales are overridden to `0` / `none`, so every `rounded-*` is sharp and every `shadow-*` is flat. Cards/panels are defined by `border-2 border-zmoki-neutral-900` instead of shadows. Supporting greys also use Tailwind `slate-*` directly (input borders, code-block bg). `tailwind.config.mjs` defines a single `ink = twColors.neutral[900]` constant for the prose/link CSS that can't reference a utility class.
 
 ### Prose typography overrides
 
-Set in `tailwind.config.mjs`, referencing the design tokens:
+Set in `tailwind.config.mjs`, all using the `ink` (= `zmoki-neutral-900`) constant:
 
-- Headings (Space Grotesk), body/bold: `zmoki-ink`
-- Links: `zmoki-ink` (monochrome), dotted bottom border 4px; hover inverts to a solid ink box with white text
-- `[data-external]` and `[data-resource]` links: also `zmoki-ink` (distinguished by border, not color)
-- `[data-anchor]` links: `zmoki-ink`, dashed bottom border 2px
+- Headings (Space Grotesk), body/bold: ink
+- Links: ink (monochrome), dotted bottom border 4px; hover inverts to a solid ink box with white text
+- `[data-external]` and `[data-resource]` links: also ink (distinguished by border, not color)
+- `[data-anchor]` links: ink, dashed bottom border 2px
 
 ---
 

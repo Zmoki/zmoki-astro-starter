@@ -13,7 +13,7 @@ const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
   id="brevo-form"
   method="POST"
   action={`https://${import.meta.env.PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/${brevoFormId}`}
-  class="flex flex-col gap-4 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
+  class="flex flex-col gap-4 rounded-xl border-2 border-zmoki-neutral-900 bg-white px-4 py-8 md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
 >
   <section class="prose prose-lg !leading-tight xl:prose-2xl prose-headings:font-semibold md:w-1/2">
     <slot />
@@ -47,16 +47,16 @@ const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
         id="consent"
         name="consent"
         required
-        class="mt-1 h-4 w-4 rounded border-slate-400 focus:ring-zmoki-primary-500"
+        class="mt-1 h-4 w-4 rounded border-slate-400 focus:ring-zmoki-neutral-900"
       />
       <label for="consent" class="font-mono text-xs">
         By checking this box, I acknowledge that I have read, understood, and agree to the <a
           href="/legal/terms/"
-          class="border-b-2 border-dotted border-current text-zmoki-muted"
+          class="border-b-2 border-dotted border-current text-zmoki-neutral-600"
           target="_blank">Terms of Service</a
         > and <a
           href="/legal/privacy/"
-          class="border-b-2 border-dotted border-current text-zmoki-muted"
+          class="border-b-2 border-dotted border-current text-zmoki-neutral-600"
           target="_blank">Privacy Policy</a
         >.
       </label>
@@ -65,7 +65,7 @@ const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
     <!-- Submit button -->
     <button
       type="submit"
-      class="rounded-sm bg-zmoki-action-500 px-4 py-2 font-mono font-medium uppercase tracking-normal text-white hover:bg-zmoki-action-500/80"
+      class="rounded-sm bg-zmoki-neutral-900 px-4 py-2 font-mono font-medium uppercase tracking-normal text-white hover:bg-zmoki-neutral-900/80"
       set:html={buttonText}
     />
 

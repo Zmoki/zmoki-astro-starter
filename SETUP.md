@@ -27,7 +27,15 @@ Then set the domain in two more places:
 
 ## 2. Palette
 
-The starter ships a neutral palette. Re-skin by editing the hex values in **`src/design-tokens.mjs`** (keep the token names). Preview at `/-/astro/brand/color/`. The favicon at `public/favicon.svg` uses the same colors — swap it for your own.
+The starter is **monochrome** — templates use `zmoki-neutral` (Tailwind's grey). All of Tailwind's palettes are generated under the `zmoki-` prefix (`zmoki-red`, `zmoki-blue`, …), so to re-skin you have two options:
+
+- **Use a built-in Tailwind color** — no token edits. Find/replace `zmoki-neutral` → e.g. `zmoki-blue` across `src/` to recolor the whole site, or change it only on the elements you want colored (links, nav button, CTA).
+- **Use a custom brand color** (not in Tailwind) — build a full `50`→`950` scale and add it to **`src/design-tokens.mjs`**:
+  1. Pick your base color. On [colorhexa.com](https://www.colorhexa.com/), enter its hex — that's your `500`.
+  2. In the **"Shades and Tints"** section, read off the ramp: the lighter **tints** (toward white) become `400 300 200 100 50`, your base is `500`, and the darker **shades** (toward black) become `600 700 800 900 950`. Pick by eye for even spacing.
+  3. Add the scale to `customPalettes` in `design-tokens.mjs` (there's a commented example). It becomes a `zmoki-<name>-*` utility and shows on the reference page.
+
+Preview everything at `/-/astro/brand/color/`. The favicon at `public/favicon.svg` uses the same colors — swap it for your own.
 
 ## 3. Content
 

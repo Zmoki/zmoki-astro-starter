@@ -5,7 +5,7 @@ const { data, slug } = Astro.props as CollectionEntry<"blog">;
 const { title, description, contentModifiedDate } = data;
 ---
 
-<article class="overflow-hidden rounded-lg border-2 border-zmoki-ink bg-zmoki-surface">
+<article class="overflow-hidden rounded-lg border-2 border-zmoki-neutral-900 bg-white">
   <a href={`/blog/${slug}/`} class="flex h-full w-full flex-col gap-2 p-6 text-xl md:p-8">
     <h3 class="pb-2 text-2xl font-semibold leading-normal xl:text-3xl">
       <span set:html={title} class="border-b-4 border-dotted border-current" />
