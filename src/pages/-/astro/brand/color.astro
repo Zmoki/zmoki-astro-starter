@@ -161,5 +161,17 @@ const families = (names: string[]) =>
       > in <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">src/design-tokens.mjs</code>,
       and it appears here automatically.
     </p>
+    <p class="mt-4 text-sm opacity-80">
+      <strong>Combinations must pass WCAG AA</strong> — every text/background pair needs ≥ 4.5:1 (≥ 3:1
+      for large text, borders, and focus rings). Fills carrying white text (CTA, buttons, hero) usually
+      need a <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">-600</code>/<code
+        class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">-700</code
+      > shade to qualify. Check pairs with the
+      <a
+        href="https://www.figma.com/color-contrast-checker/"
+        data-external="true"
+        class="font-medium underline">Figma contrast checker</a
+      >.
+    </p>
   </section>
 </BrandLayout>

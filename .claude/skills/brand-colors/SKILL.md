@@ -43,9 +43,34 @@ const brand = { 50: "#…", 100: "#…", /* … */ 950: "#…" };
 const customPalettes = { "zmoki-brand": brand };
 ```
 
-It auto-generates `zmoki-brand-*` utilities and auto-appears on `/-/astro/brand/color/` (via the `customPaletteNames` export). Use `zmoki-brand` as the target group in Step 3.
+It auto-generates `zmoki-brand-*` utilities and auto-appears on `/-/astro/brand/color/` (via the `customPaletteNames` export). Use `zmoki-brand` as the target group in Step 4.
 
-## Step 3 — Apply
+## Step 3 — Check combinations (WCAG AA)
+
+Before committing to shades, make sure every text/background pair the palette produces meets **at least WCAG AA**. Verify each pair with Figma's checker: **<https://www.figma.com/color-contrast-checker/>** (paste the two hex values from `src/design-tokens.mjs` / `/-/astro/brand/color/`).
+
+Thresholds:
+
+- **Normal text** — contrast ratio **≥ 4.5:1**
+- **Large text** (≥ 24px, or ≥ 18.66px bold) and **UI / graphical elements** (borders, icons, focus rings) — **≥ 3:1**
+
+Pairs to check on every re-skin (`<target>` = the chosen group):
+
+| Foreground                                      | Background                                       | Min   |
+| ----------------------------------------------- | ------------------------------------------------ | ----- |
+| Ink text (`<target>-900` / `zmoki-neutral-900`) | page bg `zmoki-neutral-200`, cards `white`       | 4.5:1 |
+| Muted text `zmoki-neutral-600`                  | `white` / page bg                                | 4.5:1 |
+| Inverse text `white` / `slate-50`               | colored fills — nav CTA, hero, CTA band, buttons | 4.5:1 |
+| Hard borders / focus ring (`-900`)              | `white` / page bg                                | 3:1   |
+
+Rules:
+
+- A fill that carries **white text** (buttons, CTA, hero) must be dark enough to pass — usually `-600` / `-700`. The mid/light shades of bright hues (yellow, lime, amber, cyan, sky, …) **fail** white-on-fill AA: either go darker, or flip to **dark text on a light fill**.
+- If a pair fails AA, **fix the shade — don't ship it**. Prefer adjusting the shade over weakening the rule.
+- For custom (colorhexa) scales, check the specific shades you actually use, not just `-500`.
+- Note any pair that lands close to the threshold in the commit/PR.
+
+## Step 4 — Apply
 
 Let `<target>` be the chosen group (`zmoki-blue`, `zmoki-brand`, …).
 
@@ -65,9 +90,9 @@ Let `<target>` be the chosen group (`zmoki-blue`, `zmoki-brand`, …).
 
   Change `zmoki-neutral-900` → `<target>-600` (or the shade that reads well) on those elements only. **Confirm the exact element list with the user** — "accents" is subjective.
 
-Keep the inverse text on colored fills readable: `text-white` / `text-slate-50` on dark shades.
+Keep the inverse text on colored fills readable: `text-white` / `text-slate-50` on dark shades — and confirm each fill still passes the Step 3 contrast check at the shade you land on.
 
-## Step 4 — Verify
+## Step 5 — Verify
 
 ```bash
 npm run format      # Tailwind class order is plugin-enforced — always format
@@ -75,7 +100,7 @@ npm run check       # 0 errors
 npm run build       # must pass
 ```
 
-Then open `/-/astro/brand/color/` (via `/run`) and eyeball the palette and a couple of real pages (`/`, a blog post). Sanity-check the generated CSS if unsure:
+Then open `/-/astro/brand/color/` (via `/run`) and eyeball the palette and a couple of real pages (`/`, a blog post). Re-confirm the Step 3 contrast pairs at the shades you shipped — at minimum ink-on-bg and white-on-CTA. Sanity-check the generated CSS if unsure:
 
 ```bash
 grep -oE "\.bg-<target>-600\{[^}]*\}" dist/_astro/*.css | head -1
@@ -83,5 +108,5 @@ grep -oE "\.bg-<target>-600\{[^}]*\}" dist/_astro/*.css | head -1
 
 ## Notes
 
-- The full re-skin rules also live in `AGENTS.md` ("Changing the palette") and `SETUP.md` ("Palette") — keep all three in sync if the workflow changes.
+- The full re-skin rules — including the WCAG AA combinations — also live in `AGENTS.md` ("Changing the palette") and `SETUP.md` ("Palette") — keep all in sync if the workflow changes.
 - Don't reintroduce semantic role tokens (`zmoki-primary`, `-accent`, …) — the system is intentionally palette-group-based, not role-based.
