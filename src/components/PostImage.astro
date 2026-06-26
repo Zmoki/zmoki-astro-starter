@@ -25,7 +25,7 @@ const licenseUrl = new URL("/terms#1-content-images--text", Astro.url).href;
     height={800}
     layout="constrained"
     loading="lazy"
-    class="max-w-[min(600px,100%)] rounded-lg border-2 border-zmoki-ink"
+    class="max-w-[min(600px,100%)] rounded-lg border-2 border-zmoki-neutral-900"
     itemprop="contentUrl"
   />
 
@@ -37,7 +37,7 @@ const licenseUrl = new URL("/terms#1-content-images--text", Astro.url).href;
   <span itemprop="creator" itemscope itemtype="https://schema.org/Person">
     <meta itemprop="name" content={site.author.name} />
   </span>
-  <figcaption class="!mt-0 max-w-[520px] text-center text-sm text-zmoki-muted">
+  <figcaption class="!mt-0 max-w-[520px] text-center text-sm text-zmoki-neutral-600">
     <slot />
   </figcaption>
 </figure>

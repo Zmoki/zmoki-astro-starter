@@ -1,8 +1,13 @@
 import { colors as brandColors } from "./src/design-tokens.mjs";
+import twColors from "tailwindcss/colors";
 import plugin from "tailwindcss/plugin";
 
 // Headings (h1–h6 + wordmark) are set in the serif family.
 const headingFontStack = "'Noto Serif', Georgia, serif";
+
+// The monochrome ink used for text, borders, fills, and prose. Sourced from
+// the Tailwind neutral palette (also available as `zmoki-neutral-900`).
+const ink = twColors.neutral[900];
 
 /** @type {import('tailwindcss').Config} */
 export default {
@@ -21,12 +26,12 @@ export default {
     "uppercase",
     "tracking-normal",
     "rounded-sm",
-    "bg-zmoki-action-500",
+    "bg-zmoki-neutral-900",
     "text-white",
-    "hover:bg-zmoki-action-500/80",
+    "hover:bg-zmoki-neutral-900/80",
     "focus:outline-none",
     "focus:ring-2",
-    "focus:ring-zmoki-primary-500",
+    "focus:ring-zmoki-neutral-900",
     "focus:ring-offset-2",
     "transition-colors",
     "duration-200",
@@ -60,10 +65,10 @@ export default {
       typography: () => ({
         DEFAULT: {
           css: {
-            "--tw-prose-headings": brandColors["zmoki-ink"],
-            "--tw-prose-body": brandColors["zmoki-ink"],
-            "--tw-prose-bold": brandColors["zmoki-ink"],
-            "--tw-prose-links": brandColors["zmoki-ink"],
+            "--tw-prose-headings": ink,
+            "--tw-prose-body": ink,
+            "--tw-prose-bold": ink,
+            "--tw-prose-links": ink,
             "h1, h2, h3, h4, h5, h6": {
               fontFamily: headingFontStack,
             },
@@ -74,13 +79,13 @@ export default {
               "border-style": "dotted",
             },
             "[data-external]": {
-              color: brandColors["zmoki-ink"],
+              color: ink,
             },
             "[data-resource]": {
-              color: brandColors["zmoki-ink"],
+              color: ink,
             },
             "[data-anchor]": {
-              color: brandColors["zmoki-ink"],
+              color: ink,
               "border-style": "dashed",
               "border-bottom-width": "2px",
             },
@@ -115,10 +120,10 @@ export default {
           transition: "all 200ms",
         },
         "a:hover": {
-          backgroundColor: brandColors["zmoki-primary"][500],
+          backgroundColor: ink,
           color: "#fff",
           outlineStyle: "solid",
-          outlineColor: brandColors["zmoki-primary"][500],
+          outlineColor: ink,
         },
       });
     }),

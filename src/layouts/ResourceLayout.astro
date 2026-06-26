@@ -30,7 +30,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   <article class="space-y-4">
     <!-- Post Header -->
     <header
-      class="flex flex-col gap-6 rounded-xl bg-zmoki-surface px-4 py-8 outline-dashed outline-8 -outline-offset-2 outline-zmoki-action-500 md:items-center md:p-16 md:text-center lg:p-20 lg:pb-16"
+      class="flex flex-col gap-6 rounded-xl bg-white px-4 py-8 outline-dashed outline-8 -outline-offset-2 outline-zmoki-neutral-900 md:items-center md:p-16 md:text-center lg:p-20 lg:pb-16"
     >
       <h1 class="text-5xl font-semibold xl:text-6xl" set:html={title} />
       {description && <p class="text-2xl xl:text-3xl" set:html={description} />}
@@ -52,7 +52,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
     <div class="flex flex-col gap-4">
       <!-- Post Content -->
       <div
-        class="prose prose-xl max-w-none rounded-xl border-2 border-zmoki-ink bg-zmoki-surface px-4 py-8 xl:prose-2xl prose-headings:font-semibold md:p-16 xl:px-32 xl:py-16 [&_a]:text-zmoki-primary-500"
+        class="prose prose-xl max-w-none rounded-xl border-2 border-zmoki-neutral-900 bg-white px-4 py-8 xl:prose-2xl prose-headings:font-semibold md:p-16 xl:px-32 xl:py-16 [&_a]:text-zmoki-neutral-900"
       >
         <slot />
       </div>

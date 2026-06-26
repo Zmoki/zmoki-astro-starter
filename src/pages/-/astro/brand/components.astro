@@ -12,7 +12,7 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
   description="My Project X reusable components: cards, links, buttons, panels, and meta labels"
 >
   <header
-    class="mb-8 rounded-xl border-2 border-zmoki-ink bg-zmoki-action-500 px-6 py-10 text-slate-50 md:px-10"
+    class="mb-8 rounded-xl border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-6 py-10 text-slate-50 md:px-10"
   >
     <a href="/-/astro/brand/" class="font-mono text-xs uppercase tracking-normal opacity-70"
       >← My Project X brand</a
@@ -26,21 +26,21 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Cards / panels -->
   <h2 class={sectionLabel}>Cards &amp; panels</h2>
-  <section class="mb-10 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+  <section class="mb-10 rounded-xl border-2 border-zmoki-neutral-900 bg-white p-6 md:p-8">
     <p class="mb-6 max-w-2xl opacity-80">
       The base surface for everything:
-      <code class="font-mono text-base">border-2 border-zmoki-ink</code> +
-      <code class="font-mono text-base">bg-zmoki-surface</code>. Corners are flat globally, so a
-      card is defined by its hard border, not a shadow. Compose them into a
+      <code class="font-mono text-base">border-2 border-zmoki-neutral-900</code> +
+      <code class="font-mono text-base">bg-white</code>. Corners are flat globally, so a card is
+      defined by its hard border, not a shadow. Compose them into a
       <code class="font-mono text-base">grid</code> + <code class="font-mono text-base">gap-4</code
       >.
     </p>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div class="border-2 border-zmoki-ink bg-zmoki-surface p-6">
+      <div class="border-2 border-zmoki-neutral-900 bg-white p-6">
         <h3 class="text-xl font-semibold">Card</h3>
         <p class="mt-2 text-base opacity-80">Single panel of content on the page background.</p>
       </div>
-      <div class="border-2 border-zmoki-ink bg-zmoki-surface p-6 sm:col-span-2">
+      <div class="border-2 border-zmoki-neutral-900 bg-white p-6 sm:col-span-2">
         <h3 class="text-xl font-semibold">Wide card</h3>
         <p class="mt-2 text-base opacity-80">
           Spans two columns — just cards of different
@@ -49,12 +49,12 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
       </div>
     </div>
     <pre
-      class="mt-6 overflow-x-auto bg-slate-900 p-4 font-mono text-xs text-slate-50"><code>&lt;div class="border-2 border-zmoki-ink bg-zmoki-surface p-6"&gt;…&lt;/div&gt;</code></pre>
+      class="mt-6 overflow-x-auto bg-slate-900 p-4 font-mono text-xs text-slate-50"><code>&lt;div class="border-2 border-zmoki-neutral-900 bg-white p-6"&gt;…&lt;/div&gt;</code></pre>
   </section>
 
   <!-- Links -->
   <h2 class={sectionLabel}>Links</h2>
-  <section class="mb-10 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+  <section class="mb-10 rounded-xl border-2 border-zmoki-neutral-900 bg-white p-6 md:p-8">
     <p class="mb-6 max-w-2xl opacity-80">
       Monochrome: every link is ink. Destination is signalled by the bottom border (dotted vs
       dashed) rather than color, and hover inverts to a solid black box with white text. In prose,
@@ -64,7 +64,7 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
     </p>
     <ul class="space-y-4 text-xl">
       <li>
-        <a href="#" class="border-b-4 border-dotted border-current text-zmoki-primary-500"
+        <a href="#" class="border-b-4 border-dotted border-current text-zmoki-neutral-900"
           >Internal link</a
         >
         <span class="ml-3 font-mono text-sm uppercase tracking-normal opacity-60"
@@ -72,7 +72,7 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
         >
       </li>
       <li>
-        <a href="#" class="border-b-4 border-dotted border-current text-zmoki-external-500"
+        <a href="#" class="border-b-4 border-dotted border-current text-zmoki-neutral-900"
           >External link</a
         >
         <span class="ml-3 font-mono text-sm uppercase tracking-normal opacity-60"
@@ -80,7 +80,7 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
         >
       </li>
       <li>
-        <a href="#" class="border-b-4 border-dotted border-current text-zmoki-action-500"
+        <a href="#" class="border-b-4 border-dotted border-current text-zmoki-neutral-900"
           >Resource link</a
         >
         <span class="ml-3 font-mono text-sm uppercase tracking-normal opacity-60"
@@ -88,7 +88,9 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
         >
       </li>
       <li>
-        <a href="#" class="border-b-2 border-dashed border-current text-zmoki-ink">Anchor link</a>
+        <a href="#" class="border-b-2 border-dashed border-current text-zmoki-neutral-900"
+          >Anchor link</a
+        >
         <span class="ml-3 font-mono text-sm uppercase tracking-normal opacity-60"
           >[data-anchor] · dashed 2px</span
         >
@@ -98,52 +100,54 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Buttons -->
   <h2 class={sectionLabel}>Buttons</h2>
-  <section class="mb-10 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+  <section class="mb-10 rounded-xl border-2 border-zmoki-neutral-900 bg-white p-6 md:p-8">
     <p class="mb-6 max-w-2xl opacity-80">
       Square, hard-bordered, solid ink fill with a white mono uppercase label. The nav/hero CTA uses
-      <code class="font-mono text-base">bg-zmoki-primary-500</code>; the form submit and code-block
-      copy button use <code class="font-mono text-base">bg-zmoki-action-500</code> (both ink in the monochrome
+      <code class="font-mono text-base">bg-zmoki-neutral-900</code>; the form submit and code-block
+      copy button use <code class="font-mono text-base">bg-zmoki-neutral-900</code> (both ink in the monochrome
       palette).
     </p>
     <div class="flex flex-wrap items-center gap-4">
       <button
         type="button"
-        class="border-2 border-zmoki-ink bg-zmoki-action-500 px-4 py-2 font-mono font-bold uppercase tracking-tight text-white"
+        class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono font-bold uppercase tracking-tight text-white"
         >Subscribe</button
       >
       <button
         type="button"
-        class="border-2 border-zmoki-ink bg-zmoki-action-500 px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-tight text-white"
+        class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-tight text-white"
         >Copy</button
       >
     </div>
     <pre
-      class="mt-6 overflow-x-auto bg-slate-900 p-4 font-mono text-xs text-slate-50"><code>class="border-2 border-zmoki-ink bg-zmoki-action-500 px-4 py-2 font-mono font-bold uppercase text-white"</code></pre>
+      class="mt-6 overflow-x-auto bg-slate-900 p-4 font-mono text-xs text-slate-50"><code>class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono font-bold uppercase text-white"</code></pre>
   </section>
 
   <!-- Navigation & footer -->
   <h2 class={sectionLabel}>Navigation &amp; footer</h2>
-  <section class="mb-10 border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+  <section class="mb-10 border-2 border-zmoki-neutral-900 bg-white p-6 md:p-8">
     <p class="mb-6 max-w-2xl opacity-80">
       The top nav and footer wrap every page (BaseLayout). Hard rules top and bottom (<code
-        class="font-mono text-base">border-b-2 / border-t-2 border-zmoki-ink</code
-      >), a Space&nbsp;Grotesk wordmark, mono uppercase links, and a bordered CTA button.
+        class="font-mono text-base">border-b-2 / border-t-2 border-zmoki-neutral-900</code
+      >), a Noto&nbsp;Serif wordmark, mono uppercase links, and a bordered CTA button.
     </p>
-    <div class="border-2 border-zmoki-ink">
-      <div class="flex items-center justify-between gap-4 border-b-2 border-zmoki-ink px-4 py-3">
+    <div class="border-2 border-zmoki-neutral-900">
+      <div
+        class="flex items-center justify-between gap-4 border-b-2 border-zmoki-neutral-900 px-4 py-3"
+      >
         <span class="font-serif text-lg font-bold uppercase">My Project X</span>
         <div class="flex items-center gap-4">
           <span class="hidden font-mono text-sm uppercase sm:inline">Features</span>
           <span class="hidden font-mono text-sm uppercase sm:inline">Blog</span>
           <span
-            class="border-2 border-zmoki-ink bg-zmoki-primary-500 px-3 py-1.5 font-mono text-sm font-bold uppercase text-slate-50"
+            class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-3 py-1.5 font-mono text-sm font-bold uppercase text-slate-50"
             >Get started</span
           >
         </div>
       </div>
       <div class="px-4 py-10 text-center font-mono text-xs uppercase opacity-50">page content</div>
       <div
-        class="flex items-center justify-between gap-4 border-t-2 border-zmoki-ink px-4 py-3 font-mono text-xs uppercase text-zmoki-muted"
+        class="flex items-center justify-between gap-4 border-t-2 border-zmoki-neutral-900 px-4 py-3 font-mono text-xs uppercase text-zmoki-neutral-600"
       >
         <span>© My Project X 2025</span>
         <span>Privacy · Terms · Source</span>
@@ -153,34 +157,37 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Landing blocks -->
   <h2 class={sectionLabel}>Landing blocks</h2>
-  <section class="mb-10 border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+  <section class="mb-10 border-2 border-zmoki-neutral-900 bg-white p-6 md:p-8">
     <p class="mb-6 max-w-2xl opacity-80">
       The home page stacks three blocks: a centered hero with CTAs, a bordered feature grid, and a
       solid-ink closing CTA band. <code class="font-mono text-base">PostCard</code> is the blog-list item.
     </p>
     <div class="space-y-4">
-      <div class="border-2 border-zmoki-ink p-6 text-center">
+      <div class="border-2 border-zmoki-neutral-900 p-6 text-center">
         <p class="font-serif text-2xl font-bold">Build something people want</p>
         <p class="mt-2 text-sm opacity-70">A one-line pitch.</p>
         <div class="mt-4 flex flex-wrap justify-center gap-3">
           <span
-            class="border-2 border-zmoki-ink bg-zmoki-primary-500 px-4 py-2 font-mono text-xs font-bold uppercase text-slate-50"
+            class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono text-xs font-bold uppercase text-slate-50"
             >Get started</span
           >
-          <span class="border-2 border-zmoki-ink px-4 py-2 font-mono text-xs font-bold uppercase"
+          <span
+            class="border-2 border-zmoki-neutral-900 px-4 py-2 font-mono text-xs font-bold uppercase"
             >Read the blog</span
           >
         </div>
       </div>
       <div class="grid gap-4 sm:grid-cols-2">
-        <div class="border-2 border-zmoki-ink p-6">
+        <div class="border-2 border-zmoki-neutral-900 p-6">
           <h3 class="font-semibold">Feature card</h3>
           <p class="mt-2 text-sm opacity-70">Title plus one line, in a hard-bordered box.</p>
         </div>
-        <div class="border-2 border-zmoki-ink bg-zmoki-primary-500 p-6 text-center text-slate-50">
+        <div
+          class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 p-6 text-center text-slate-50"
+        >
           <p class="font-serif font-bold">Ready to get started?</p>
           <span
-            class="mt-3 inline-block border-2 border-zmoki-surface bg-zmoki-surface px-4 py-2 font-mono text-xs font-bold uppercase text-zmoki-ink"
+            class="mt-3 inline-block border-2 border-white bg-white px-4 py-2 font-mono text-xs font-bold uppercase text-zmoki-neutral-900"
             >Get in touch</span
           >
         </div>
@@ -190,7 +197,7 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Meta labels -->
   <h2 class={sectionLabel}>Meta labels</h2>
-  <section class="mb-10 rounded-xl border-2 border-zmoki-ink bg-zmoki-surface p-6 md:p-8">
+  <section class="mb-10 rounded-xl border-2 border-zmoki-neutral-900 bg-white p-6 md:p-8">
     <p class="mb-6 max-w-2xl opacity-80">
       Mono, uppercase, <code class="font-mono text-base">tracking-normal</code> — used for dates, Previous
       / Next nav, section eyebrows, and the footer. Usually dimmed with
@@ -206,23 +213,27 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
   </section>
 
   <!-- Usage -->
-  <section class="rounded-xl border-2 border-zmoki-ink bg-slate-700 p-6 text-slate-50 md:p-8">
+  <section
+    class="rounded-xl border-2 border-zmoki-neutral-900 bg-slate-700 p-6 text-slate-50 md:p-8"
+  >
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Conventions</h2>
     <ul class="space-y-2 font-mono text-sm">
       <li>
-        <span class="text-zmoki-primary-300">border-2 border-zmoki-ink + bg-zmoki-surface</span>
+        <span class="text-zmoki-neutral-300">border-2 border-zmoki-neutral-900 + bg-white</span>
         <span class="opacity-60">— every card and panel (flat, sharp)</span>
       </li>
       <li>
-        <span class="text-zmoki-primary-300">border-b-4 border-dotted border-current</span>
+        <span class="text-zmoki-neutral-300">border-b-4 border-dotted border-current</span>
         <span class="opacity-60">— links (anchors use dashed b-2)</span>
       </li>
       <li>
-        <span class="text-zmoki-primary-300">border-2 border-zmoki-ink … uppercase text-white</span>
+        <span class="text-zmoki-neutral-300"
+          >border-2 border-zmoki-neutral-900 … uppercase text-white</span
+        >
         <span class="opacity-60">— action buttons</span>
       </li>
       <li>
-        <span class="text-zmoki-primary-300">font-mono uppercase tracking-normal</span>
+        <span class="text-zmoki-neutral-300">font-mono uppercase tracking-normal</span>
         <span class="opacity-60">— all meta labels</span>
       </li>
     </ul>
