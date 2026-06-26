@@ -96,10 +96,10 @@ const copyrightYears =
     {analyticsEnabled && <PostHog />}
   </head>
   <body
-    class="flex min-h-full flex-col bg-zmoki-bg font-sans text-lg leading-tight tracking-tight text-zmoki-ink xl:text-xl"
+    class="flex min-h-full flex-col bg-zmoki-neutral-200 font-sans text-lg leading-tight tracking-tight text-zmoki-neutral-900 xl:text-xl"
   >
     <!-- Top navigation -->
-    <header class="sticky top-0 z-40 border-b-2 border-zmoki-ink bg-zmoki-surface">
+    <header class="sticky top-0 z-40 border-b-2 border-zmoki-neutral-900 bg-white">
       <nav
         class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 lg:px-8"
       >
@@ -111,7 +111,7 @@ const copyrightYears =
                 <li>
                   <a
                     href={item.href}
-                    class="font-mono text-sm uppercase tracking-tight text-zmoki-ink"
+                    class="font-mono text-sm uppercase tracking-tight text-zmoki-neutral-900"
                   >
                     {item.label}
                   </a>
@@ -121,7 +121,7 @@ const copyrightYears =
           </ul>
           <a
             href={site.cta.href}
-            class="border-2 border-zmoki-ink bg-zmoki-primary-500 px-4 py-2 font-mono text-sm font-bold uppercase tracking-tight text-slate-50"
+            class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono text-sm font-bold uppercase tracking-tight text-slate-50"
             >{site.cta.label}</a
           >
         </div>
@@ -142,9 +142,9 @@ const copyrightYears =
     </script>
 
     <!-- Footer -->
-    <footer class="border-t-2 border-zmoki-ink bg-zmoki-surface">
+    <footer class="border-t-2 border-zmoki-neutral-900 bg-white">
       <div
-        class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 font-mono text-xs uppercase tracking-tight text-zmoki-muted md:flex-row md:items-center md:justify-between lg:px-8"
+        class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 font-mono text-xs uppercase tracking-tight text-zmoki-neutral-600 md:flex-row md:items-center md:justify-between lg:px-8"
       >
         <p>&copy; {site.name} {copyrightYears}</p>
         <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">

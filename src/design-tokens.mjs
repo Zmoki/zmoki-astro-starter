@@ -1,59 +1,87 @@
-// Single source of truth for the site's color tokens.
-// Imported by tailwind.config.mjs (to generate utilities) and by the
-// brand reference page at /-/astro/brand/ (to document them). Keep this file
-// free of Node-only APIs (no require) so it is safe to import anywhere.
+// Single source of truth for the site's color palette.
 //
-// This is the STARTER palette — flat and MONOCHROME (brutalist). There is no
-// color: every token resolves to black, white, or a grey. The token names are
-// kept (so templates never change); to introduce an accent on a new site, give
-// one family real hues here and the whole site picks it up.
+// Instead of bespoke semantic role tokens, this exposes Tailwind's default
+// color palettes under the `zmoki-` prefix — `zmoki-slate`, `zmoki-red`,
+// `zmoki-neutral`, … — each a full 50→950 scale. So every Tailwind palette is
+// available as a namespaced utility: `bg-zmoki-neutral-900`, `text-zmoki-red-500`,
+// `border-zmoki-slate-200`, and so on.
+//
+// Imported by tailwind.config.mjs (to generate the utilities) and by the brand
+// reference page at /-/astro/brand/color/ (to document them). Keep this file
+// free of Node-only APIs so it is safe to import anywhere (Astro and Tailwind).
 
-// Accent families — kept as named roles, but monochrome in the starter.
-export const accents = {
-  // zmoki-primary: primary — links, nav button, hero, CTA, ink (900)
-  "zmoki-primary": {
-    200: "#d4d4d4",
-    300: "#bcbcbc",
-    400: "#8a8a8a",
-    500: "#111111",
-    600: "#000000",
-    700: "#111111",
-    800: "#0a0a0a",
-    900: "#111111",
-    950: "#000000",
-  },
-  // zmoki-accent: secondary accent (brand pages)
-  "zmoki-accent": {
-    200: "#e0e0e0",
-    400: "#9a9a9a",
-    500: "#3a3a3a",
-    600: "#2a2a2a",
-    700: "#1a1a1a",
-  },
-  // zmoki-action: action buttons (form submit, copy)
-  "zmoki-action": {
-    500: "#111111",
-  },
-  // zmoki-external: external links, brand headers
-  "zmoki-external": {
-    500: "#111111",
-  },
-  // zmoki-highlight: highlight / marker behind headings (404, callouts)
-  "zmoki-highlight": {
-    500: "#d4d4d4",
-  },
+import twColors from "tailwindcss/colors";
+
+// The Tailwind palettes we surface, in their canonical documentation order.
+// (Greys first, then the chromatic ramp.) Each name maps to a { 50..950 } scale.
+export const paletteNames = [
+  "slate",
+  "gray",
+  "zinc",
+  "neutral",
+  "stone",
+  "red",
+  "orange",
+  "amber",
+  "yellow",
+  "lime",
+  "green",
+  "emerald",
+  "teal",
+  "cyan",
+  "sky",
+  "blue",
+  "indigo",
+  "violet",
+  "purple",
+  "fuchsia",
+  "pink",
+  "rose",
+];
+
+// ─── Re-skinning: how to change the palette ────────────────────────────────
+//
+// The starter is monochrome — templates use `zmoki-neutral`. Two ways to give
+// the site color (full guide in SETUP.md → "Palette"):
+//
+//   A. Use a built-in Tailwind palette. Nothing to edit here — every group is
+//      already generated. Swap the prefix in templates, e.g. find/replace
+//      `zmoki-neutral` → `zmoki-blue` (whole site), or just on the elements you
+//      want colored (links, buttons, CTA).
+//
+//   B. Define a CUSTOM color that isn't in Tailwind. Pick your base color, then
+//      build a full 50→950 scale on https://www.colorhexa.com/ :
+//        1. Enter your base hex on the site — this is your `500`.
+//        2. Open the "Shades and Tints" section and read hexes off the ramp:
+//             50 100 200 300 400  ← tints  (base → white, lightest first)
+//             500                 ← your base color
+//             600 700 800 900 950 ← shades (base → black, darkest last)
+//           Pick by eye so the steps look evenly spaced (Tailwind's own scales
+//           ramp non-linearly — match that feel rather than fixed 10% stops).
+//      Add the scale to `customPalettes` below; it becomes a `zmoki-<name>-*`
+//      utility (e.g. `zmoki-brand-600`) and shows on /-/astro/brand/color/.
+//
+// Example — replace with values from colorhexa, then uncomment:
+//   const brand = {
+//     50: "#eff6ff", 100: "#dbeafe", 200: "#bfdbfe", 300: "#93c5fd",
+//     400: "#60a5fa", 500: "#3b82f6", 600: "#2563eb", 700: "#1d4ed8",
+//     800: "#1e40af", 900: "#1e3a8a", 950: "#172554",
+//   };
+/** @type {Record<string, Record<string | number, string>>} */
+const customPalettes = {
+  // "zmoki-brand": brand,
 };
 
-// Neutrals — the structural palette. Flat single values, one per role.
-export const neutrals = {
-  "zmoki-bg": "#ececec", // page background (light grey)
-  "zmoki-surface": "#ffffff", // cards & panels (white, defined by hard borders)
-  "zmoki-ink": "#111111", // primary text, borders (near-black)
-  "zmoki-muted": "#555555", // muted / meta text
-};
+// Names of any custom palettes (without the `zmoki-` prefix), so the brand
+// color reference page can document them alongside the Tailwind defaults.
+export const customPaletteNames = Object.keys(customPalettes).map((key) =>
+  key.replace(/^zmoki-/, ""),
+);
 
-// Merged map consumed by Tailwind.
+// zmoki-<palette> → { 50: "#…", …, 950: "#…" } map consumed by Tailwind's
+// `theme.extend.colors` and iterated by the brand color reference page.
+/** @type {Record<string, Record<string | number, string>>} */
 export const colors = {
-  ...accents,
-  ...neutrals,
+  ...Object.fromEntries(paletteNames.map((name) => [`zmoki-${name}`, twColors[name]])),
+  ...customPalettes,
 };
