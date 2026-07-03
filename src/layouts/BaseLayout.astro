@@ -1,6 +1,7 @@
 ---
 import "@/styles/global.css";
 import PostHog from "@/components/posthog.astro";
+import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 
 export interface Props {
@@ -97,14 +98,16 @@ const copyrightYears =
     {analyticsEnabled && <PostHog />}
   </head>
   <body
-    class="bg-zmoki-neutral-200 text-zmoki-neutral-900 flex min-h-full flex-col font-sans text-lg leading-tight tracking-tight xl:text-xl"
+    class="bg-zmoki-cream-100 text-zmoki-stone-900 flex min-h-full flex-col font-sans text-lg leading-normal tracking-tight xl:text-xl"
   >
     <!-- Top navigation -->
-    <header class="border-zmoki-neutral-900 sticky top-0 z-40 border-b-2 bg-white">
+    <header
+      class="border-zmoki-stone-200 bg-zmoki-cream-100/80 sticky top-0 z-40 border-b backdrop-blur-md"
+    >
       <nav
         class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 lg:px-8"
       >
-        <a href="/" class="font-serif text-xl font-bold tracking-tight uppercase">{site.name}</a>
+        <a href="/" class="text-zmoki-stone-900 text-xl font-bold tracking-tight">{site.name}</a>
         <div class="flex items-center gap-4 md:gap-6">
           <ul class="hidden items-center gap-6 md:flex">
             {
@@ -112,7 +115,7 @@ const copyrightYears =
                 <li>
                   <a
                     href={item.href}
-                    class="text-zmoki-neutral-900 font-mono text-sm tracking-tight uppercase"
+                    class="text-zmoki-stone-600 hover:text-zmoki-stone-900 text-sm font-medium transition-colors"
                   >
                     {item.label}
                   </a>
@@ -120,11 +123,7 @@ const copyrightYears =
               ))
             }
           </ul>
-          <a
-            href={site.cta.href}
-            class="border-zmoki-neutral-900 bg-zmoki-neutral-900 border-2 px-4 py-2 font-mono text-sm font-bold tracking-tight text-slate-50 uppercase"
-            >{site.cta.label}</a
-          >
+          <Button href={site.cta.href}>{site.cta.label}</Button>
         </div>
       </nav>
     </header>
@@ -143,9 +142,9 @@ const copyrightYears =
     </script>
 
     <!-- Footer -->
-    <footer class="border-zmoki-neutral-900 border-t-2 bg-white">
+    <footer class="border-zmoki-stone-200 border-t bg-white">
       <div
-        class="text-zmoki-neutral-600 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 font-mono text-xs tracking-tight uppercase md:flex-row md:items-center md:justify-between lg:px-8"
+        class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8"
       >
         <p>&copy; {site.name} {copyrightYears}</p>
         <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">

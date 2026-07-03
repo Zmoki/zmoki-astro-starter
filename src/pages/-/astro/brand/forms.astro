@@ -3,39 +3,40 @@ import BrandLayout from "@/layouts/BrandLayout.astro";
 
 // Shared input class strings so the live examples and the usage code stay in
 // sync with what BrevoForm.astro actually renders.
-const labelClass = "font-mono text-sm font-medium";
+const labelClass = "text-sm font-medium";
 const inputClass =
-  "w-full rounded-sm border border-slate-300 bg-white p-2 font-mono text-lg focus:border-zmoki-neutral-900 focus:outline-none focus:ring-2 focus:ring-zmoki-neutral-900";
+  "w-full rounded-lg border border-zmoki-stone-300 bg-white p-2 text-lg focus:border-zmoki-indigo-500 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500/30";
 const inputErrorClass =
-  "w-full rounded-sm border border-zmoki-neutral-900 bg-white p-2 font-mono text-lg focus:border-zmoki-neutral-900 focus:outline-none focus:ring-2 focus:ring-zmoki-neutral-900";
+  "w-full rounded-lg border border-zmoki-red-400 bg-white p-2 text-lg focus:border-zmoki-red-500 focus:outline-none focus:ring-2 focus:ring-zmoki-red-500/30";
 const buttonClass =
-  "border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono font-bold uppercase tracking-tight text-white";
+  "rounded-lg bg-zmoki-indigo-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-zmoki-indigo-700";
 ---
 
 <BrandLayout title="Brand — Forms" description="My Project X form components, states, and patterns">
   <header
-    class="border-zmoki-neutral-900 bg-zmoki-neutral-900 mb-8 rounded-xl border-2 px-6 py-10 text-slate-50 md:px-10"
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-900 mb-8 rounded-2xl border px-6 py-10 shadow-sm md:px-10"
   >
     <a
       href="/-/astro/brand/"
-      class="font-mono text-xs tracking-normal uppercase opacity-70 hover:opacity-100"
+      class="text-zmoki-indigo-600 hover:text-zmoki-indigo-700 text-xs underline underline-offset-2"
       >← My Project X brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Forms</h1>
-    <p class="mt-4 max-w-2xl text-xl md:text-2xl">
-      Inputs, labels, and the action button. The newsletter signup (<code class="font-mono"
-        >BrevoForm</code
+    <p class="text-zmoki-stone-700 mt-4 max-w-2xl text-xl md:text-2xl">
+      Inputs, labels, and the action button. The newsletter signup (<code
+        class="rounded bg-white px-1.5 py-0.5 text-base">BrevoForm</code
       >) is the canonical example — every pattern below comes from it.
     </p>
   </header>
 
   <!-- Inputs & labels -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Inputs & labels</h2>
-  <section class="border-zmoki-neutral-900 space-y-6 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="opacity-80">
-      Labels are <span class="font-mono">font-mono</span>, sitting above the field. Inputs use a
-      thin slate border, flat corners, and mono text. Placeholders are muted, never used in place of
-      a label.
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Inputs & labels</h2>
+  <section
+    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
+  >
+    <p class="text-zmoki-stone-700">
+      Labels are plain sans, sitting above the field. Inputs use a thin warm-stone border, rounded
+      corners, and an indigo focus ring. Placeholders are muted, never used in place of a label.
     </p>
     <div class="grid gap-6 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
@@ -54,34 +55,34 @@ const buttonClass =
   </section>
 
   <!-- Focus states -->
-  <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
-    Focus states
-  </h2>
-  <section class="border-zmoki-neutral-900 space-y-6 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="opacity-80">
-      Focus is the <span class="font-mono">zmoki-neutral-900</span> ring — a 2px ring plus a matching
+  <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Focus states</h2>
+  <section
+    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
+  >
+    <p class="text-zmoki-stone-700">
+      Focus is the <span class="font-mono">zmoki-indigo-500</span> ring — a soft 2px ring plus a matching
       border. Tab into or click the field below to see it.
     </p>
     <div class="max-w-sm">
       <label for="demo-focus" class={`${labelClass} mb-2 block`}>Try focusing</label>
       <input type="text" id="demo-focus" placeholder="Click or tab here" class={inputClass} />
     </div>
-    <ul class="space-y-1 font-mono text-sm opacity-70">
-      <li>focus:border-zmoki-neutral-900</li>
-      <li>focus:ring-2 focus:ring-zmoki-neutral-900</li>
+    <ul class="text-zmoki-stone-500 space-y-1 font-mono text-sm">
+      <li>focus:border-zmoki-indigo-500</li>
+      <li>focus:ring-2 focus:ring-zmoki-indigo-500/30</li>
       <li>focus:outline-none</li>
     </ul>
   </section>
 
   <!-- Submit button -->
-  <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
-    Submit button
-  </h2>
-  <section class="border-zmoki-neutral-900 space-y-6 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="opacity-80">
-      The action button is square and hard-bordered, filled with
-      <span class="font-mono">zmoki-neutral-900</span> (ink in the monochrome palette), mono and uppercase.
-      It is the same button used for resource downloads and copy actions.
+  <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Submit button</h2>
+  <section
+    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
+  >
+    <p class="text-zmoki-stone-700">
+      The action button is rounded and filled with
+      <span class="font-mono">zmoki-indigo-600</span> (the indigo accent), sans and semibold, with a subtle
+      hover shift. It is the same button used for resource downloads and copy actions.
     </p>
     <div class="flex flex-wrap items-center gap-4">
       <button type="button" class={buttonClass}>Subscribe</button>
@@ -93,17 +94,17 @@ const buttonClass =
   </section>
 
   <!-- Consent & captcha -->
-  <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
-    Consent & captcha
-  </h2>
-  <section class="border-zmoki-neutral-900 space-y-6 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="opacity-80">
-      A required consent checkbox (<span class="font-mono">zmoki-neutral-900</span> focus ring) and the
+  <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Consent & captcha</h2>
+  <section
+    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
+  >
+    <p class="text-zmoki-stone-700">
+      A required consent checkbox (<span class="font-mono">zmoki-indigo-500</span> focus ring) and the
       Cloudflare Turnstile captcha block. The captcha renders at full width; here it is a placeholder.
     </p>
 
     <div
-      class="text-zmoki-neutral-600 flex h-16 w-full max-w-sm items-center justify-center rounded-sm border border-dashed border-slate-300 bg-white font-mono text-xs tracking-normal uppercase"
+      class="border-zmoki-stone-300 text-zmoki-stone-500 flex h-16 w-full max-w-sm items-center justify-center rounded-lg border border-dashed bg-white text-xs"
     >
       Cloudflare Turnstile widget
     </div>
@@ -112,28 +113,29 @@ const buttonClass =
       <input
         type="checkbox"
         id="demo-consent"
-        class="focus:ring-zmoki-neutral-900 mt-1 h-4 w-4 rounded border-slate-400"
+        class="border-zmoki-stone-400 text-zmoki-indigo-600 focus:ring-zmoki-indigo-500 mt-1 h-4 w-4 rounded"
       />
-      <label for="demo-consent" class="font-mono text-xs">
+      <label for="demo-consent" class="text-zmoki-stone-700 text-xs">
         By checking this box, I acknowledge that I have read, understood, and agree to the <a
           href="/legal/terms/"
-          class="text-zmoki-neutral-600 border-b-2 border-dotted border-current">Terms of Service</a
-        > and <a
-          href="/legal/privacy/"
-          class="text-zmoki-neutral-600 border-b-2 border-dotted border-current">Privacy Policy</a
+          class="text-zmoki-indigo-600 underline underline-offset-2">Terms of Service</a
+        > and <a href="/legal/privacy/" class="text-zmoki-indigo-600 underline underline-offset-2"
+          >Privacy Policy</a
         >.
       </label>
     </div>
   </section>
 
   <!-- Validation & error states -->
-  <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
+  <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">
     Validation & error states
   </h2>
-  <section class="border-zmoki-neutral-900 space-y-6 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="opacity-80">
-      Errors switch the border and ring to <span class="font-mono">zmoki-neutral-900</span>, with a
-      mono message below the field. Submit the demo with an empty or invalid email to see it live.
+  <section
+    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
+  >
+    <p class="text-zmoki-stone-700">
+      Errors switch the border and ring to <span class="font-mono">zmoki-red-500</span>, with a
+      message below the field. Submit the demo with an empty or invalid email to see it live.
     </p>
 
     <!-- Static reference: error state -->
@@ -146,13 +148,11 @@ const buttonClass =
         aria-invalid="true"
         class={inputErrorClass}
       />
-      <p class="text-zmoki-neutral-900 mt-2 font-mono text-xs">
-        Please enter a valid email address.
-      </p>
+      <p class="text-zmoki-red-600 mt-2 text-xs">Please enter a valid email address.</p>
     </div>
 
     <!-- Live mini-form -->
-    <form id="demo-validate" novalidate class="max-w-sm border-t border-slate-200 pt-6">
+    <form id="demo-validate" novalidate class="border-zmoki-stone-200 max-w-sm border-t pt-6">
       <label for="demo-validate-email" class={`${labelClass} mb-2 block`}>Live validation</label>
       <input
         type="email"
@@ -163,51 +163,52 @@ const buttonClass =
         aria-describedby="demo-validate-msg"
         class={inputClass}
       />
-      <p id="demo-validate-msg" class="mt-2 hidden font-mono text-xs"></p>
+      <p id="demo-validate-msg" class="mt-2 hidden text-xs"></p>
       <button type="submit" class={`${buttonClass} mt-4`}>Subscribe</button>
     </form>
   </section>
 
   <!-- Usage in code -->
   <section
-    class="border-zmoki-neutral-900 mt-10 rounded-xl border-2 bg-slate-700 p-6 text-white md:p-8"
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-10 rounded-2xl border p-6 shadow-sm md:p-8"
   >
-    <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
-    <p class="mb-4 opacity-90">
-      Copy these utility strings straight onto inputs and buttons. In the monochrome palette the
-      focus and error rings are the same ink (<code
-        class="rounded bg-slate-900 px-1.5 py-0.5 font-mono text-base">zmoki-neutral-900</code
-      >); the error state is carried by the inline message. Swap the error ring to a Tailwind hue
-      like <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono text-base">zmoki-red-600</code> to
-      make it stand out.
+    <h2 class="text-zmoki-stone-900 mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
+    <p class="mb-4">
+      Copy these utility strings straight onto inputs and buttons. The focus ring is the indigo
+      accent (<code class="rounded bg-white px-1.5 py-0.5 font-mono text-base"
+        >zmoki-indigo-500</code
+      >); the error state switches border and ring to <code
+        class="rounded bg-white px-1.5 py-0.5 font-mono text-base">zmoki-red-500</code
+      > with an inline message below the field.
     </p>
     <ul class="space-y-3 font-mono text-sm">
       <li>
-        <span class="text-zmoki-neutral-900">label</span>
-        <span class="opacity-60">— font-mono text-sm font-medium</span>
+        <span class="text-zmoki-stone-900 font-semibold">label</span>
+        <span class="text-zmoki-stone-500">— text-sm font-medium</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-900">input</span>
-        <span class="opacity-60"
-          >— rounded-sm border border-slate-300 p-2 font-mono focus:ring-2
-          focus:ring-zmoki-neutral-900</span
+        <span class="text-zmoki-stone-900 font-semibold">input</span>
+        <span class="text-zmoki-stone-500"
+          >— rounded-lg border border-zmoki-stone-300 p-2 focus:border-zmoki-indigo-500 focus:ring-2
+          focus:ring-zmoki-indigo-500/30</span
         >
       </li>
       <li>
-        <span class="text-zmoki-neutral-900">input (error)</span>
-        <span class="opacity-60">— border-zmoki-neutral-900 focus:ring-zmoki-neutral-900</span>
+        <span class="text-zmoki-stone-900 font-semibold">input (error)</span>
+        <span class="text-zmoki-stone-500">— border-zmoki-red-400 focus:ring-zmoki-red-500/30</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-900">button</span>
-        <span class="opacity-60"
-          >— border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono uppercase
-          text-white</span
+        <span class="text-zmoki-stone-900 font-semibold">button</span>
+        <span class="text-zmoki-stone-500"
+          >— rounded-lg bg-zmoki-indigo-600 px-4 py-2 font-semibold text-white transition-colors
+          hover:bg-zmoki-indigo-700</span
         >
       </li>
       <li>
-        <span class="text-zmoki-neutral-900">checkbox</span>
-        <span class="opacity-60"
-          >— h-4 w-4 rounded border-slate-400 focus:ring-zmoki-neutral-900</span
+        <span class="text-zmoki-stone-900 font-semibold">checkbox</span>
+        <span class="text-zmoki-stone-500"
+          >— h-4 w-4 rounded border-zmoki-stone-400 text-zmoki-indigo-600
+          focus:ring-zmoki-indigo-500</span
         >
       </li>
     </ul>
@@ -222,22 +223,22 @@ const buttonClass =
     const msg = document.getElementById("demo-validate-msg");
 
     const ok =
-      "w-full rounded-sm border border-slate-300 bg-white p-2 font-mono text-lg focus:border-zmoki-neutral-900 focus:outline-none focus:ring-2 focus:ring-zmoki-neutral-900";
+      "w-full rounded-lg border border-zmoki-stone-300 bg-white p-2 text-lg focus:border-zmoki-indigo-500 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500/30";
     const bad =
-      "w-full rounded-sm border border-zmoki-neutral-900 bg-white p-2 font-mono text-lg focus:border-zmoki-neutral-900 focus:outline-none focus:ring-2 focus:ring-zmoki-neutral-900";
+      "w-full rounded-lg border border-zmoki-red-400 bg-white p-2 text-lg focus:border-zmoki-red-500 focus:outline-none focus:ring-2 focus:ring-zmoki-red-500/30";
 
     function setError(text) {
       input.className = bad;
       input.setAttribute("aria-invalid", "true");
       msg.textContent = text;
-      msg.className = "mt-2 font-mono text-xs text-zmoki-neutral-900";
+      msg.className = "mt-2 text-xs text-zmoki-red-600";
     }
 
     function setValid() {
       input.className = ok;
       input.removeAttribute("aria-invalid");
       msg.textContent = "Looks good — thanks!";
-      msg.className = "mt-2 font-mono text-xs text-zmoki-neutral-900";
+      msg.className = "mt-2 text-xs text-zmoki-indigo-600";
     }
 
     form.addEventListener("submit", function (e) {

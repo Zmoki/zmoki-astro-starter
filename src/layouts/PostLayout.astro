@@ -26,13 +26,15 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   <article class="space-y-4">
     <!-- Post Header -->
     <header
-      class="outline-zmoki-neutral-900 flex flex-col gap-6 rounded-xl bg-white px-4 py-8 outline-8 -outline-offset-2 outline-dashed md:items-center md:p-16 md:text-center lg:p-20"
+      class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
     >
-      <h1 class="text-4xl font-semibold xl:text-6xl" set:html={title} />
-      {description && <p class="text-2xl xl:text-3xl" set:html={description} />}
-      <p
-        class="order-first flex flex-col gap-2 font-mono text-xs tracking-normal uppercase opacity-70 md:flex-row lg:gap-4 xl:text-sm"
-      >
+      <h1 class="text-4xl font-semibold tracking-tight xl:text-6xl" set:html={title} />
+      {
+        description && (
+          <p class="text-zmoki-stone-600 text-2xl xl:text-3xl" set:html={description} />
+        )
+      }
+      <p class="text-zmoki-stone-500 order-first flex flex-col gap-2 text-sm md:flex-row lg:gap-4">
         {
           isContentModified ? (
             <>
@@ -54,22 +56,23 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
     <!-- Post Content -->
     <div
-      class="prose prose-xl border-zmoki-neutral-900 2xl:prose-2xl prose-headings:font-semibold max-w-none rounded-xl border-2 bg-white px-4 py-8 md:p-16 xl:pb-24 2xl:px-28 2xl:py-16"
+      class="prose prose-xl border-zmoki-stone-200 2xl:prose-2xl prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16 xl:pb-24 2xl:px-28 2xl:py-16"
     >
       <slot />
     </div>
 
     <!-- About Author -->
     <aside
-      class="border-zmoki-neutral-900 text-zmoki-neutral-900 md:bg-zmoki-neutral-700 space-y-2 rounded-xl border-2 bg-white px-4 py-8 leading-normal md:p-16 md:text-slate-50 xl:p-20"
+      class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white xl:p-20"
     >
-      <h2 class="pb-4 text-3xl font-medium xl:text-4xl">Written by {site.author.name}</h2>
+      <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">Written by {site.author.name}</h2>
       <p>
         A short author bio goes here — say who you are and what you do. Edit it in <code
           >src/layouts/PostLayout.astro</code
         >. You can read more on the <a
           href={`/blog/${site.author.aboutSlug}/`}
-          class="border-b-4 border-dotted border-current">about</a
+          class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
+          >about</a
         > page.
       </p>
     </aside>
@@ -83,14 +86,11 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
             href={`/blog/${prevPost.id}/`}
             data-nav-direction="prev"
             data-nav-slug={prevPost.id}
-            class="border-zmoki-neutral-900 flex flex-col gap-2 rounded-xl border-2 border-l-8 border-solid bg-white px-6 pt-8 pb-10"
+            class="border-zmoki-stone-200 border-l-zmoki-indigo-600 flex flex-col gap-2 rounded-2xl border border-l-4 bg-white px-6 pt-8 pb-10 shadow-sm transition-shadow hover:shadow-md"
           >
-            <div class="font-mono text-sm tracking-normal uppercase opacity-70">Previous</div>
-            <div class="text-2xl leading-normal font-medium">
-              <span
-                set:html={prevPost.data.title}
-                class="border-b-4 border-dotted border-current"
-              />
+            <div class="text-zmoki-stone-500 text-sm font-medium">Previous</div>
+            <div class="text-zmoki-stone-900 text-2xl leading-normal font-medium">
+              <span set:html={prevPost.data.title} />
             </div>
           </a>
         )
@@ -103,14 +103,11 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
             href={`/blog/${nextPost.id}/`}
             data-nav-direction="next"
             data-nav-slug={nextPost.id}
-            class="border-zmoki-neutral-900 flex flex-col gap-2 rounded-xl border-2 border-r-8 border-solid bg-white px-6 pt-8 pb-10 text-right md:col-start-2"
+            class="border-zmoki-stone-200 border-r-zmoki-indigo-600 flex flex-col gap-2 rounded-2xl border border-r-4 bg-white px-6 pt-8 pb-10 text-right shadow-sm transition-shadow hover:shadow-md md:col-start-2"
           >
-            <div class="font-mono text-sm tracking-normal uppercase opacity-70">Next</div>
-            <div class="text-2xl leading-normal font-medium">
-              <span
-                set:html={nextPost.data.title}
-                class="border-b-4 border-dotted border-current"
-              />
+            <div class="text-zmoki-stone-500 text-sm font-medium">Next</div>
+            <div class="text-zmoki-stone-900 text-2xl leading-normal font-medium">
+              <span set:html={nextPost.data.title} />
             </div>
           </a>
         )

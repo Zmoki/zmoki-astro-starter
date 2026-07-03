@@ -41,13 +41,15 @@ export const paletteNames = [
 
 // ─── Re-skinning: how to change the palette ────────────────────────────────
 //
-// The starter is monochrome — templates use `zmoki-neutral`. Two ways to give
-// the site color (full guide in SETUP.md → "Palette"):
+// The starter is a bright, warm, minimal B2B look — templates use `zmoki-indigo`
+// (accent), `zmoki-stone` (warm greys / text / borders), and the custom
+// `zmoki-cream` scale below (the ivory page background). Two ways to give the
+// site a different color (full guide in SETUP.md → "Palette"):
 //
 //   A. Use a built-in Tailwind palette. Nothing to edit here — every group is
-//      already generated. Swap the prefix in templates, e.g. find/replace
-//      `zmoki-neutral` → `zmoki-blue` (whole site), or just on the elements you
-//      want colored (links, buttons, CTA).
+//      already generated. Swap the accent in templates, e.g. find/replace
+//      `zmoki-indigo` → `zmoki-emerald` (whole site), or just on the elements
+//      you want recolored (links, buttons, CTA).
 //
 //   B. Define a CUSTOM color that isn't in Tailwind. Pick your base color, then
 //      build a full 50→950 scale on https://www.colorhexa.com/ :
@@ -60,16 +62,27 @@ export const paletteNames = [
 //           ramp non-linearly — match that feel rather than fixed 10% stops).
 //      Add the scale to `customPalettes` below; it becomes a `zmoki-<name>-*`
 //      utility (e.g. `zmoki-brand-600`) and shows on /-/astro/brand/color/.
-//
-// Example — replace with values from colorhexa, then uncomment:
-//   const brand = {
-//     50: "#eff6ff", 100: "#dbeafe", 200: "#bfdbfe", 300: "#93c5fd",
-//     400: "#60a5fa", 500: "#3b82f6", 600: "#2563eb", 700: "#1d4ed8",
-//     800: "#1e40af", 900: "#1e3a8a", 950: "#172554",
-//   };
+
+// The warm ivory background scale — the signature of the bright/minimal look.
+// A custom colour (not in Tailwind's defaults): `50` is near-white, `100`
+// (#FAF8F3) is the page background, and it ramps into warm browns for depth.
+const cream = {
+  50: "#FDFCFA",
+  100: "#FAF8F3",
+  200: "#F3EFE6",
+  300: "#E9E2D3",
+  400: "#D8CDB8",
+  500: "#C2B393",
+  600: "#A6946E",
+  700: "#867655",
+  800: "#5F5340",
+  900: "#3D362A",
+  950: "#221E17",
+};
+
 /** @type {Record<string, Record<string | number, string>>} */
 const customPalettes = {
-  // "zmoki-brand": brand,
+  "zmoki-cream": cream,
 };
 
 // Names of any custom palettes (without the `zmoki-` prefix), so the brand

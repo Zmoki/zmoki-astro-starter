@@ -4,8 +4,8 @@ import { colors } from "@/design-tokens.mjs";
 
 // Pull real tokens so the link-treatment swatches can never drift from
 // what Tailwind actually generates (mirrors the Color page approach).
-const neutral = colors["zmoki-neutral"] as Record<string, string>;
-const ink = neutral["900"];
+const indigo = colors["zmoki-indigo"] as Record<string, string>;
+const accent = indigo["600"];
 
 // ---------------------------------------------------------------------------
 // Part 1 — Design typography (UI type scale)
@@ -40,7 +40,7 @@ const typeScale = [
   {
     label: "Body",
     classes: "text-lg xl:text-xl",
-    sample: "The base reading size — Noto Sans, set tight.",
+    sample: "The base reading size — Noto Sans, set clean.",
     usage: "Global body (BaseLayout)",
   },
 ] as const;
@@ -95,30 +95,30 @@ const linkTreatments = [
   {
     label: "Base link",
     attr: "a",
-    color: ink,
-    border: "dotted 4px",
-    token: "zmoki-neutral-900",
+    color: accent,
+    style: "underline offset-2",
+    token: "zmoki-indigo-600",
   },
   {
     label: "External",
     attr: "[data-external]",
-    color: ink,
-    border: "dotted 4px",
-    token: "zmoki-neutral-900",
+    color: accent,
+    style: "underline offset-2",
+    token: "zmoki-indigo-600",
   },
   {
     label: "Resource",
     attr: "[data-resource]",
-    color: ink,
-    border: "dotted 4px",
-    token: "zmoki-neutral-900",
+    color: accent,
+    style: "underline offset-2",
+    token: "zmoki-indigo-600",
   },
   {
     label: "Anchor",
     attr: "[data-anchor]",
-    color: ink,
-    border: "dashed 2px",
-    token: "zmoki-neutral-900",
+    color: accent,
+    style: "underline offset-2",
+    token: "zmoki-indigo-600",
   },
 ];
 ---
@@ -128,66 +128,56 @@ const linkTreatments = [
   description="My Project X typography scale and prose styles"
 >
   <header
-    class="border-zmoki-neutral-900 bg-zmoki-neutral-900 mb-8 rounded-xl border-2 px-6 py-10 text-slate-50 md:px-10"
+    class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
   >
-    <a
-      href="/-/astro/brand/"
-      class="font-mono text-xs tracking-normal uppercase opacity-80 hover:opacity-100"
-      >← My Project X brand</a
+    <a href="/-/astro/brand/" class="text-xs text-white/70 hover:text-white">← My Project X brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Typography</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
-      Three faces: Noto Serif for headings, Noto Sans for body, and Noto Sans Mono for labels — plus
-      a tuned <code class="font-mono">.prose</code> layer for written content. Every specimen below renders
-      with its real utility classes.
+      Headings and body share one typeface: Noto Sans. Code uses Noto Sans Mono — plus a tuned <code
+        class="font-mono">.prose</code
+      > layer for written content. Every specimen below renders with its real utility classes.
     </p>
   </header>
 
   <!-- ===================================================================== -->
   <!-- Part 1 — Design typography                                            -->
   <!-- ===================================================================== -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
-    Part 1 · Design typography
-  </h2>
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Part 1 · Design typography</h2>
 
   <!-- Font pairing -->
-  <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-3">
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
-      <p class="font-mono text-xs tracking-normal uppercase opacity-60">Headings · font-serif</p>
-      <p class="mt-2 font-serif text-5xl font-bold">Noto Serif</p>
-      <p class="mt-3 text-lg opacity-80">All headings (h1–h6) and the wordmark. Weights 100–900.</p>
-      <p class="mt-4 font-serif text-2xl">AaBbCc 0123 — æ ß ç</p>
-    </section>
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
-      <p class="font-mono text-xs tracking-normal uppercase opacity-60">Body · font-sans</p>
-      <p class="mt-2 font-sans text-5xl font-semibold">Noto Sans</p>
-      <p class="mt-3 text-lg opacity-80">Body copy and prose. Variable weight, 100–900.</p>
+  <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
+    <section class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm md:p-8">
+      <p class="text-zmoki-stone-500 text-xs font-medium">Headings &amp; body · font-sans</p>
+      <p class="mt-2 font-sans text-5xl font-bold">Noto Sans</p>
+      <p class="text-zmoki-stone-500 mt-3 text-lg">
+        One typeface for everything — headings (h1–h6), the wordmark, body copy, and prose. Variable
+        weight, 100–900.
+      </p>
       <p class="mt-4 font-sans text-2xl">AaBbCc 0123 — æ ß ç</p>
     </section>
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
-      <p class="font-mono text-xs tracking-normal uppercase opacity-60">Labels · font-mono</p>
-      <p class="mt-2 font-mono text-4xl font-bold">Noto Sans Mono</p>
-      <p class="mt-3 text-lg opacity-80">
-        Eyebrows, dates, nav, footer, buttons — always uppercase.
-      </p>
+    <section class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm md:p-8">
+      <p class="text-zmoki-stone-500 text-xs font-medium">Code · font-mono</p>
+      <p class="mt-2 font-mono text-5xl font-bold">Noto Sans Mono</p>
+      <p class="text-zmoki-stone-500 mt-3 text-lg">Code, tokens, and literal specimens.</p>
       <p class="mt-4 font-mono text-2xl">AaBbCc 0123 — æ ß ç</p>
     </section>
   </div>
 
   <!-- Type scale -->
-  <section class="border-zmoki-neutral-900 mb-6 rounded-xl border-2 bg-white p-6 md:p-8">
+  <section class="border-zmoki-stone-200 mb-6 rounded-xl border bg-white p-6 shadow-sm md:p-8">
     <h3 class="mb-5 text-2xl font-semibold md:text-3xl">Type scale</h3>
-    <div class="divide-y divide-slate-200">
+    <div class="divide-zmoki-stone-200 divide-y">
       {
         typeScale.map((step) => (
           <div class="grid items-baseline gap-2 py-5 md:grid-cols-[10rem_1fr]">
             <div>
               <p class="font-medium">{step.label}</p>
-              <p class="mt-1 font-mono text-xs opacity-60">{step.usage}</p>
+              <p class="text-zmoki-stone-500 mt-1 text-xs">{step.usage}</p>
             </div>
             <div>
               <p class={step.classes}>{step.sample}</p>
-              <p class="mt-2 font-mono text-xs lowercase opacity-50">{step.classes}</p>
+              <p class="text-zmoki-stone-500 mt-2 font-mono text-xs lowercase">{step.classes}</p>
             </div>
           </div>
         ))
@@ -195,17 +185,17 @@ const linkTreatments = [
     </div>
 
     <h3 class="mt-8 mb-5 text-2xl font-semibold md:text-3xl">Mono labels</h3>
-    <div class="divide-y divide-slate-200">
+    <div class="divide-zmoki-stone-200 divide-y">
       {
         monoLabels.map((step) => (
           <div class="grid items-baseline gap-2 py-5 md:grid-cols-[10rem_1fr]">
             <div>
               <p class="font-medium">{step.label}</p>
-              <p class="mt-1 font-mono text-xs opacity-60">{step.usage}</p>
+              <p class="text-zmoki-stone-500 mt-1 text-xs">{step.usage}</p>
             </div>
             <div>
               <p class={step.classes}>{step.sample}</p>
-              <p class="mt-2 font-mono text-xs lowercase opacity-50">{step.classes}</p>
+              <p class="text-zmoki-stone-500 mt-2 font-mono text-xs lowercase">{step.classes}</p>
             </div>
           </div>
         ))
@@ -215,29 +205,33 @@ const linkTreatments = [
 
   <!-- Tracking & leading -->
   <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
+    <section class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm md:p-8">
       <h3 class="mb-4 text-2xl font-semibold">Tracking</h3>
       <ul class="space-y-4">
         {
           trackingRules.map((r) => (
             <li>
-              <code class="text-zmoki-neutral-950 font-mono text-sm font-medium">{r.token}</code>
-              <p class="text-base opacity-80">{r.rule}</p>
-              <p class="font-mono text-xs opacity-50">{r.where}</p>
+              <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono text-sm font-medium">
+                {r.token}
+              </code>
+              <p class="text-zmoki-stone-700 mt-1 text-base">{r.rule}</p>
+              <p class="text-zmoki-stone-500 text-xs">{r.where}</p>
             </li>
           ))
         }
       </ul>
     </section>
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
+    <section class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm md:p-8">
       <h3 class="mb-4 text-2xl font-semibold">Leading</h3>
       <ul class="space-y-4">
         {
           leadingRules.map((r) => (
             <li>
-              <code class="text-zmoki-neutral-950 font-mono text-sm font-medium">{r.token}</code>
-              <p class="text-base opacity-80">{r.rule}</p>
-              <p class="font-mono text-xs opacity-50">{r.where}</p>
+              <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono text-sm font-medium">
+                {r.token}
+              </code>
+              <p class="text-zmoki-stone-700 mt-1 text-base">{r.rule}</p>
+              <p class="text-zmoki-stone-500 text-xs">{r.where}</p>
             </li>
           ))
         }
@@ -248,61 +242,69 @@ const linkTreatments = [
   <!-- ===================================================================== -->
   <!-- Part 2 — Prose typography                                             -->
   <!-- ===================================================================== -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
-    Part 2 · Prose typography
-  </h2>
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Part 2 · Prose typography</h2>
 
   <!-- Prose config -->
-  <section class="border-zmoki-neutral-900 mb-6 rounded-xl border-2 bg-white p-6 md:p-8">
+  <section class="border-zmoki-stone-200 mb-6 rounded-xl border bg-white p-6 shadow-sm md:p-8">
     <h3 class="mb-4 text-2xl font-semibold md:text-3xl">.prose configuration</h3>
-    <p class="mb-4 opacity-80">
-      MDX content renders inside <code class="font-mono">prose prose-xl</code> (stepping up to
-      <code class="font-mono">2xl:prose-2xl</code>). Overrides live in
-      <code class="font-mono">tailwind.config.mjs</code> via <code class="font-mono"
+    <p class="text-zmoki-stone-700 mb-4">
+      MDX content renders inside <code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
+        >prose prose-xl</code
+      > (stepping up to
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
+        >2xl:prose-2xl</code
+      >). Overrides live in
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
+        >tailwind.config.mjs</code
+      > via <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
         >typography()</code
       >.
     </p>
-    <ul class="space-y-2 font-mono text-sm">
+    <ul
+      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 space-y-2 rounded-xl border p-4 font-mono text-sm"
+    >
       <li>
-        <span class="text-zmoki-neutral-950">--tw-prose-headings</span>
-        <span class="opacity-60">→ zmoki-neutral-900</span>
+        <span class="text-zmoki-stone-900">--tw-prose-headings</span>
+        <span class="text-zmoki-stone-500">→ zmoki-stone-900</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-950">--tw-prose-body</span>
-        <span class="opacity-60">→ zmoki-neutral-900</span>
+        <span class="text-zmoki-stone-900">--tw-prose-body</span>
+        <span class="text-zmoki-stone-500">→ zmoki-stone-900</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-950">--tw-prose-bold</span>
-        <span class="opacity-60">→ zmoki-neutral-900</span>
+        <span class="text-zmoki-stone-900">--tw-prose-bold</span>
+        <span class="text-zmoki-stone-500">→ zmoki-stone-900</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-950">prose-headings:font-semibold</span>
-        <span class="opacity-60">→ heading weight (PostLayout)</span>
+        <span class="text-zmoki-stone-900">prose-headings:font-semibold</span>
+        <span class="text-zmoki-stone-500">→ heading weight (PostLayout)</span>
       </li>
     </ul>
   </section>
 
   <!-- Link treatments -->
-  <section class="border-zmoki-neutral-900 mb-6 rounded-xl border-2 bg-white p-6 md:p-8">
+  <section class="border-zmoki-stone-200 mb-6 rounded-xl border bg-white p-6 shadow-sm md:p-8">
     <h3 class="mb-5 text-2xl font-semibold md:text-3xl">In-prose links</h3>
-    <p class="mb-5 opacity-80">
-      Link color is driven by data attributes added by the <code class="font-mono"
+    <p class="text-zmoki-stone-700 mb-5">
+      Link treatment is driven by data attributes added by the <code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
         >rehypeExternalLinks</code
       > plugin. Each renders with its real token.
     </p>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {
         linkTreatments.map((link) => (
-          <div class="rounded-lg border border-slate-200 p-4">
+          <div class="border-zmoki-stone-200 rounded-xl border p-4">
             <span
-              class="text-lg font-medium"
-              style={`color: ${link.color}; border-bottom: ${link.border} ${link.color};`}
+              class="text-lg font-medium underline underline-offset-2"
+              style={`color: ${link.color};`}
             >
               {link.label}
             </span>
-            <p class="mt-3 font-mono text-xs opacity-60">{link.attr}</p>
-            <p class="font-mono text-xs tracking-normal uppercase opacity-50">
-              {link.token} · {link.border}
+            <p class="text-zmoki-stone-500 mt-3 font-mono text-xs">{link.attr}</p>
+            <p class="text-zmoki-stone-500 text-xs">
+              {link.token} · {link.style}
             </p>
           </div>
         ))
@@ -314,11 +316,11 @@ const linkTreatments = [
   <section class="mb-10">
     <h3 class="mb-4 px-1 text-2xl font-semibold md:text-3xl">Live specimen</h3>
     <div
-      class="prose prose-xl border-zmoki-neutral-900 prose-headings:font-semibold max-w-none rounded-xl border-2 bg-white px-4 py-8 md:p-12"
+      class="prose prose-xl border-zmoki-stone-200 prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-12"
     >
       <h1>The shape of a sentence</h1>
       <p>
-        Prose body is set in Noto Sans at <code>prose-xl</code>, with Noto Serif headings and <strong
+        Prose body and headings are both set in Noto Sans at <code>prose-xl</code>, with <strong
           >ink-colored bold</strong
         >. This is a base <a href="/">internal link</a>, an
         <a href="https://example.com" data-external="true">external link</a>, a
