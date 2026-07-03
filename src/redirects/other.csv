@@ -1,0 +1,3 @@
+source,destination,code
+# Everything else — resources, external links, one-off moves.
+# /resources/something/,https://external.example.com/,302

@@ -66,4 +66,16 @@ export const site = {
 
   /** First year shown in the footer copyright range. */
   copyrightStartYear: 2025,
+
+  /** Deploy-time settings (hosting). See SETUP.md §6. */
+  deploy: {
+    /**
+     * Hosting target for the redirects build (`npm run build:redirects`).
+     * Selects which artifact the CSVs in src/redirects/ compile to:
+     *   "cloudflare" | "netlify" → public/_redirects
+     *   "vercel"                 → vercel.json (redirects[] merged in)
+     *   "amplify"                → redirects.json (paste into the Amplify console/IaC)
+     */
+    platform: "cloudflare",
+  },
 } as const;

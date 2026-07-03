@@ -1,0 +1,3 @@
+source,destination,code
+# Legacy blog slugs → current post URLs. One row per redirect.
+# /feed/old-slug/,/blog/1-new-slug/,301

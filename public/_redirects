@@ -1,4 +1,5 @@
-# Cloudflare Pages redirects. Format: <from> <to> <status>
-# Add legacy-slug or external redirects here as your site grows, e.g.:
-# /feed/old-slug/ /feed/1-new-slug/ 301
-# /resources/something/ https://external.example.com/ 302
+# GENERATED FILE — do not edit by hand.
+# Source: src/redirects/*.csv  ·  Build: npm run build:redirects  ·  Platform: cloudflare
+# Format: <from> <to> <status>
+
+# (no redirects defined yet)
