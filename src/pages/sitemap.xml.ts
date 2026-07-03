@@ -47,7 +47,7 @@ export const GET: APIRoute = async ({ site }) => {
   ${allFeedIems
     .map((post: CollectionEntry<"blog">) =>
       sitemapUrl(
-        `blog/${post.slug}/`,
+        `blog/${post.id}/`,
         (post.data.contentModifiedDate ?? post.data.publishDate).toISOString().substring(0, 10),
       ),
     )
@@ -55,7 +55,7 @@ export const GET: APIRoute = async ({ site }) => {
   ${allResources
     .map((resource: CollectionEntry<"resources">) =>
       sitemapUrl(
-        `resources/${resource.slug}/`,
+        `resources/${resource.id}/`,
         (resource.data.contentModifiedDate ?? resource.data.publishDate)
           .toISOString()
           .substring(0, 10),
@@ -65,7 +65,7 @@ export const GET: APIRoute = async ({ site }) => {
     ${allLegalItems
       .map((legalItem: CollectionEntry<"legal">) =>
         sitemapUrl(
-          `legal/${legalItem.slug}/`,
+          `legal/${legalItem.id}/`,
           legalItem.data.contentModifiedDate.toISOString().substring(0, 10),
         ),
       )

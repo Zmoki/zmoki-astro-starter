@@ -114,11 +114,11 @@ export async function GET(context: { site: string | undefined }) {
   // Render and sanitize each post's content
   const items = await Promise.all(
     sortedPosts.map(async (post: CollectionEntry<"blog">) => {
-      // First, strip import statements
-      let processedContent = stripImports(post.body);
+      // First, strip import statements (Content Layer types `body` as optional)
+      let processedContent = stripImports(post.body ?? "");
 
       // Then convert MDX components to HTML
-      processedContent = convertMdxComponentsToHtml(processedContent, siteUrl, post.slug);
+      processedContent = convertMdxComponentsToHtml(processedContent, siteUrl, post.id);
 
       // Then render the Markdown to HTML using markdown-it
       let contentHtml = parser.render(processedContent);
@@ -129,7 +129,7 @@ export async function GET(context: { site: string | undefined }) {
       // Use the OG image for this post (already generated for each post)
       // This follows the pattern from https://webreaper.dev/posts/astro-rss-feed-blog-post-images/
       // Ensure no double slashes in URL
-      const ogImagePath = `og-images/blog/${post.slug}/wide.jpg`;
+      const ogImagePath = `og-images/blog/${post.id}/wide.jpg`;
       const baseUrl = String(siteUrl).replace(/\/$/, "");
       const ogImageUrl = `${baseUrl}/${ogImagePath}`;
 
@@ -171,7 +171,7 @@ export async function GET(context: { site: string | undefined }) {
       return {
         title: post.data.title,
         description: post.data.description,
-        link: `/blog/${post.slug}/`,
+        link: `/blog/${post.id}/`,
         pubDate: post.data.publishDate,
         content: sanitizedContent,
         customData: customData,

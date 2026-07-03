@@ -13,18 +13,18 @@ const { title, description, publishDate, contentModifiedDate } = Astro.props;
 >
   <section class="space-y-4">
     <header
-      class="flex flex-col gap-6 rounded-xl border border-zmoki-neutral-900 bg-white px-4 py-8 outline-dashed outline-8 -outline-offset-2 outline-slate-400 md:items-center md:p-16 md:text-center xl:p-20"
+      class="border-zmoki-neutral-900 flex flex-col gap-6 rounded-xl border bg-white px-4 py-8 outline-8 -outline-offset-2 outline-slate-400 outline-dashed md:items-center md:p-16 md:text-center xl:p-20"
     >
       <h1 class="text-5xl font-semibold xl:text-6xl" set:html={title} />
       {description && <p class="text-2xl xl:text-3xl" set:html={description} />}
       <p
-        class="order-first flex flex-col gap-2 font-mono text-xs uppercase tracking-normal opacity-70 md:flex-row lg:gap-4 xl:text-sm"
+        class="order-first flex flex-col gap-2 font-mono text-xs tracking-normal uppercase opacity-70 md:flex-row lg:gap-4 xl:text-sm"
       >
         <span>Updated on <Time datetime={contentModifiedDate} /></span>
       </p>
     </header>
     <section
-      class="prose max-w-none rounded-xl border border-zmoki-neutral-900 bg-white px-4 py-8 prose-headings:font-semibold md:p-16 xl:px-28 xl:py-16 [&_a]:text-zmoki-neutral-900"
+      class="prose border-zmoki-neutral-900 prose-headings:font-semibold [&_a]:text-zmoki-neutral-900 max-w-none rounded-xl border bg-white px-4 py-8 md:p-16 xl:px-28 xl:py-16"
     >
       <slot />
     </section>

@@ -1,17 +1,17 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import LegalLayout from "@/layouts/LegalLayout.astro";
 
 export async function getStaticPaths() {
   const posts = await getCollection("legal");
   return posts.map((post: CollectionEntry<"legal">) => ({
-    params: { slug: post.slug },
+    params: { slug: post.id },
     props: post,
   }));
 }
 
 const post = Astro.props as CollectionEntry<"legal">;
-const { Content } = await post.render();
+const { Content } = await render(post);
 ---
 
 <LegalLayout
