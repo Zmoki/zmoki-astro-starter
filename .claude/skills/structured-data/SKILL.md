@@ -89,9 +89,10 @@ Keep URLs absolute (`site.domain` + path) and dates as ISO 8601 — both are wha
 Structured data isn't "done" until Google's own validators pass:
 
 1. **Build** and serve, or push to production.
-2. **Rich Results Test** — <https://search.google.com/test/rich-results> — enter the URL (or paste the rendered HTML). Confirm the intended type is **detected with no errors**; fix every error and every warning you can.
-3. On the live site, **URL Inspection** in Google Search Console confirms Google can crawl and parse it.
-4. Sanity-check that the marked-up facts are actually **visible on the page** — the core policy.
+2. **`npm run check:sd`** — the repo's offline CI guard (`scripts/check-structured-data.ts`, runs after build in CI). It parses every JSON-LD block in `dist/` and fails on malformed/unsound markup (invalid JSON, missing `@context`/`@type`, unresolved `${…}`/`undefined` leftovers). This catches emit-time regressions **but does not** judge rich-result eligibility — it's a floor, not the Rich Results Test.
+3. **Rich Results Test** — <https://search.google.com/test/rich-results> — enter the URL (or paste the rendered HTML). Confirm the intended type is **detected with no errors**; fix every error and every warning you can. (No CI API exists for this — it's manual/live.)
+4. On the live site, **URL Inspection** in Google Search Console confirms Google can crawl and parse it.
+5. Sanity-check that the marked-up facts are actually **visible on the page** — the core policy.
 
 Report which type(s) you added, which page(s), and the Rich Results Test outcome. Do not claim eligibility for a rich result the test didn't confirm.
 

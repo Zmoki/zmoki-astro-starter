@@ -55,6 +55,7 @@ npm run build            # production build (also emits OG images to dist/og/)
 npm run timeline:blog    # generate blog-timeline.csv
 npm run build:redirects  # compile src/redirects/*.csv → host redirect artifact (runs automatically before build)
 npm run check:redirects  # CI guard: rebuild redirects and fail if the committed artifact drifted
+npm run check:sd         # CI guard: validate schema.org JSON-LD in dist/ (run after build)
 npm run lhci:mobile      # Lighthouse CI mobile
 npm run lhci:desktop     # Lighthouse CI desktop
 npm run format           # Prettier format all files
@@ -72,6 +73,7 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 3. **Lint** — `npm run lint`
 4. **Redirects drift check** — `npm run check:redirects` (rebuilds the redirect artifact and fails if it differs from what's committed)
 5. **Build** — `npm run build`
+6. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
 
 Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`.
 

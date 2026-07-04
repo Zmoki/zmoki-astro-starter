@@ -41,3 +41,6 @@ jobs:
           PUBLIC_POSTHOG_HOST: ${{ secrets.PUBLIC_POSTHOG_HOST }}
           PUBLIC_BREVO_ACCOUNT_ID: ${{ secrets.PUBLIC_BREVO_ACCOUNT_ID }}
           PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
+
+      - name: Structured data check
+        run: npm run check:sd

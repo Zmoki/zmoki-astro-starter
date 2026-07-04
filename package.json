@@ -13,6 +13,7 @@
     "build:redirects": "node scripts/generate-redirects.ts",
     "check:redirects": "node scripts/generate-redirects.ts && (git diff --exit-code -- public/_redirects vercel.json redirects.json || (echo '\\n✖ Redirect artifacts are out of date. Run: npm run build:redirects, then commit the result.' && exit 1))",
     "check": "astro check",
+    "check:sd": "node scripts/check-structured-data.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
