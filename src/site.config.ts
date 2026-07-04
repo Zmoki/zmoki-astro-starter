@@ -19,7 +19,7 @@ export const site = {
   ogSiteName: "Zmoki Astro Starter",
 
   /** RSS feed description. */
-  feedDescription: "Posts, projects, and resources from Zmoki Astro Starter.",
+  feedDescription: "Posts and guides about building your site with the Zmoki Astro Starter.",
 
   /** Top-nav links (between the logo and the CTA button). Anchors or routes. */
   nav: [
