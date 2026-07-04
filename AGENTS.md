@@ -21,7 +21,7 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 | Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4           |
 | Content             | MDX via @astrojs/mdx                                           | ^7           |
 | Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Google Fonts |
-| Analytics           | PostHog                                                        | posthog-js   |
+| Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in       | posthog-js   |
 | Email/Forms         | Brevo                                                          | —            |
 | OG images           | Puppeteer (script)                                             | —            |
 | RSS                 | @astrojs/rss                                                   | —            |
@@ -41,6 +41,7 @@ Project skills live in `.claude/skills/`:
 - `/brand-typography` — swap the site's fonts end to end (`.claude/skills/brand-typography/SKILL.md`)
 - `/redirects` — add or edit URL redirects (`.claude/skills/redirects/SKILL.md`)
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
+- `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
 
 ---
 
@@ -92,7 +93,7 @@ Config: `eslint.config.mjs`. Ignores: `dist/`, `.astro/`, `node_modules/`, `.cla
 Conventions:
 
 - Prefix intentionally unused function params/vars with `_` to satisfy `no-unused-vars`
-- Vendor scripts (e.g. `posthog.astro`) use `/* eslint-disable */` inline
+- Vendor scripts (e.g. `analytics/posthog.astro`) use `/* eslint-disable */` inline
 
 ---
 
@@ -308,7 +309,20 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 
 ---
 
-## Analytics events (PostHog)
+## Analytics
+
+Analytics is **provider-agnostic** and supports **multiple providers at once**. Call sites never name a vendor — they fire events through a global facade `window.track(event, props)` (always called optionally: `window.track?.(...)`). Each active provider chains onto `window.track`, so one call fans out to all of them.
+
+Built-in providers ship as self-gating components in `src/components/analytics/`:
+
+- **`posthog.astro`** — PostHog. Active when `PUBLIC_POSTHOG_PROJECT_TOKEN` **and** `PUBLIC_POSTHOG_HOST` are set. `track` → `posthog.capture(event, props)`.
+- **`gtm.astro`** — Google Tag Manager. Active when `PUBLIC_GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`) is set. `track` → `dataLayer.push({ event, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
+
+`Analytics.astro` is the dispatcher: it renders every provider (each emits nothing when its own env vars are absent) under one global kill switch, `PUBLIC_ANALYTICS_ENABLED !== "false"`.
+
+**To add a provider:** drop a component in `src/components/analytics/` that renders its loader snippet and chains onto `window.track` (wrap the previous `track` so events still reach earlier providers), then render it from `Analytics.astro`. Add its host to the CSP in `public/_headers` and its env var to `src/env.d.ts` + `.env.example`.
+
+### Tracked events
 
 | Event                     | Where fired              | Properties                      |
 | ------------------------- | ------------------------ | ------------------------------- |
@@ -316,26 +330,27 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 | `post_navigation_clicked` | PostLayout inline script | `direction`, `destination_slug` |
 | `code_block_copied`       | PostLayout inline script | `snippet_length`                |
 
-PostHog captures all listed events plus pageviews automatically.
+These fire via `window.track(...)` and reach every active provider. Pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). Note: property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
 
 ---
 
 ## Components
 
-| Component            | Purpose                                                       |
-| -------------------- | ------------------------------------------------------------- |
-| `BaseLayout.astro`   | Shell: nav, meta, footer, analytics                           |
-| `PostLayout.astro`   | Blog post wrapper                                             |
-| `PostCard.astro`     | Post list item on index page                                  |
-| `PostImage.astro`    | Image with caption in posts                                   |
-| `RawVideo.astro`     | Video embed                                                   |
-| `Video.astro`        | Video with controls                                           |
-| `Button.astro`       | Reusable button; renders `<a>` when given `href` (see below)  |
-| `BrevoForm.astro`    | Email signup form (Brevo)                                     |
-| `ResourceLink.astro` | Renders a resource link in sidebar/resource pages             |
-| `Time.astro`         | Renders `<time>` element with formatted date                  |
-| `Analytics.astro`    | Injects PostHog only when analytics is configured (see below) |
-| `posthog.astro`      | PostHog init script (rendered by `Analytics.astro`)           |
+| Component                 | Purpose                                                      |
+| ------------------------- | ------------------------------------------------------------ |
+| `BaseLayout.astro`        | Shell: nav, meta, footer, analytics                          |
+| `PostLayout.astro`        | Blog post wrapper                                            |
+| `PostCard.astro`          | Post list item on index page                                 |
+| `PostImage.astro`         | Image with caption in posts                                  |
+| `RawVideo.astro`          | Video embed                                                  |
+| `Video.astro`             | Video with controls                                          |
+| `Button.astro`            | Reusable button; renders `<a>` when given `href` (see below) |
+| `BrevoForm.astro`         | Email signup form (Brevo)                                    |
+| `ResourceLink.astro`      | Renders a resource link in sidebar/resource pages            |
+| `Time.astro`              | Renders `<time>` element with formatted date                 |
+| `Analytics.astro`         | Dispatcher: renders every analytics provider (see Analytics) |
+| `analytics/posthog.astro` | PostHog provider — loader + `track` facade                   |
+| `analytics/gtm.astro`     | Google Tag Manager provider — loader + `track` facade        |
 
 ### `Button.astro`
 
@@ -343,7 +358,7 @@ Reusable button composed from Tailwind utilities. Renders a `<button>`, or an `<
 
 ### `Analytics.astro`
 
-Wraps `posthog.astro` and only renders it when analytics is actually configured: `PUBLIC_ANALYTICS_ENABLED !== "false"` **and** both `PUBLIC_POSTHOG_PROJECT_TOKEN` and `PUBLIC_POSTHOG_HOST` are set. Without a host, PostHog would request `<host>/static/array.js` from the current origin, 404, and log a console error — which is what happened in the Lighthouse/CI build (those secrets are empty there), capping the Best-Practices score. Gating on the env vars keeps PostHog out of any build where it can't work.
+Dispatcher for the analytics providers in `src/components/analytics/` (see **Analytics** above). Renders each provider under one global kill switch (`PUBLIC_ANALYTICS_ENABLED !== "false"`); each provider then self-gates on its own env vars and emits **nothing** when unconfigured. This matters beyond tidiness: an unconfigured PostHog would request `<host>/static/array.js` from the current origin, 404, and log a console error — which is what happened in the Lighthouse/CI build (those secrets are empty there), capping the Best-Practices score. Emitting no snippet when a provider can't work keeps that score clean.
 
 ### Fonts
 
@@ -387,7 +402,8 @@ Current variables:
 | -------------------------------------- | -------- | -------------------------------------------------- |
 | `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token (required to load PostHog) |
 | `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL (required to load PostHog)        |
-| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to force-disable PostHog          |
+| `PUBLIC_GTM_CONTAINER_ID`              | No       | Google Tag Manager container ID (`GTM-XXXXXXX`)    |
+| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to force-disable all analytics    |
 | `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration                       |
 | `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection                |
 
