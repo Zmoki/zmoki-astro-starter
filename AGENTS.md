@@ -320,15 +320,15 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 
 ## Analytics events (PostHog)
 
-| Event                        | Where fired                | Properties                      |
-| ---------------------------- | -------------------------- | ------------------------------- |
-| `contact_email_clicked`      | BaseLayout inline script   | `email`                         |
-| `post_navigation_clicked`    | PostLayout inline script   | `direction`, `destination_slug` |
-| `code_block_copied`          | PostLayout inline script   | `snippet_length`                |
-| `gate_viewed`                | BrevoForm inline script    | `resource_slug`, `form_id`      |
-| `newsletter_form_submitted`  | BrevoForm inline script    | `form_id`, `resource_slug`      |
-| `resource_download_confirmed`| Thank-you inline script    | `resource_name`, `resource_url` |
-| `resource_downloaded`        | Thank-you inline script    | `resource_name`, `asset_file`   |
+| Event                         | Where fired              | Properties                      |
+| ----------------------------- | ------------------------ | ------------------------------- |
+| `contact_email_clicked`       | BaseLayout inline script | `email`                         |
+| `post_navigation_clicked`     | PostLayout inline script | `direction`, `destination_slug` |
+| `code_block_copied`           | PostLayout inline script | `snippet_length`                |
+| `gate_viewed`                 | BrevoForm inline script  | `resource_slug`, `form_id`      |
+| `newsletter_form_submitted`   | BrevoForm inline script  | `form_id`, `resource_slug`      |
+| `resource_download_confirmed` | Thank-you inline script  | `resource_name`, `resource_url` |
+| `resource_downloaded`         | Thank-you inline script  | `resource_name`, `asset_file`   |
 
 PostHog captures all listed events plus pageviews automatically.
 
