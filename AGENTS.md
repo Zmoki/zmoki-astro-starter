@@ -225,7 +225,7 @@ Props:
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
-Sets `<html lang="en">`, loads Google Fonts, meta/OG tags, PostHog, canonical URL. OG images are served from `/og-images{pathname}wide.jpg` (or `/og-images/wide.jpg` for non-articles).
+Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. OG images are served from `/og-images{pathname}wide.jpg` (or `/og-images/wide.jpg` for non-articles).
 
 ### `PostLayout.astro`
 
@@ -322,18 +322,32 @@ PostHog captures all listed events plus pageviews automatically.
 
 ## Components
 
-| Component            | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `BaseLayout.astro`   | Shell: grid, meta, sidebars, analytics            |
-| `PostLayout.astro`   | Blog post wrapper                                 |
-| `PostCard.astro`     | Post list item on index page                      |
-| `PostImage.astro`    | Image with caption in posts                       |
-| `RawVideo.astro`     | Video embed                                       |
-| `Video.astro`        | Video with controls                               |
-| `BrevoForm.astro`    | Email signup form (Brevo)                         |
-| `ResourceLink.astro` | Renders a resource link in sidebar/resource pages |
-| `Time.astro`         | Renders `<time>` element with formatted date      |
-| `posthog.astro`      | PostHog init script (injected in `<head>`)        |
+| Component            | Purpose                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `BaseLayout.astro`   | Shell: nav, meta, footer, analytics                           |
+| `PostLayout.astro`   | Blog post wrapper                                             |
+| `PostCard.astro`     | Post list item on index page                                  |
+| `PostImage.astro`    | Image with caption in posts                                   |
+| `RawVideo.astro`     | Video embed                                                   |
+| `Video.astro`        | Video with controls                                           |
+| `Button.astro`       | Reusable button; renders `<a>` when given `href` (see below)  |
+| `BrevoForm.astro`    | Email signup form (Brevo)                                     |
+| `ResourceLink.astro` | Renders a resource link in sidebar/resource pages             |
+| `Time.astro`         | Renders `<time>` element with formatted date                  |
+| `Analytics.astro`    | Injects PostHog only when analytics is configured (see below) |
+| `posthog.astro`      | PostHog init script (rendered by `Analytics.astro`)           |
+
+### `Button.astro`
+
+Reusable button composed from Tailwind utilities. Renders a `<button>`, or an `<a>` when given `href` (a button-like link). Props: `variant` (`primary` = indigo fill / `secondary` = white + soft stone border / `inverse` = white, for use on an indigo band) and `size` (`md` / `lg`). Extra `class` is appended; other attributes (`type`, `target`, `data-*`) pass through. Live demo on `/-/astro/brand/components/`.
+
+### `Analytics.astro`
+
+Wraps `posthog.astro` and only renders it when analytics is actually configured: `PUBLIC_ANALYTICS_ENABLED !== "false"` **and** both `PUBLIC_POSTHOG_PROJECT_TOKEN` and `PUBLIC_POSTHOG_HOST` are set. Without a host, PostHog would request `<host>/static/array.js` from the current origin, 404, and log a console error — which is what happened in the Lighthouse/CI build (those secrets are empty there), capping the Best-Practices score. Gating on the env vars keeps PostHog out of any build where it can't work.
+
+### Fonts
+
+`BaseLayout` and `BrandLayout` load Google Fonts **non-render-blocking**: `<link rel="preload" as="style">` + `<link rel="stylesheet" media="print" onload="this.media='all'">` (with a `<noscript>` fallback), so text paints immediately in the fallback and the font never blocks First Contentful Paint. Only **Noto Sans** and **Noto Sans Mono** are requested, weights **400–700** (the range the site actually uses). The shared URL lives in a `fontsHref` const in each layout — keep the two in sync.
 
 ---
 
@@ -369,13 +383,13 @@ Edit this file directly for header changes (not Terraform).
 
 Current variables:
 
-| Variable                               | Required | Purpose                                    |
-| -------------------------------------- | -------- | ------------------------------------------ |
-| `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token                    |
-| `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL                           |
-| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to disable PostHog in dev |
-| `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration               |
-| `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection        |
+| Variable                               | Required | Purpose                                            |
+| -------------------------------------- | -------- | -------------------------------------------------- |
+| `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token (required to load PostHog) |
+| `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL (required to load PostHog)        |
+| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to force-disable PostHog          |
+| `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration                       |
+| `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection                |
 
 When adding a new env var: add it to `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment.
 

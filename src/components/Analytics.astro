@@ -1,0 +1,15 @@
+---
+// Renders PostHog only when analytics is actually configured: not explicitly
+// disabled (PUBLIC_ANALYTICS_ENABLED !== "false") AND both the project token
+// and host are present. Without a host, PostHog requests
+// `<host>/static/array.js` from the current origin, 404s, and logs a console
+// error (e.g. in the Lighthouse build, where these env vars are empty).
+import PostHog from "@/components/posthog.astro";
+
+const analyticsEnabled =
+  import.meta.env.PUBLIC_ANALYTICS_ENABLED !== "false" &&
+  !!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN &&
+  !!import.meta.env.PUBLIC_POSTHOG_HOST;
+---
+
+{analyticsEnabled && <PostHog />}
