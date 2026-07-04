@@ -32,7 +32,7 @@ Split the results into two buckets:
 
 ## 2. Confirm scope
 
-Use `AskUserQuestion` to ask how far to go: safe-only, safe + specific majors,
+Ask the user how far to go: safe-only, safe + specific majors,
 or everything. Majors can be large migrations — don't assume.
 
 ## 3. Stage the work — one commit per bump
@@ -48,7 +48,7 @@ git commit -am "chore(deps): apply safe within-range dependency updates"
 For **each major**, separately:
 
 1. **Research** the breaking changes first — read the official upgrade guide
-   (`WebFetch` it). Don't trust memory for versions newer than your cutoff.
+   (fetch it). Don't trust memory for versions newer than your cutoff.
 2. `npm install <pkg>@^<major>` (install coupled packages together — see below).
 3. Apply the code/config migration.
 4. **Verify** (section 4), then commit with a message explaining what broke and

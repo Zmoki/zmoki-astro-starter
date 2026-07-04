@@ -24,7 +24,7 @@ Live reference: `/-/astro/brand/color/`.
 
 ## Step 1 — Ask the user
 
-Use `AskUserQuestion` to settle two things before editing:
+Ask the user to settle two things before editing:
 
 1. **Which color?** A Tailwind color name (slate, gray, zinc, neutral, stone,
    red, orange, amber, yellow, lime, green, emerald, teal, cyan, sky, blue,
@@ -52,8 +52,8 @@ The user prefers **[colorhexa.com](https://www.colorhexa.com/)**. Build a full
 3. **Pick by eye for even, Tailwind-like spacing** — Tailwind's own scales ramp
    non-linearly, so match that feel rather than fixed 10% stops.
 
-Fetch `https://www.colorhexa.com/<hex-without-#>` (e.g. `.../2f6bff`) with
-WebFetch to read off the shade/tint hexes, or ask the user to paste the scale.
+Fetch `https://www.colorhexa.com/<hex-without-#>` (e.g. `.../2f6bff`)
+to read off the shade/tint hexes, or ask the user to paste the scale.
 
 Add it to `customPalettes` in `src/design-tokens.mjs` (the existing `zmoki-cream`
 scale is the worked example):

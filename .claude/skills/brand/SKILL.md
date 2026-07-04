@@ -46,7 +46,7 @@ and its implementation (so the site matches) — in the same pass.
 1. **Orient.** Open the relevant guideline page (`/run` → `/-/astro/brand/…`) and
    read it. It is the current truth — work from it, not from memory.
 2. **Settle the change with the user** if the direction is open (which color, which
-   font, what the voice should be). Use `AskUserQuestion` rather than guessing.
+   font, what the voice should be). Ask the user rather than guessing.
 3. **Adapt the guideline + implementation together.** The task references below
    carry the concrete how-to (files, commands, gotchas):
    - Recolor / re-skin / custom brand color → `references/colors.md`

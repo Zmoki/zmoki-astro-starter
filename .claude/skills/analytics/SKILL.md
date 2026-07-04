@@ -20,7 +20,7 @@ Env vars are declared in **`src/env.d.ts`** (source of truth) and mirrored empty
 
 ## Step 1 — Figure out the task
 
-Ask (`AskUserQuestion`) only if unclear. The four jobs:
+Ask the user only if unclear. The four jobs:
 
 - **A. Enable a built-in provider** (PostHog / GTM) → just env vars, no code. Step 2.
 - **B. Add a new provider** (Plausible, Fathom, GA4, Umami, …) → the recipe. Step 3.
