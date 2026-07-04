@@ -17,6 +17,7 @@ tell what your changes broke:
 ```bash
 npm install
 npm run build && npm run check && npm run lint && npm run format:check
+npm audit   # record the starting vulnerability count, so you know what you fixed
 ```
 
 ## 1. Categorize
@@ -30,12 +31,69 @@ Split the results into two buckets:
 - **Safe** — the `Wanted` column (within the current semver range). Low risk.
 - **Major** — `Latest` > `Wanted` (a new major). Breaking; handle one at a time.
 
-## 2. Confirm scope
+## 2. Security audit
+
+A dependency pass is also the moment to clear (or at least assess) security
+advisories and the `npm warn deprecated …` noise you saw on install.
+
+```bash
+npm audit
+```
+
+**Never run `npm audit fix --force` blind.** Its "fix" is frequently a
+_downgrade_ to an ancient major — npm will cheerfully propose `@lhci/cli@0.1.0`
+(15 majors back), which breaks the tool for zero real gain. Read each advisory
+and decide deliberately.
+
+Triage each finding by where the vulnerable package sits — `npm ls <pkg>` shows
+the parent chain:
+
+1. **Direct dep, forward fix exists** — bump it like any other update (sections
+   below). Prefer this.
+2. **Transitive dep, parent has a newer release** — bump the _parent_; the fix
+   flows down.
+3. **Transitive dep, no forward fix** (the parent is already latest and _still_
+   ships the vulnerable version) — pin the patched version with an `overrides`
+   block in `package.json`, then reinstall and re-audit:
+
+   ```jsonc
+   // package.json — sits next to "devDependencies"
+   "overrides": {
+     "tmp": "^0.2.7",
+     "uuid": "^11.1.1"
+   }
+   ```
+
+   Use a **global** override when the package reaches the tree through only one
+   parent (confirm with `npm ls <pkg>` — one chain = safe to force globally);
+   scope it (`"parent": { "pkg": "…" }`) when other consumers still need the old
+   version. An override force-changes a transitive package across a major
+   boundary, so **verify the owning tool still runs** — `npm audit` going to 0 is
+   necessary but not sufficient; the bump could break the consumer at runtime. For
+   `@lhci/cli`, `npx lhci healthcheck` is the cheap end-to-end check.
+
+**Weigh the blast radius.** A vuln in a **dev/CI-only** tool (Lighthouse,
+Prettier, ESLint) never reaches visitors — treat it differently from one in a
+runtime dependency. Fix what's cheap and safe; don't force a risky override on a
+dev tool for a local-only, never-shipped issue. Commit any `overrides` change on
+its own (`fix(deps): …`) so it's easy to bisect.
+
+### Deprecation warnings are not vulnerabilities
+
+The `npm warn deprecated …` lines on install are maintainer notices ("no longer
+supported", "leaks memory"), **not** advisories. Trace each to its parent
+(`npm ls <pkg>`). If it's a transitive dep of a tool you can't move — the parent
+still _requires_ the old version — the warning is cosmetic; leave it until
+upstream updates rather than forcing an override that risks breaking the parent
+at runtime. Only chase one when it carries a matching `npm audit` advisory, or
+the parent is your own direct dep.
+
+## 3. Confirm scope
 
 Ask the user how far to go: safe-only, safe + specific majors,
 or everything. Majors can be large migrations — don't assume.
 
-## 3. Stage the work — one commit per bump
+## 4. Stage the work — one commit per bump
 
 For **safe updates** (all at once is fine):
 
@@ -51,10 +109,10 @@ For **each major**, separately:
    (fetch it). Don't trust memory for versions newer than your cutoff.
 2. `npm install <pkg>@^<major>` (install coupled packages together — see below).
 3. Apply the code/config migration.
-4. **Verify** (section 4), then commit with a message explaining what broke and
+4. **Verify** (section 5), then commit with a message explaining what broke and
    how you migrated it.
 
-## 4. Verification gates (every stage)
+## 5. Verification gates (every stage)
 
 - `npm run build` — must produce output; a green build alone isn't proof.
 - `npm run check` (astro type check) and `npm run lint`.
@@ -71,7 +129,7 @@ For **each major**, separately:
   brand colors, fonts, and text (a broken font/color pipeline still "builds" but
   produces blank or black cards). See `src/og/`.
 
-## 5. Lockfile hygiene (critical for CI)
+## 6. Lockfile hygiene (critical for CI)
 
 Incremental `npm install` calls can leave `package-lock.json` missing
 cross-platform **optional** deps (e.g. Tailwind 4 pulls `@tailwindcss/oxide`
@@ -87,7 +145,7 @@ npm ci        # must succeed — this is exactly what CI runs
 
 Commit the regenerated lock.
 
-## 6. GitHub Actions
+## 7. GitHub Actions
 
 Workflow actions are dependencies too, and pinned by major tag. Check them:
 
@@ -124,7 +182,7 @@ After bumping the floor, grep to confirm nothing drifted:
 grep -H node .node-version; grep -n '"node"' package.json; grep -rn node-version .github/workflows/
 ```
 
-## 7. PR + watch CI
+## 8. PR + watch CI
 
 ```bash
 git push -u origin <branch>
@@ -133,7 +191,7 @@ gh pr checks <PR#> --watch --interval 15
 ```
 
 Both `ci` and `lighthouse` must go green. If `ci` fails in seconds at "Install
-dependencies", it's the lockfile — go back to section 5.
+dependencies", it's the lockfile — go back to section 6.
 
 **Worktree caveat:** `gh pr merge --delete-branch` fails with
 `'main' is already used by worktree` because the primary checkout holds `main`.
@@ -162,3 +220,13 @@ unified()` in `astro.config.mjs`. Keep it unless you port the plugins.
   directive; the JS `safelist` is gone — use `@source inline("…")` for classes
   the scanner can't see (the rehype-injected copy-button classes). Verify the
   brand color page renders: `/-/astro/brand/color/`.
+- **`@lhci/cli` audit noise (dev-only).** Every `npm audit` finding and most
+  deprecation warnings in this repo trace to `@lhci/cli` (Lighthouse CI) and its
+  Lighthouse sub-deps — `tmp`, `uuid`, `inquirer`, and `chrome-launcher → rimraf
+→ glob → inflight`. It's already on the latest version, so there's no forward
+  fix, and `npm audit fix --force` would downgrade it to 0.1.0. The `overrides`
+  block (`tmp` → `^0.2.7`, `uuid` → `^11.1.1`) clears all of the advisories;
+  confirm with `npx lhci healthcheck`. The residual `inflight`/`rimraf@3`/`glob@7`
+  deprecation warnings come from `chrome-launcher`, carry **no** advisory, and are
+  left as-is — forcing `rimraf@4+` (callback API removed) would break
+  chrome-launcher's temp-profile cleanup for no security gain.
