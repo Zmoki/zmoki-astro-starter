@@ -27,17 +27,17 @@ Then set the domain in two more places:
 
 ## 2. Palette & typography
 
-The starter is **monochrome** — templates use `zmoki-neutral` (Tailwind's grey). All of Tailwind's palettes are generated under the `zmoki-` prefix (`zmoki-red`, `zmoki-blue`, …), so to re-skin you have two options:
+The starter is a **bright, warm, minimal** look — an ivory canvas (`zmoki-cream`), warm-grey text/borders (`zmoki-stone`), and a single **indigo** accent (`zmoki-indigo`). All of Tailwind's palettes are generated under the `zmoki-` prefix (`zmoki-red`, `zmoki-blue`, …), so to re-skin you have two options:
 
-- **Use a built-in Tailwind color** — no token edits. Find/replace `zmoki-neutral` → e.g. `zmoki-blue` across `src/` to recolor the whole site, or change it only on the elements you want colored (links, nav button, CTA).
+- **Use a built-in Tailwind color** — no token edits. Find/replace `zmoki-indigo` → e.g. `zmoki-emerald` across `src/` to swap the accent site-wide, or change it only on the elements you want recolored (links, nav button, CTA). Swap `zmoki-cream`/`zmoki-stone` the same way to change the canvas or greys.
 - **Use a custom brand color** (not in Tailwind) — build a full `50`→`950` scale and add it to **`src/design-tokens.mjs`**:
   1. Pick your base color. On [colorhexa.com](https://www.colorhexa.com/), enter its hex — that's your `500`.
   2. In the **"Shades and Tints"** section, read off the ramp: the lighter **tints** (toward white) become `400 300 200 100 50`, your base is `500`, and the darker **shades** (toward black) become `600 700 800 900 950`. Pick by eye for even spacing.
-  3. Add the scale to `customPalettes` in `design-tokens.mjs` (there's a commented example). It becomes a `zmoki-<name>-*` utility and shows on the reference page.
+  3. Add the scale to `customPalettes` in `design-tokens.mjs` (the `zmoki-cream` scale already there is the worked example). It becomes a `zmoki-<name>-*` utility and shows on the reference page.
 
 Preview everything at `/-/astro/brand/color/`. The favicon at `public/favicon.svg` uses the same colors — swap it for your own.
 
-Type is three Google Fonts wired into Tailwind's `font-sans` / `font-serif` / `font-mono` families (serif headings, sans body, mono labels). To change them, run **`/brand-typography`** — it walks the full swap (Tailwind families, both layout font links, and the brand specimen). Preview at `/-/astro/brand/typography/`.
+Type is Google Fonts wired into Tailwind's `font-sans` / `font-serif` / `font-mono` families — the site is **all-sans**: Noto Sans for headings and body, Noto Sans Mono for code (`font-serif` stays available but unused). To change them, run **`/brand-typography`** — it walks the full swap (Tailwind families, both layout font links, and the brand specimen). Preview at `/-/astro/brand/typography/`.
 
 ## 3. Content
 

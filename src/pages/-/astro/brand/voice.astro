@@ -157,11 +157,9 @@ const checklist = [
   description="How My Project X sounds: clear, honest, helpful, and human"
 >
   <header
-    class="border-zmoki-neutral-900 bg-zmoki-neutral-900 mb-8 rounded-xl border-2 px-6 py-10 text-white md:px-10"
+    class="border-zmoki-indigo-600 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
   >
-    <a
-      href="/-/astro/brand/"
-      class="font-mono text-xs tracking-normal uppercase opacity-80 hover:opacity-100"
+    <a href="/-/astro/brand/" class="text-xs tracking-normal opacity-80 hover:opacity-100"
       >← My Project X brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Voice &amp; tone</h1>
@@ -172,7 +170,7 @@ const checklist = [
   </header>
 
   <!-- Who's speaking -->
-  <section class="border-zmoki-neutral-900 mb-10 rounded-xl border-2 bg-white p-6 md:p-8">
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <h2 class="mb-3 text-2xl font-semibold md:text-3xl">Who&rsquo;s speaking</h2>
     <p class="max-w-2xl text-lg opacity-80">
       Write as the team behind My Project X, talking directly to the people who use it. One clear,
@@ -182,12 +180,14 @@ const checklist = [
   </section>
 
   <!-- Voice pillars -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Voice pillars</h2>
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-semibold tracking-normal">
+    Voice pillars
+  </h2>
   <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
     {
       pillars.map((pillar) => (
-        <section class="border-zmoki-neutral-900 flex flex-col gap-3 rounded-xl border-2 bg-white p-6 md:p-8">
-          <span class="bg-zmoki-neutral-900 h-2 w-12" />
+        <section class="border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+          <span class="bg-zmoki-indigo-600 h-2 w-12 rounded-full" />
           <h3 class="text-2xl font-semibold md:text-3xl">{pillar.label}</h3>
           <p class="font-medium opacity-90">{pillar.summary}</p>
           <p class="opacity-70">{pillar.detail}</p>
@@ -197,18 +197,18 @@ const checklist = [
   </div>
 
   <!-- Writing mechanics -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">House style</h2>
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-semibold tracking-normal">House style</h2>
   <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-3">
     {
       mechanics.map((m) => (
-        <section class="border-zmoki-neutral-900 flex flex-col gap-3 rounded-xl border-2 bg-white p-6 md:p-8">
+        <section class="border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
           <h3 class="text-lg font-semibold">{m.rule}</h3>
-          <div class="border-zmoki-neutral-900 flex items-start gap-2 border-2 px-3 py-2 text-sm">
-            <span class="font-mono text-xs font-bold uppercase">Do</span>
+          <div class="border-zmoki-emerald-200 bg-zmoki-emerald-50 flex items-start gap-2 rounded-xl border px-3 py-2 text-sm">
+            <span class="text-zmoki-emerald-700 text-xs font-bold">Do</span>
             <span>{m.right}</span>
           </div>
-          <div class="bg-zmoki-neutral-900 flex items-start gap-2 px-3 py-2 text-sm text-white">
-            <span class="font-mono text-xs font-bold uppercase">Don’t</span>
+          <div class="border-zmoki-rose-200 bg-zmoki-rose-50 flex items-start gap-2 rounded-xl border px-3 py-2 text-sm">
+            <span class="text-zmoki-rose-700 text-xs font-bold">Don’t</span>
             <span class="line-through opacity-90">{m.wrong}</span>
           </div>
         </section>
@@ -217,68 +217,75 @@ const checklist = [
   </div>
 
   <!-- Do / don't -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Rewrites</h2>
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-semibold tracking-normal">Rewrites</h2>
   <div class="mb-10 space-y-4">
     {
       examples.map((ex) => (
-        <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
-          <p class="mb-4 font-mono text-xs tracking-normal uppercase opacity-60">{ex.context}</p>
+        <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+          <p class="text-zmoki-stone-500 mb-4 text-xs tracking-normal">{ex.context}</p>
           <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div class="bg-zmoki-neutral-900 p-4 text-white">
-              <p class="mb-1 font-mono text-xs tracking-normal uppercase">Don’t</p>
+            <div class="border-zmoki-rose-200 bg-zmoki-rose-50 rounded-xl border p-4">
+              <p class="text-zmoki-rose-700 mb-1 text-xs tracking-normal">Don’t</p>
               <p class="line-through opacity-90">{ex.wrong}</p>
             </div>
-            <div class="border-zmoki-neutral-900 border-2 p-4">
-              <p class="mb-1 font-mono text-xs tracking-normal uppercase">Do</p>
+            <div class="border-zmoki-emerald-200 bg-zmoki-emerald-50 rounded-xl border p-4">
+              <p class="text-zmoki-emerald-700 mb-1 text-xs tracking-normal">Do</p>
               <p>{ex.right}</p>
             </div>
           </div>
-          <p class="mt-3 text-sm opacity-60">{ex.note}</p>
+          <p class="text-zmoki-stone-500 mt-3 text-sm">{ex.note}</p>
         </section>
       ))
     }
   </div>
 
   <!-- Asking good questions -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-semibold tracking-normal">
     Asking good questions
   </h2>
-  <section class="border-zmoki-neutral-900 mb-10 rounded-xl border-2 bg-white p-6 md:p-8">
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="max-w-2xl opacity-80">
       Questions make strong headings and FAQ entries. Open questions that start with What, Why, or
       How invite a full answer and let each section stand on its own. Closed yes or no questions
       stop at a fact, so save them for the rare moment a fact is all you need. For a worked example,
       see
-      <a href="/blog/2-example-post/" class="font-medium underline">the example post</a>.
+      <a
+        href="/blog/2-example-post/"
+        class="text-zmoki-indigo-600 font-medium underline underline-offset-2">the example post</a
+      >.
     </p>
     <ul class="mt-5 flex flex-wrap gap-2">
       {
         sampleQuestions.map((q) => (
-          <li class="border-zmoki-neutral-900 border-2 px-3 py-1 font-mono text-sm">{q}</li>
+          <li class="bg-zmoki-indigo-100 text-zmoki-indigo-700 rounded-full px-3 py-1 text-sm">
+            {q}
+          </li>
         ))
       }
     </ul>
   </section>
 
   <!-- Lexicon -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Words</h2>
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-semibold tracking-normal">Words</h2>
   <div class="mb-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
+    <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
       <h3 class="mb-4 text-xl font-semibold">Use</h3>
       <ul class="flex flex-wrap gap-2">
         {
           lexicon.use.map((word) => (
-            <li class="border-zmoki-neutral-900 border-2 px-3 py-1 font-mono text-sm">{word}</li>
+            <li class="border-zmoki-emerald-200 bg-zmoki-emerald-50 text-zmoki-emerald-700 rounded-full border px-3 py-1 text-sm">
+              {word}
+            </li>
           ))
         }
       </ul>
     </section>
-    <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
+    <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
       <h3 class="mb-4 text-xl font-semibold">Avoid</h3>
       <ul class="flex flex-wrap gap-2">
         {
           lexicon.avoid.map((word) => (
-            <li class="bg-zmoki-neutral-900 px-3 py-1 font-mono text-sm text-white line-through">
+            <li class="border-zmoki-rose-200 bg-zmoki-rose-50 text-zmoki-rose-700 rounded-full border px-3 py-1 text-sm line-through">
               {word}
             </li>
           ))
@@ -288,8 +295,8 @@ const checklist = [
   </div>
 
   <!-- UI microcopy -->
-  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">UI copy</h2>
-  <section class="border-zmoki-neutral-900 rounded-xl border-2 bg-white p-6 md:p-8">
+  <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-semibold tracking-normal">UI copy</h2>
+  <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="mb-5 max-w-2xl opacity-80">
       The same voice runs through interface copy, from buttons and links to empty states and errors.
     </p>
@@ -298,8 +305,8 @@ const checklist = [
         microcopy.map((item) => (
           <div>
             <h3 class="font-semibold">{item.pattern}</h3>
-            <p class="mt-1 font-mono text-sm">{item.example}</p>
-            <p class="mt-1 text-sm opacity-60">{item.note}</p>
+            <p class="text-zmoki-stone-700 mt-1 text-sm">{item.example}</p>
+            <p class="text-zmoki-stone-500 mt-1 text-sm">{item.note}</p>
           </div>
         ))
       }
@@ -307,17 +314,17 @@ const checklist = [
   </section>
 
   <!-- Pre-publish checklist -->
-  <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
+  <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-semibold tracking-normal">
     Before you publish
   </h2>
   <section
-    class="border-zmoki-neutral-900 bg-zmoki-neutral-900 rounded-xl border-2 p-6 text-slate-50 md:p-8"
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 rounded-2xl border p-6 md:p-8"
   >
     <ul class="space-y-3">
       {
         checklist.map((item) => (
           <li class="flex items-start gap-3">
-            <span class="border-zmoki-neutral-300 mt-1 h-4 w-4 shrink-0 border-2" />
+            <span class="border-zmoki-indigo-300 mt-1 h-4 w-4 shrink-0 rounded border" />
             <span class="opacity-90">{item}</span>
           </li>
         ))

@@ -25,9 +25,9 @@ const families = (names: string[]) =>
 
 <BrandLayout title="Brand — Color" description="My Project X brand color palette and tokens">
   <header
-    class="border-zmoki-neutral-900 bg-zmoki-neutral-700 mb-8 rounded-xl border-2 px-6 py-10 text-white md:px-10"
+    class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
   >
-    <a href="/-/astro/brand/" class="font-mono text-xs tracking-normal uppercase opacity-80"
+    <a href="/-/astro/brand/" class="text-zmoki-indigo-100 text-xs font-medium tracking-normal"
       >← My Project X brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Color</h1>
@@ -35,10 +35,11 @@ const families = (names: string[]) =>
       The palette is Tailwind's default colors, namespaced under the <code class="font-mono"
         >zmoki-</code
       > prefix — every group available as <code class="font-mono">zmoki-slate</code>,
-      <code class="font-mono">zmoki-red</code>, <code class="font-mono">zmoki-neutral</code>, and so
-      on, each a full 50→950 scale. The starter stays <strong>monochrome</strong>: reach for the
-      greys (<code class="font-mono">zmoki-neutral</code>) and let the chromatic ramps wait until
-      you want color. No inline hex — only the utility classes.
+      <code class="font-mono">zmoki-indigo</code>, <code class="font-mono">zmoki-stone</code>, and
+      so on, each a full 50→950 scale. The system is <strong>warm and minimal</strong>: an ivory
+      canvas (<code class="font-mono">zmoki-cream</code>), soft white cards, and a single
+      <code class="font-mono">zmoki-indigo</code> accent — the other ramps wait until you want more color.
+      No inline hex — only the utility classes.
     </p>
   </header>
 
@@ -46,7 +47,7 @@ const families = (names: string[]) =>
   <div class="space-y-3">
     {
       families(greyNames).map((family) => (
-        <section class="border-zmoki-neutral-900 overflow-hidden rounded-xl border-2 bg-white">
+        <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
           <div class="flex items-center justify-between gap-4 px-5 pt-4">
             <h3 class="text-lg font-semibold">{family.name}</h3>
             <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
@@ -69,7 +70,7 @@ const families = (names: string[]) =>
   <div class="space-y-3">
     {
       families(colorNames).map((family) => (
-        <section class="border-zmoki-neutral-900 overflow-hidden rounded-xl border-2 bg-white">
+        <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
           <div class="flex items-center justify-between gap-4 px-5 pt-4">
             <h3 class="text-lg font-semibold">{family.name}</h3>
             <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
@@ -96,7 +97,7 @@ const families = (names: string[]) =>
         </h2>
         <div class="space-y-3">
           {families(customNames).map((family) => (
-            <section class="border-zmoki-neutral-900 overflow-hidden rounded-xl border-2 bg-white">
+            <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
               <div class="flex items-center justify-between gap-4 px-5 pt-4">
                 <h3 class="text-lg font-semibold">{family.name}</h3>
                 <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
@@ -119,58 +120,72 @@ const families = (names: string[]) =>
 
   <!-- Usage in code -->
   <section
-    class="border-zmoki-neutral-900 mt-10 rounded-xl border-2 bg-slate-700 p-6 text-white md:p-8"
+    class="border-zmoki-stone-200 text-zmoki-stone-900 mt-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
   >
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
-    <p class="mb-4 opacity-90">
+    <p class="text-zmoki-stone-500 mb-4">
       Reference any palette as a Tailwind utility with the <code
-        class="rounded bg-slate-900 px-1.5 py-0.5 font-mono text-base">zmoki-</code
-      > prefix and a shade. The starter's ink, fills, and borders all use
-      <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono text-base">zmoki-neutral</code>.
+        class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-</code
+      > prefix and a shade. The system's accent is <code
+        class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-indigo</code
+      > on a warm <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base"
+        >zmoki-cream</code
+      > canvas.
     </p>
     <ul class="space-y-2 font-mono text-sm">
       <li>
-        <span class="text-zmoki-neutral-300">bg-zmoki-neutral-900</span>
-        <span class="opacity-60">— hero, primary links, nav button, CTA, action buttons (ink)</span>
+        <span class="text-zmoki-indigo-600">bg-zmoki-indigo-600 / text-white</span>
+        <span class="text-zmoki-stone-500"
+          >— accent: links, buttons, CTAs (hover zmoki-indigo-700, focus ring zmoki-indigo-500)</span
+        >
       </li>
       <li>
-        <span class="text-zmoki-neutral-300">text-zmoki-neutral-600</span>
-        <span class="opacity-60">— meta & secondary text</span>
+        <span class="text-zmoki-indigo-600">bg-zmoki-cream-100</span>
+        <span class="text-zmoki-stone-500">— page background (warm ivory)</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-300">bg-zmoki-neutral-200</span>
-        <span class="opacity-60">— page background</span>
+        <span class="text-zmoki-indigo-600">text-zmoki-stone-900</span>
+        <span class="text-zmoki-stone-500">— ink: body text & headings</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-300">border-2 border-zmoki-neutral-900 + bg-white</span>
-        <span class="opacity-60">— cards & panels (flat, hard borders)</span>
+        <span class="text-zmoki-indigo-600">text-zmoki-stone-500 / text-zmoki-stone-600</span>
+        <span class="text-zmoki-stone-500">— muted & secondary text</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-300">bg-zmoki-red-600 / text-zmoki-blue-600 …</span>
-        <span class="opacity-60">— reach for a chromatic group to introduce color</span>
+        <span class="text-zmoki-indigo-600"
+          >bg-white + border border-zmoki-stone-200 + shadow-sm</span
+        >
+        <span class="text-zmoki-stone-500"
+          >— cards & panels (soft border, subtle shadow, rounded)</span
+        >
       </li>
     </ul>
-    <p class="mt-5 border-t border-slate-600 pt-4 text-sm opacity-80">
-      <strong>Re-skinning?</strong> To recolor the whole site, find/replace
-      <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">zmoki-neutral</code> with another group.
-      For a brand color that isn't in Tailwind, build a 50→950 scale from your base on
-      <a href="https://www.colorhexa.com/" data-external="true" class="font-medium underline"
-        >colorhexa.com</a
-      > ("Shades and Tints"), add it to <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono"
-        >customPalettes</code
-      > in <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">src/design-tokens.mjs</code>,
-      and it appears here automatically.
+    <p class="border-zmoki-stone-200 text-zmoki-stone-500 mt-5 border-t pt-4 text-sm">
+      <strong class="text-zmoki-stone-900">Re-skinning?</strong> To recolor the whole site, find/replace
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">zmoki-indigo</code> with another
+      Tailwind group. For a brand color that isn't in Tailwind, build a 50→950 scale from your base on
+      <a
+        href="https://www.colorhexa.com/"
+        data-external="true"
+        class="text-zmoki-indigo-600 font-medium underline">colorhexa.com</a
+      > ("Shades and Tints"), add it to <code
+        class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">customPalettes</code
+      > in <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono"
+        >src/design-tokens.mjs</code
+      > (the <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">zmoki-cream</code> scale
+      is the worked example), and it appears here automatically.
     </p>
-    <p class="mt-4 text-sm opacity-80">
-      <strong>Combinations must pass WCAG AA</strong> — every text/background pair needs ≥ 4.5:1 (≥ 3:1
-      for large text, borders, and focus rings). Fills carrying white text (CTA, buttons, hero) usually
-      need a <code class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">-600</code>/<code
-        class="rounded bg-slate-900 px-1.5 py-0.5 font-mono">-700</code
-      > shade to qualify. Check pairs with the
+    <p class="text-zmoki-stone-500 mt-4 text-sm">
+      <strong class="text-zmoki-stone-900">Combinations must pass WCAG AA</strong> — every text/background
+      pair needs ≥ 4.5:1 (≥ 3:1 for large text, borders, and focus rings). Fills carrying white text (CTA,
+      buttons, hero) usually need a <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono"
+        >-600</code
+      >/<code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">-700</code> shade to qualify.
+      Check pairs with the
       <a
         href="https://www.figma.com/color-contrast-checker/"
         data-external="true"
-        class="font-medium underline">Figma contrast checker</a
+        class="text-zmoki-indigo-600 font-medium underline">Figma contrast checker</a
       >.
     </p>
   </section>

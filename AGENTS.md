@@ -20,12 +20,12 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 | Language            | TypeScript                                                     | via Astro    |
 | Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4           |
 | Content             | MDX via @astrojs/mdx                                           | ^7           |
-| Fonts               | Noto Serif (headings), Noto Sans (body), Noto Sans Mono        | Google Fonts |
+| Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Google Fonts |
 | Analytics           | PostHog                                                        | posthog-js   |
 | Email/Forms         | Brevo                                                          | —            |
 | OG images           | Puppeteer (script)                                             | —            |
 | RSS                 | @astrojs/rss                                                   | —            |
-| Syntax highlighting | Shiki, theme: `catppuccin-latte`                               | —            |
+| Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)      | —            |
 | Performance         | Lighthouse CI (@lhci/cli)                                      | —            |
 | Formatting          | Prettier + prettier-plugin-astro + prettier-plugin-tailwindcss | —            |
 
@@ -225,7 +225,7 @@ Props:
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
-Sets `<html lang="en">`, loads Google Fonts, meta/OG tags, PostHog, canonical URL. OG images are served from `/og-images{pathname}wide.jpg` (or `/og-images/wide.jpg` for non-articles).
+Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. OG images are served from `/og-images{pathname}wide.jpg` (or `/og-images/wide.jpg` for non-articles).
 
 ### `PostLayout.astro`
 
@@ -237,7 +237,7 @@ Exist but follow the same `BaseLayout` wrapper pattern.
 
 ### `BrandLayout.astro`
 
-Standalone layout for the internal brand pages under `/-/astro/brand/`. Like `BaseLayout` but **without** the sidebars/header/footer chrome — a single-column canvas. Sets `noindex`, loads the same fonts, uses `bg-zmoki-neutral-200` / `text-zmoki-neutral-900`. Props: `title`, `description?`.
+Standalone layout for the internal brand pages under `/-/astro/brand/`. Like `BaseLayout` but **without** the sidebars/header/footer chrome — a single-column canvas. Sets `noindex`, loads the same fonts, uses `bg-zmoki-cream-100` / `text-zmoki-stone-900`. Props: `title`, `description?`.
 
 ---
 
@@ -245,45 +245,46 @@ Standalone layout for the internal brand pages under `/-/astro/brand/`. Like `Ba
 
 All colors come from **`src/design-tokens.mjs`** — the single source of truth, imported by both `tailwind.config.mjs` (to generate utilities) and the brand reference page. It re-exports Tailwind's default color palettes under the **`zmoki-`** prefix, so every group is a namespaced full 50→950 scale: `zmoki-slate`, `zmoki-gray`, `zmoki-zinc`, `zmoki-neutral`, `zmoki-stone`, plus the chromatic ramps (`zmoki-red`, `zmoki-orange`, … `zmoki-rose`). Templates use these `zmoki-*` utility classes; **no inline hex**. Live reference: `/-/astro/brand/color/`.
 
-The starter palette is flat and **monochrome** (brutalist): templates reach for **`zmoki-neutral`** (and Tailwind's built-in `white` / `slate-*`) only — every chromatic group is generated and available, but unused until you want color.
+The starter palette is a **bright, warm, minimal B2B** look: an ivory canvas, white cards with soft borders and gentle shadows, and a single **indigo** accent. Templates reach for **`zmoki-cream`** (custom warm-ivory scale), **`zmoki-stone`** (warm greys — text, borders), and **`zmoki-indigo`** (accent) — every other chromatic group is generated and available, but unused until you want it.
 
-### Conventions (monochrome starter)
+### Conventions (warm-indigo starter)
 
-| Usage                      | Class                                                                   |
-| -------------------------- | ----------------------------------------------------------------------- |
-| Ink — text, borders, fills | `zmoki-neutral-900` (links, nav button, hero, CTA, action/copy buttons) |
-| Darkest fill / hover       | `zmoki-neutral-950`                                                     |
-| Meta / secondary text      | `zmoki-neutral-600`                                                     |
-| Page background            | `zmoki-neutral-200`                                                     |
-| Cards & panels             | `white` + `border-2 border-zmoki-neutral-900`                           |
-| Marker / highlight         | `zmoki-neutral-300`                                                     |
-| Inverse text on ink fills  | `text-white` / `text-slate-50`                                          |
+| Usage                         | Class                                                                                               |
+| ----------------------------- | --------------------------------------------------------------------------------------------------- |
+| Accent — links, buttons, CTAs | `zmoki-indigo-600` (hover `zmoki-indigo-700`, focus ring `zmoki-indigo-500`)                        |
+| Ink — text & headings         | `zmoki-stone-900`                                                                                   |
+| Meta / secondary text         | `zmoki-stone-500` (or `zmoki-stone-600`)                                                            |
+| Page background               | `zmoki-cream-100` (warm ivory)                                                                      |
+| Cards & panels                | `white` + `border border-zmoki-stone-200` + `rounded-2xl` + `shadow-sm`                             |
+| Soft accent fill / callout    | `bg-zmoki-indigo-50` + `border-zmoki-indigo-100`; pills `bg-zmoki-indigo-100 text-zmoki-indigo-700` |
+| Input borders                 | `border-zmoki-stone-300` / `border-zmoki-stone-400`                                                 |
+| Inverse text on accent fills  | `text-white`                                                                                        |
 
-To introduce real color, swap a role to a chromatic group (e.g. `bg-zmoki-red-600`, `text-zmoki-blue-600`) — the utilities already exist.
+`zmoki-cream` is a **custom** scale (not a Tailwind default) defined in `src/design-tokens.mjs` — the worked example of adding a custom palette. To shift the accent to a different chromatic group, swap `zmoki-indigo` on the relevant elements.
 
 ### Changing the palette (re-skin)
 
-When the user wants to shift the site to a different color (e.g. "make it red/green"), there are two paths — pick based on whether the target color is a Tailwind default:
+When the user wants to shift the site to a different accent (e.g. "make it green/blue"), there are two paths — pick based on whether the target color is a Tailwind default:
 
-1. **Built-in Tailwind color** — no token edits needed; every group is already generated. To recolor the whole site, find/replace `zmoki-neutral` → the new group (e.g. `zmoki-blue`) across `src/`. To color only accents, change it just on the relevant elements (links, nav button, hero, CTA, action buttons). Confirm scope with the user before a blanket find/replace.
-2. **Custom brand color** (not in Tailwind's defaults) — define a full `50`→`950` scale in `customPalettes` inside **`src/design-tokens.mjs`** (a commented `zmoki-brand` example is in place). Build the scale from the user's base color on **colorhexa.com** (the user's preferred tool): enter the base hex as `500`, then use the **"Shades and Tints"** section — lighter tints fill `400 300 200 100 50`, darker shades fill `600 700 800 900 950`. Pick by eye for even, Tailwind-like spacing. The new scale auto-generates `zmoki-<name>-*` utilities and auto-appears on `/-/astro/brand/color/` (via the `customPaletteNames` export). Then point the relevant templates at it.
+1. **Built-in Tailwind color** — no token edits needed; every group is already generated. To swap the accent site-wide, find/replace `zmoki-indigo` → the new group (e.g. `zmoki-emerald`) across `src/`. To recolor the canvas or greys, swap `zmoki-cream` / `zmoki-stone` similarly. Confirm scope with the user before a blanket find/replace.
+2. **Custom brand color** (not in Tailwind's defaults) — define a full `50`→`950` scale in `customPalettes` inside **`src/design-tokens.mjs`** (the `zmoki-cream` scale already there is the worked example). Build the scale from the user's base color on **colorhexa.com** (the user's preferred tool): enter the base hex as `500`, then use the **"Shades and Tints"** section — lighter tints fill `400 300 200 100 50`, darker shades fill `600 700 800 900 950`. Pick by eye for even, Tailwind-like spacing. The new scale auto-generates `zmoki-<name>-*` utilities and auto-appears on `/-/astro/brand/color/` (via the `customPaletteNames` export). Then point the relevant templates at it.
 
-**Combinations must meet at least WCAG AA.** Every text/background pair the palette produces — ink text on `zmoki-neutral-200` / `white`, muted `zmoki-neutral-600` on white, inverse `white` / `slate-50` on colored fills (nav CTA, hero, CTA band, buttons), borders/focus rings — needs **≥ 4.5:1** for normal text (**≥ 3:1** for large text and UI/graphical elements). Verify pairs with Figma's checker: <https://www.figma.com/color-contrast-checker/>. A fill carrying white text must be dark enough to pass (usually `-600`/`-700`); the mid/light shades of bright hues fail, so go darker or use dark text on a light fill. If a pair fails, fix the shade — don't ship it.
+**Combinations must meet at least WCAG AA.** Every text/background pair the palette produces — ink `zmoki-stone-900` on `zmoki-cream-100` / `white`, muted `zmoki-stone-500` on white, white text on accent fills (nav CTA, hero, CTA band, buttons = `zmoki-indigo-600`), borders/focus rings — needs **≥ 4.5:1** for normal text (**≥ 3:1** for large text and UI/graphical elements). Verify pairs with Figma's checker: <https://www.figma.com/color-contrast-checker/>. A fill carrying white text must be dark enough to pass (usually `-600`/`-700`); the mid/light shades of bright hues fail, so go darker or use dark text on a light fill. If a pair fails, fix the shade — don't ship it.
 
 After any palette change, run `npm run build` and check `/-/astro/brand/color/`.
 
-Flat + brutalist is enforced globally in `tailwind.config.mjs`: the `borderRadius` and `boxShadow` scales are overridden to `0` / `none`, so every `rounded-*` is sharp and every `shadow-*` is flat. Cards/panels are defined by `border-2 border-zmoki-neutral-900` instead of shadows. Supporting greys also use Tailwind `slate-*` directly (input borders, code-block bg). `tailwind.config.mjs` defines a single `ink = twColors.neutral[900]` constant for the prose/link CSS that can't reference a utility class.
+Soft + bright is the global default in `tailwind.config.mjs`: the `borderRadius` and `boxShadow` scales are left at Tailwind's defaults, so `rounded-*` gives real rounded corners and `shadow-*` gives subtle elevation. Cards/panels are defined by a soft `border border-zmoki-stone-200` **plus** `shadow-sm` and a rounded corner — not a hard border. `tailwind.config.mjs` defines an `ink = twColors.stone[900]` constant and an `accent = twColors.indigo[600]` constant for the prose/link CSS that can't reference a utility class.
 
 **Tailwind v4 wiring:** the `@tailwindcss/vite` plugin (in `astro.config.mjs`) replaces the old `@astrojs/tailwind` integration. Styles enter through `src/styles/global.css` (`@import "tailwindcss"`), imported once each in `BaseLayout.astro` and `BrandLayout.astro`. The v3-style `tailwind.config.mjs` above is kept via the `@config` directive in that CSS file, and the copy-button classes the rehype plugin injects are preserved with `@source inline(...)` (v4 dropped the JS `safelist` option).
 
 ### Prose typography overrides
 
-Set in `tailwind.config.mjs`, all using the `ink` (= `zmoki-neutral-900`) constant:
+Set in `tailwind.config.mjs`:
 
-- Headings (Noto Serif), body/bold: ink
-- Links: ink (monochrome), dotted bottom border 4px; hover inverts to a solid ink box with white text
-- `[data-external]` and `[data-resource]` links: also ink (distinguished by border, not color)
-- `[data-anchor]` links: ink, dashed bottom border 2px
+- Headings (Noto Sans), body (`stone-700`), bold (ink `stone-900`)
+- Links: `accent` (indigo-600), clean 1px underline; hover deepens to `indigo-700` with a 2px underline
+- `[data-external]` and `[data-resource]` links: also accent indigo
+- `[data-anchor]` links: accent indigo
 
 ---
 
@@ -321,18 +322,32 @@ PostHog captures all listed events plus pageviews automatically.
 
 ## Components
 
-| Component            | Purpose                                           |
-| -------------------- | ------------------------------------------------- |
-| `BaseLayout.astro`   | Shell: grid, meta, sidebars, analytics            |
-| `PostLayout.astro`   | Blog post wrapper                                 |
-| `PostCard.astro`     | Post list item on index page                      |
-| `PostImage.astro`    | Image with caption in posts                       |
-| `RawVideo.astro`     | Video embed                                       |
-| `Video.astro`        | Video with controls                               |
-| `BrevoForm.astro`    | Email signup form (Brevo)                         |
-| `ResourceLink.astro` | Renders a resource link in sidebar/resource pages |
-| `Time.astro`         | Renders `<time>` element with formatted date      |
-| `posthog.astro`      | PostHog init script (injected in `<head>`)        |
+| Component            | Purpose                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| `BaseLayout.astro`   | Shell: nav, meta, footer, analytics                           |
+| `PostLayout.astro`   | Blog post wrapper                                             |
+| `PostCard.astro`     | Post list item on index page                                  |
+| `PostImage.astro`    | Image with caption in posts                                   |
+| `RawVideo.astro`     | Video embed                                                   |
+| `Video.astro`        | Video with controls                                           |
+| `Button.astro`       | Reusable button; renders `<a>` when given `href` (see below)  |
+| `BrevoForm.astro`    | Email signup form (Brevo)                                     |
+| `ResourceLink.astro` | Renders a resource link in sidebar/resource pages             |
+| `Time.astro`         | Renders `<time>` element with formatted date                  |
+| `Analytics.astro`    | Injects PostHog only when analytics is configured (see below) |
+| `posthog.astro`      | PostHog init script (rendered by `Analytics.astro`)           |
+
+### `Button.astro`
+
+Reusable button composed from Tailwind utilities. Renders a `<button>`, or an `<a>` when given `href` (a button-like link). Props: `variant` (`primary` = indigo fill / `secondary` = white + soft stone border / `inverse` = white, for use on an indigo band) and `size` (`md` / `lg`). Extra `class` is appended; other attributes (`type`, `target`, `data-*`) pass through. Live demo on `/-/astro/brand/components/`.
+
+### `Analytics.astro`
+
+Wraps `posthog.astro` and only renders it when analytics is actually configured: `PUBLIC_ANALYTICS_ENABLED !== "false"` **and** both `PUBLIC_POSTHOG_PROJECT_TOKEN` and `PUBLIC_POSTHOG_HOST` are set. Without a host, PostHog would request `<host>/static/array.js` from the current origin, 404, and log a console error — which is what happened in the Lighthouse/CI build (those secrets are empty there), capping the Best-Practices score. Gating on the env vars keeps PostHog out of any build where it can't work.
+
+### Fonts
+
+`BaseLayout` and `BrandLayout` load Google Fonts **non-render-blocking**: `<link rel="preload" as="style">` + `<link rel="stylesheet" media="print" onload="this.media='all'">` (with a `<noscript>` fallback), so text paints immediately in the fallback and the font never blocks First Contentful Paint. Only **Noto Sans** and **Noto Sans Mono** are requested, weights **400–700** (the range the site actually uses). The shared URL lives in a `fontsHref` const in each layout — keep the two in sync.
 
 ---
 
@@ -368,13 +383,13 @@ Edit this file directly for header changes (not Terraform).
 
 Current variables:
 
-| Variable                               | Required | Purpose                                    |
-| -------------------------------------- | -------- | ------------------------------------------ |
-| `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token                    |
-| `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL                           |
-| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to disable PostHog in dev |
-| `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration               |
-| `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection        |
+| Variable                               | Required | Purpose                                            |
+| -------------------------------------- | -------- | -------------------------------------------------- |
+| `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token (required to load PostHog) |
+| `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL (required to load PostHog)        |
+| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to force-disable PostHog          |
+| `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration                       |
+| `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection                |
 
 When adding a new env var: add it to `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment.
 

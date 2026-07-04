@@ -1,10 +1,11 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
+import Button from "@/components/Button.astro";
 
 // Each entry documents one reusable building block with a live example and
 // the canonical Tailwind recipe. The page mirrors the real markup used in
 // BaseLayout / PostLayout / BrevoForm so it can never drift from production.
-const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60";
+const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-stone-500";
 ---
 
 <BrandLayout
@@ -12,87 +13,88 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
   description="My Project X reusable components: cards, links, buttons, panels, and meta labels"
 >
   <header
-    class="border-zmoki-neutral-900 bg-zmoki-neutral-900 mb-8 rounded-xl border-2 px-6 py-10 text-slate-50 md:px-10"
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
   >
-    <a href="/-/astro/brand/" class="font-mono text-xs tracking-normal uppercase opacity-70"
+    <a href="/-/astro/brand/" class="text-xs font-medium tracking-normal text-white/70"
       >← My Project X brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Components</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
       The reusable building blocks and their conventions — nav, footer, hero, cards, links, buttons,
-      and meta labels. Flat and monochrome: hard black borders, sharp corners, no shadows.
+      and meta labels. Bright and warm: white cards on an ivory canvas, soft stone borders, rounded
+      corners, and gentle shadows.
     </p>
   </header>
 
   <!-- Cards / panels -->
   <h2 class={sectionLabel}>Cards &amp; panels</h2>
-  <section class="border-zmoki-neutral-900 mb-10 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="mb-6 max-w-2xl opacity-80">
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       The base surface for everything:
-      <code class="font-mono text-base">border-2 border-zmoki-neutral-900</code> +
-      <code class="font-mono text-base">bg-white</code>. Corners are flat globally, so a card is
-      defined by its hard border, not a shadow. Compose them into a
-      <code class="font-mono text-base">grid</code> + <code class="font-mono text-base">gap-4</code
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >border border-zmoki-stone-200</code
+      > +
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >bg-white shadow-sm</code
+      >. A card is defined by a soft stone border plus a subtle shadow, with rounded corners.
+      Compose them into a
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >grid</code
+      > + <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >gap-4</code
       >.
     </p>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-      <div class="border-zmoki-neutral-900 border-2 bg-white p-6">
+      <div class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm">
         <h3 class="text-xl font-semibold">Card</h3>
-        <p class="mt-2 text-base opacity-80">Single panel of content on the page background.</p>
+        <p class="text-zmoki-stone-500 mt-2 text-base">
+          Single panel of content on the page background.
+        </p>
       </div>
-      <div class="border-zmoki-neutral-900 border-2 bg-white p-6 sm:col-span-2">
+      <div class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm sm:col-span-2">
         <h3 class="text-xl font-semibold">Wide card</h3>
-        <p class="mt-2 text-base opacity-80">
+        <p class="text-zmoki-stone-500 mt-2 text-base">
           Spans two columns — just cards of different
-          <code class="font-mono">col-span</code> widths in one grid.
+          <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono"
+            >col-span</code
+          > widths in one grid.
         </p>
       </div>
     </div>
     <pre
-      class="mt-6 overflow-x-auto bg-slate-900 p-4 font-mono text-xs text-slate-50"><code>&lt;div class="border-2 border-zmoki-neutral-900 bg-white p-6"&gt;…&lt;/div&gt;</code></pre>
+      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;div class="rounded-xl border border-zmoki-stone-200 bg-white p-6 shadow-sm"&gt;…&lt;/div&gt;</code></pre>
   </section>
 
   <!-- Links -->
   <h2 class={sectionLabel}>Links</h2>
-  <section class="border-zmoki-neutral-900 mb-10 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="mb-6 max-w-2xl opacity-80">
-      Monochrome: every link is ink. Destination is signalled by the bottom border (dotted vs
-      dashed) rather than color, and hover inverts to a solid black box with white text. In prose,
-      the
-      <code class="font-mono text-base">data-*</code> attributes are added automatically by the rehype
-      pipeline.
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
+      Links carry the indigo accent, with a clean underline. In prose, the
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >data-*</code
+      > attributes are added automatically by the rehype pipeline.
     </p>
     <ul class="space-y-4 text-xl">
       <li>
-        <a href="#" class="text-zmoki-neutral-900 border-b-4 border-dotted border-current"
-          >Internal link</a
-        >
-        <span class="ml-3 font-mono text-sm tracking-normal uppercase opacity-60"
-          >default · dotted 4px</span
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">Internal link</a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal">default</span>
+      </li>
+      <li>
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">External link</a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal"
+          >[data-external]</span
         >
       </li>
       <li>
-        <a href="#" class="text-zmoki-neutral-900 border-b-4 border-dotted border-current"
-          >External link</a
-        >
-        <span class="ml-3 font-mono text-sm tracking-normal uppercase opacity-60"
-          >[data-external] · dotted 4px</span
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">Resource link</a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal"
+          >[data-resource]</span
         >
       </li>
       <li>
-        <a href="#" class="text-zmoki-neutral-900 border-b-4 border-dotted border-current"
-          >Resource link</a
-        >
-        <span class="ml-3 font-mono text-sm tracking-normal uppercase opacity-60"
-          >[data-resource] · dotted 4px</span
-        >
-      </li>
-      <li>
-        <a href="#" class="text-zmoki-neutral-900 border-b-2 border-dashed border-current"
-          >Anchor link</a
-        >
-        <span class="ml-3 font-mono text-sm tracking-normal uppercase opacity-60"
-          >[data-anchor] · dashed 2px</span
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">Anchor link</a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal"
+          >[data-anchor]</span
         >
       </li>
     </ul>
@@ -100,54 +102,75 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Buttons -->
   <h2 class={sectionLabel}>Buttons</h2>
-  <section class="border-zmoki-neutral-900 mb-10 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="mb-6 max-w-2xl opacity-80">
-      Square, hard-bordered, solid ink fill with a white mono uppercase label. The nav/hero CTA uses
-      <code class="font-mono text-base">bg-zmoki-neutral-900</code>; the form submit and code-block
-      copy button use <code class="font-mono text-base">bg-zmoki-neutral-900</code> (both ink in the monochrome
-      palette).
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
+      One reusable
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >Button.astro</code
+      >, built from pure Tailwind utilities. It renders a
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >&lt;button&gt;</code
+      >, or an
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >&lt;a&gt;</code
+      > when given an <code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">href</code
+      > (a button-like link). Three <code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >variant</code
+      >s — <strong>primary</strong> (indigo fill), <strong>secondary</strong> (white + soft stone border),
+      and <strong>inverse</strong> (white, for use on an indigo band) — in two <code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">size</code
+      >s (<code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >md</code
+      > / <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >lg</code
+      >).
     </p>
     <div class="flex flex-wrap items-center gap-4">
-      <button
-        type="button"
-        class="border-zmoki-neutral-900 bg-zmoki-neutral-900 border-2 px-4 py-2 font-mono font-bold tracking-tight text-white uppercase"
-        >Subscribe</button
-      >
-      <button
-        type="button"
-        class="border-zmoki-neutral-900 bg-zmoki-neutral-900 border-2 px-3 py-1.5 font-mono text-xs font-bold tracking-tight text-white uppercase"
-        >Copy</button
-      >
+      <Button>Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button size="lg">Primary · lg</Button>
+      <Button href="#" variant="secondary" size="lg">Link · lg</Button>
+    </div>
+    <div class="bg-zmoki-indigo-600 mt-4 flex flex-wrap items-center gap-4 rounded-xl p-4">
+      <Button variant="inverse">Inverse</Button>
+      <Button href="#" variant="inverse" size="lg">Inverse link · lg</Button>
     </div>
     <pre
-      class="mt-6 overflow-x-auto bg-slate-900 p-4 font-mono text-xs text-slate-50"><code>class="border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 px-4 py-2 font-mono font-bold uppercase text-white"</code></pre>
+      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;Button href="/signup" variant="primary" size="lg"&gt;Get started&lt;/Button&gt;</code></pre>
   </section>
 
   <!-- Navigation & footer -->
   <h2 class={sectionLabel}>Navigation &amp; footer</h2>
-  <section class="border-zmoki-neutral-900 mb-10 border-2 bg-white p-6 md:p-8">
-    <p class="mb-6 max-w-2xl opacity-80">
-      The top nav and footer wrap every page (BaseLayout). Hard rules top and bottom (<code
-        class="font-mono text-base">border-b-2 / border-t-2 border-zmoki-neutral-900</code
-      >), a Noto&nbsp;Serif wordmark, mono uppercase links, and a bordered CTA button.
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
+      The top nav and footer wrap every page (BaseLayout). A soft bottom border under the nav and a
+      soft top border above the footer (<code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >border-b / border-t border-zmoki-stone-200</code
+      >), a clean sans wordmark, medium-weight links, and a rounded indigo CTA pill.
     </p>
-    <div class="border-zmoki-neutral-900 border-2">
+    <div class="border-zmoki-stone-200 overflow-hidden rounded-xl border shadow-sm">
       <div
-        class="border-zmoki-neutral-900 flex items-center justify-between gap-4 border-b-2 px-4 py-3"
+        class="border-zmoki-stone-200 flex items-center justify-between gap-4 border-b bg-white px-4 py-3"
       >
-        <span class="font-serif text-lg font-bold uppercase">My Project X</span>
+        <span class="text-zmoki-stone-900 text-lg font-bold">My Project X</span>
         <div class="flex items-center gap-4">
-          <span class="hidden font-mono text-sm uppercase sm:inline">Features</span>
-          <span class="hidden font-mono text-sm uppercase sm:inline">Blog</span>
-          <span
-            class="border-zmoki-neutral-900 bg-zmoki-neutral-900 border-2 px-3 py-1.5 font-mono text-sm font-bold text-slate-50 uppercase"
+          <span class="text-zmoki-stone-500 hidden text-sm font-medium sm:inline">Features</span>
+          <span class="text-zmoki-stone-500 hidden text-sm font-medium sm:inline">Blog</span>
+          <span class="bg-zmoki-indigo-600 rounded-lg px-3 py-1.5 text-sm font-medium text-white"
             >Get started</span
           >
         </div>
       </div>
-      <div class="px-4 py-10 text-center font-mono text-xs uppercase opacity-50">page content</div>
       <div
-        class="border-zmoki-neutral-900 text-zmoki-neutral-600 flex items-center justify-between gap-4 border-t-2 px-4 py-3 font-mono text-xs uppercase"
+        class="bg-zmoki-cream-100 text-zmoki-stone-500 px-4 py-10 text-center text-xs font-medium"
+      >
+        page content
+      </div>
+      <div
+        class="border-zmoki-stone-200 text-zmoki-stone-500 flex items-center justify-between gap-4 border-t bg-white px-4 py-3 text-xs"
       >
         <span>© My Project X 2025</span>
         <span>Privacy · Terms · Source</span>
@@ -157,37 +180,41 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Landing blocks -->
   <h2 class={sectionLabel}>Landing blocks</h2>
-  <section class="border-zmoki-neutral-900 mb-10 border-2 bg-white p-6 md:p-8">
-    <p class="mb-6 max-w-2xl opacity-80">
-      The home page stacks three blocks: a centered hero with CTAs, a bordered feature grid, and a
-      solid-ink closing CTA band. <code class="font-mono text-base">PostCard</code> is the blog-list item.
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
+      The home page stacks three blocks: a centered hero with CTAs, a soft feature grid, and an
+      indigo closing CTA band. <code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >PostCard</code
+      > is the blog-list item.
     </p>
     <div class="space-y-4">
-      <div class="border-zmoki-neutral-900 border-2 p-6 text-center">
-        <p class="font-serif text-2xl font-bold">Build something people want</p>
-        <p class="mt-2 text-sm opacity-70">A one-line pitch.</p>
+      <div class="border-zmoki-stone-200 rounded-xl border bg-white p-6 text-center shadow-sm">
+        <p class="text-2xl font-bold">Build something people want</p>
+        <p class="text-zmoki-stone-500 mt-2 text-sm">A one-line pitch.</p>
         <div class="mt-4 flex flex-wrap justify-center gap-3">
-          <span
-            class="border-zmoki-neutral-900 bg-zmoki-neutral-900 border-2 px-4 py-2 font-mono text-xs font-bold text-slate-50 uppercase"
+          <span class="bg-zmoki-indigo-600 rounded-lg px-4 py-2 text-xs font-medium text-white"
             >Get started</span
           >
           <span
-            class="border-zmoki-neutral-900 border-2 px-4 py-2 font-mono text-xs font-bold uppercase"
+            class="border-zmoki-stone-300 text-zmoki-stone-900 rounded-lg border bg-white px-4 py-2 text-xs font-medium"
             >Read the blog</span
           >
         </div>
       </div>
       <div class="grid gap-4 sm:grid-cols-2">
-        <div class="border-zmoki-neutral-900 border-2 p-6">
+        <div class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm">
           <h3 class="font-semibold">Feature card</h3>
-          <p class="mt-2 text-sm opacity-70">Title plus one line, in a hard-bordered box.</p>
+          <p class="text-zmoki-stone-500 mt-2 text-sm">
+            Title plus one line, in a soft-bordered card.
+          </p>
         </div>
         <div
-          class="border-zmoki-neutral-900 bg-zmoki-neutral-900 border-2 p-6 text-center text-slate-50"
+          class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-xl border p-6 text-center text-white shadow-sm"
         >
-          <p class="font-serif font-bold">Ready to get started?</p>
+          <p class="font-bold">Ready to get started?</p>
           <span
-            class="text-zmoki-neutral-900 mt-3 inline-block border-2 border-white bg-white px-4 py-2 font-mono text-xs font-bold uppercase"
+            class="text-zmoki-indigo-700 hover:bg-zmoki-indigo-50 mt-3 inline-block rounded-lg bg-white px-4 py-2 text-xs font-medium transition-colors"
             >Get in touch</span
           >
         </div>
@@ -197,44 +224,47 @@ const sectionLabel = "mb-4 px-1 font-mono text-sm uppercase tracking-normal opac
 
   <!-- Meta labels -->
   <h2 class={sectionLabel}>Meta labels</h2>
-  <section class="border-zmoki-neutral-900 mb-10 rounded-xl border-2 bg-white p-6 md:p-8">
-    <p class="mb-6 max-w-2xl opacity-80">
-      Mono, uppercase, <code class="font-mono text-base">tracking-normal</code> — used for dates, Previous
-      / Next nav, section eyebrows, and the footer. Usually dimmed with
-      <code class="font-mono text-base">opacity-60</code>–<code class="font-mono text-base">70</code
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
+      Clean sans, normal case, muted stone — used for dates, Previous / Next nav, section eyebrows,
+      and the footer. Rendered in
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >text-zmoki-stone-500</code
       >.
     </p>
     <div class="space-y-4">
-      <p class="font-mono text-xs tracking-normal uppercase opacity-70">Published on 20 Jun 2026</p>
-      <p class="font-mono text-sm tracking-normal uppercase opacity-70">Previous</p>
-      <p class="font-mono text-sm tracking-normal uppercase opacity-60">Section eyebrow</p>
-      <p class="font-mono text-xs tracking-normal uppercase opacity-60">View →</p>
+      <p class="text-zmoki-stone-500 text-xs font-medium tracking-normal">
+        Published on 20 Jun 2026
+      </p>
+      <p class="text-zmoki-stone-500 text-sm font-medium tracking-normal">Previous</p>
+      <p class="text-zmoki-stone-500 text-sm font-medium tracking-normal">Section eyebrow</p>
+      <p class="text-zmoki-stone-500 text-xs font-medium tracking-normal">View →</p>
     </div>
   </section>
 
   <!-- Usage -->
   <section
-    class="border-zmoki-neutral-900 rounded-xl border-2 bg-slate-700 p-6 text-slate-50 md:p-8"
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8"
   >
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Conventions</h2>
     <ul class="space-y-2 font-mono text-sm">
       <li>
-        <span class="text-zmoki-neutral-300">border-2 border-zmoki-neutral-900 + bg-white</span>
-        <span class="opacity-60">— every card and panel (flat, sharp)</span>
-      </li>
-      <li>
-        <span class="text-zmoki-neutral-300">border-b-4 border-dotted border-current</span>
-        <span class="opacity-60">— links (anchors use dashed b-2)</span>
-      </li>
-      <li>
-        <span class="text-zmoki-neutral-300"
-          >border-2 border-zmoki-neutral-900 … uppercase text-white</span
+        <span class="text-white">border border-zmoki-stone-200 + bg-white shadow-sm</span>
+        <span class="text-white/70"
+          >— every card and panel (soft border, subtle shadow, rounded)</span
         >
-        <span class="opacity-60">— action buttons</span>
       </li>
       <li>
-        <span class="text-zmoki-neutral-300">font-mono uppercase tracking-normal</span>
-        <span class="opacity-60">— all meta labels</span>
+        <span class="text-white">text-zmoki-indigo-600 underline underline-offset-2</span>
+        <span class="text-white/70">— links</span>
+      </li>
+      <li>
+        <span class="text-white">rounded-lg bg-zmoki-indigo-600 … text-white</span>
+        <span class="text-white/70">— action buttons</span>
+      </li>
+      <li>
+        <span class="text-white">font-medium tracking-normal text-zmoki-stone-500</span>
+        <span class="text-white/70">— all meta labels</span>
       </li>
     </ul>
   </section>

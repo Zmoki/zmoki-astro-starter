@@ -4,6 +4,8 @@ export interface Props {
   buttonText?: string;
 }
 
+import Button from "@/components/Button.astro";
+
 const defaultButtonText = "Subscribe";
 const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
 ---
@@ -13,7 +15,7 @@ const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
   id="brevo-form"
   method="POST"
   action={`https://${import.meta.env.PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/${brevoFormId}`}
-  class="border-zmoki-neutral-900 flex flex-col gap-4 rounded-xl border-2 bg-white px-4 py-8 md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
+  class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
 >
   <section class="prose prose-lg xl:prose-2xl prose-headings:font-semibold !leading-tight md:w-1/2">
     <slot />
@@ -21,14 +23,14 @@ const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
 
   <section class="flex min-w-[300px] flex-1 flex-col gap-4 md:pt-2">
     <!-- Email input -->
-    <label for="EMAIL" class="font-mono text-xl font-medium">Email</label>
+    <label for="EMAIL" class="text-xl font-medium">Email</label>
     <input
       type="email"
       id="EMAIL"
       name="EMAIL"
       placeholder="your@email.com"
       required
-      class="w-full rounded-sm border border-slate-300 p-2 font-mono text-lg"
+      class="border-zmoki-stone-300 focus:border-zmoki-indigo-500 focus:ring-zmoki-indigo-500/30 w-full rounded-lg border p-2 text-lg focus:ring-2 focus:outline-none"
     />
 
     <!-- Captcha -->
@@ -47,27 +49,23 @@ const { brevoFormId, buttonText = defaultButtonText } = Astro.props;
         id="consent"
         name="consent"
         required
-        class="focus:ring-zmoki-neutral-900 mt-1 h-4 w-4 rounded border-slate-400"
+        class="border-zmoki-stone-400 text-zmoki-indigo-600 focus:ring-zmoki-indigo-500 mt-1 h-4 w-4 rounded"
       />
-      <label for="consent" class="font-mono text-xs">
+      <label for="consent" class="text-zmoki-stone-500 text-xs">
         By checking this box, I acknowledge that I have read, understood, and agree to the <a
           href="/legal/terms/"
-          class="text-zmoki-neutral-600 border-b-2 border-dotted border-current"
+          class="text-zmoki-indigo-600 underline underline-offset-2"
           target="_blank">Terms of Service</a
         > and <a
           href="/legal/privacy/"
-          class="text-zmoki-neutral-600 border-b-2 border-dotted border-current"
+          class="text-zmoki-indigo-600 underline underline-offset-2"
           target="_blank">Privacy Policy</a
         >.
       </label>
     </div>
 
     <!-- Submit button -->
-    <button
-      type="submit"
-      class="bg-zmoki-neutral-900 hover:bg-zmoki-neutral-900/80 rounded-sm px-4 py-2 font-mono font-medium tracking-normal text-white uppercase"
-      set:html={buttonText}
-    />
+    <Button type="submit"><Fragment set:html={buttonText} /></Button>
 
     <!-- Hidden inputs -->
     <input type="text" name="email_address_check" value="" style="display: none;" />

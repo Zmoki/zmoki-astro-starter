@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
-/* Keep the existing Tailwind v3-style JS config — theme tokens, prose
-   overrides, brutalist flattening (no rounded/shadow), the typography and
-   base-layer plugins — working under Tailwind v4 via the compat directive. */
+/* Keep the existing Tailwind v3-style JS config — theme tokens (cream/stone/
+   indigo), prose overrides, the typography and base-layer plugins — working
+   under Tailwind v4 via the compat directive. */
 @config "../../tailwind.config.mjs";
 
 /* The copy-button classes are injected by a rehype plugin in astro.config.mjs,
    which the class scanner doesn't cover. Tailwind v4 has no JS `safelist`, so
-   register them here so they're always generated. */
+   register them here so they're always generated. Keep in sync with the button
+   markup in astro.config.mjs. */
 @source inline(
-  "relative absolute top-2 right-2 px-3 py-1.5 text-xs font-medium font-mono uppercase tracking-normal rounded-sm bg-zmoki-neutral-900 text-white hover:bg-zmoki-neutral-900/80 focus:outline-none focus:ring-2 focus:ring-zmoki-neutral-900 focus:ring-offset-2 transition-colors duration-200"
+  "relative absolute top-2 right-2 rounded-lg bg-zmoki-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-zmoki-indigo-700 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500 focus:ring-offset-2 transition-colors duration-200"
 );
