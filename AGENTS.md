@@ -43,6 +43,7 @@ Project skills live in `.claude/skills/`:
 - `/og-images` — customize the OG / social-share image cards (`.claude/skills/og-images/SKILL.md`)
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 - `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
+- `/structured-data` — add/edit schema.org JSON-LD for Google rich results, per Google's docs (`.claude/skills/structured-data/SKILL.md`)
 
 ---
 
@@ -367,6 +368,7 @@ The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_for
 | `ResourceLink.astro`      | Renders a resource link in sidebar/resource pages            |
 | `Time.astro`              | Renders `<time>` element with formatted date                 |
 | `Analytics.astro`         | Dispatcher: renders every analytics provider (see Analytics) |
+| `JsonLd.astro`            | Renders a schema.org JSON-LD block (see `/structured-data`)  |
 | `analytics/posthog.astro` | PostHog provider — loader + `track` facade                   |
 | `analytics/gtm.astro`     | Google Tag Manager provider — loader + `track` facade        |
 
