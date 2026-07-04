@@ -39,6 +39,7 @@ Project skills live in `.claude/skills/`:
 
 - `/run` — launch the Astro dev server (`.claude/skills/run/SKILL.md`)
 - `/brand-typography` — swap the site's fonts end to end (`.claude/skills/brand-typography/SKILL.md`)
+- `/redirects` — add or edit URL redirects (`.claude/skills/redirects/SKILL.md`)
 
 ---
 
@@ -50,6 +51,8 @@ npm run build            # production build
 npm run og:generate      # generate OG images via Puppeteer
 npm run build:full       # build + og:generate
 npm run timeline:blog    # generate blog-timeline.csv
+npm run build:redirects  # compile src/redirects/*.csv → host redirect artifact (runs automatically before build)
+npm run check:redirects  # CI guard: rebuild redirects and fail if the committed artifact drifted
 npm run lhci:mobile      # Lighthouse CI mobile
 npm run lhci:desktop     # Lighthouse CI desktop
 npm run format           # Prettier format all files
@@ -65,7 +68,8 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 1. **Format check** — `npm run format:check`
 2. **Type check** — `npm run check`
 3. **Lint** — `npm run lint`
-4. **Build** — `npm run build`
+4. **Redirects drift check** — `npm run check:redirects` (rebuilds the redirect artifact and fails if it differs from what's committed)
+5. **Build** — `npm run build`
 
 Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`.
 
@@ -115,7 +119,7 @@ npm run format
 
 ## Site configuration (`src/site.config.ts`)
 
-The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), primary CTA (`cta`), hero copy (`hero`), closing CTA band (`finalCta`), author name + about-slug, contact email, source repo, copyright year. Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages are not wired to it — they use the `My Project X` placeholder and are edited directly.
+The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), primary CTA (`cta`), hero copy (`hero`), closing CTA band (`finalCta`), author name + about-slug, contact email, source repo, copyright year, and the deploy target (`deploy.platform`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages are not wired to it — they use the `My Project X` placeholder and are edited directly.
 
 ---
 
@@ -351,9 +355,9 @@ If DNS, zone settings, or Cloudflare Pages project config need changing, edit th
 
 Edit this file directly for header changes (not Terraform).
 
-**`public/_redirects`** — URL redirects handled by Cloudflare Pages. Format: `<from> <to> <status>`. Starts empty (with example comments); add legacy-slug or external redirects as the site grows.
+**Redirects** — authored as platform-neutral CSV in **`src/redirects/`** and compiled by `scripts/generate-redirects.ts` into the artifact for the host set by **`site.deploy.platform`** in `src/site.config.ts` (`public/_redirects` for Cloudflare/Netlify, `vercel.json` for Vercel, `redirects.json` for Amplify). The artifact is **committed** and CI's `npm run check:redirects` fails on drift, so rebuild (`npm run build:redirects`) and commit it alongside any CSV change.
 
-Edit this file directly for redirect changes (not Terraform).
+**The `/redirects` skill (`.claude/skills/redirects/SKILL.md`) is the source of truth** for the CSV format, platform table, and workflow — see it (or `src/redirects/README.md`) rather than duplicating the details here.
 
 ---
 

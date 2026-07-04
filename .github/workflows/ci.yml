@@ -31,6 +31,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Redirects drift check
+        run: npm run check:redirects
+
       - name: Build
         run: npm run build
         env:

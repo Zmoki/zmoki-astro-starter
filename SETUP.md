@@ -65,7 +65,22 @@ All are optional — the site builds and runs without them.
 
 ## 6. Deploy
 
-Set up hosting (the original uses Cloudflare Pages on the `main` branch — every push deploys). Update `public/_headers` and `public/_redirects` as needed. See the **Deploy & infrastructure** section in `AGENTS.md`.
+Set up hosting (the original uses Cloudflare Pages on the `main` branch — every push deploys).
+
+**Pick your platform for redirects.** Redirects are authored once as CSV in `src/redirects/` and compiled to whatever your host expects. Set `deploy.platform` in **`src/site.config.ts`**:
+
+| `platform`               | Compiles to         | Host                                   |
+| ------------------------ | ------------------- | -------------------------------------- |
+| `"cloudflare"` (default) | `public/_redirects` | Cloudflare Pages                       |
+| `"netlify"`              | `public/_redirects` | Netlify                                |
+| `"vercel"`               | `vercel.json`       | Vercel (`redirects[]` merged)          |
+| `"amplify"`              | `redirects.json`    | AWS Amplify (paste into console / IaC) |
+
+Then run `npm run build:redirects` (it also runs automatically on every `npm run build`). Add redirects by editing the CSVs — see the `/redirects` skill. If you switch platforms, delete the stale artifact from the old one (the build warns you which).
+
+The generated artifact is **committed** — run `npm run build:redirects` and commit it alongside any CSV change. CI runs `npm run check:redirects` and fails if the committed artifact is out of date, so drift can't reach production.
+
+Update `public/_headers` (Cloudflare/Netlify header rules) as needed. See the **Deploy & infrastructure** section in `AGENTS.md`.
 
 ## 7. Verify
 
