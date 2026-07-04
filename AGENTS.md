@@ -323,20 +323,9 @@ Edit this file directly for header changes (not Terraform).
 
 ## Environment variables
 
-**Source of truth: `src/env.d.ts`** — all `PUBLIC_*` env vars must be declared here first. `.env.example` must mirror it (same keys, no values).
+**`src/env.d.ts` is the source of truth** — every `PUBLIC_*` var is declared and documented there (one JSDoc line each: purpose + when it applies), and **`.env.example`** mirrors the same keys as a copy-me template (`cp .env.example .env`). Read those two files rather than a table here; all vars are optional (an unset provider just stays off). Which of them CI's build needs as secrets is listed under **CI** above.
 
-Current variables:
-
-| Variable                               | Required | Purpose                                            |
-| -------------------------------------- | -------- | -------------------------------------------------- |
-| `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token (required to load PostHog) |
-| `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL (required to load PostHog)        |
-| `PUBLIC_GTM_CONTAINER_ID`              | No       | Google Tag Manager container ID (`GTM-XXXXXXX`)    |
-| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to force-disable all analytics    |
-| `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration                       |
-| `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection                |
-
-When adding a new env var: add it to `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment.
+When adding a new env var: declare it (with a doc comment) in `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment. If the provider exposes a browser global, add it to the `Window` interface in `src/env.d.ts` too.
 
 ---
 
