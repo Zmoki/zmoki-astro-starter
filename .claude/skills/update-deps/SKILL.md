@@ -100,7 +100,29 @@ done
 
 Bump each `uses: <action>@vN` to the latest major. For `github-script`, skim the
 inline `script:` — v8/v9 keep `github.rest.*`, `context.*`, and `require`, so
-stable scripts carry over. Leave `node-version` matching the `engines` field.
+stable scripts carry over.
+
+### Node version — keep three files in sync
+
+The Node major is pinned in **three** places that must move together whenever you
+bump the `engines` floor:
+
+- **`package.json`** `engines.node` (e.g. `">=24"`) — the declared floor.
+- **`.github/workflows/*.yml`** `node-version:` (`ci.yml` + `lighthouse.yml`) — CI.
+- **`.node-version`** (repo root, e.g. `24.11.1`) — **Cloudflare Pages**, the deploy
+  builder. This is the easy one to forget: Cloudflare reads _neither_ `engines`
+  nor the CI workflow, so if it's missing/stale the build falls back to an older
+  default Node. That bit us once — Cloudflare ran Node 22, which can't execute the
+  `.ts` build scripts natively (`node scripts/generate-redirects.ts` in `prebuild`),
+  and the deploy died with `ERR_UNKNOWN_FILE_EXTENSION` even though CI was green.
+  The build scripts are `.ts` and rely on Node ≥24's native type-stripping — so the
+  deploy Node version is load-bearing, not cosmetic.
+
+After bumping the floor, grep to confirm nothing drifted:
+
+```bash
+grep -H node .node-version; grep -n '"node"' package.json; grep -rn node-version .github/workflows/
+```
 
 ## 7. PR + watch CI
 
