@@ -28,6 +28,29 @@ interface FileSection {
   rows: Redirect[];
 }
 
+// Per-platform ceiling on the number of redirects the artifact may hold.
+// null = no meaningful hard cap (bound by file size / soft guidance instead).
+const PLATFORM_LIMITS: Record<Platform, { max: number; note: string } | null> = {
+  cloudflare: {
+    max: 2100,
+    note: "2,000 static + 100 dynamic; Cloudflare silently drops rules past the cap. Beyond this, use Bulk Redirects.",
+  },
+  netlify: null, // bound by serialized file size, not a rule count
+  vercel: {
+    max: 1024,
+    note: "shared across redirects + rewrites + headers in vercel.json. Beyond this, use Edge Middleware + Edge Config.",
+  },
+  amplify: null, // no documented hard quota
+};
+
+// Warn as the count nears the cap; the build fails once it exceeds it.
+const LIMIT_WARN_RATIO = 0.9;
+
+interface EmitResult {
+  output: string;
+  count: number; // redirects actually written to the artifact
+}
+
 // Split a single CSV line into fields, honoring double-quoted values.
 function parseCsvLine(line: string): string[] {
   const fields: string[] = [];
@@ -100,7 +123,7 @@ function parseRedirectsCsv(fileName: string, content: string, errors: string[]):
 // artifacts from other platforms.
 
 // Cloudflare Pages and Netlify share the exact `_redirects` format.
-function emitRedirectsFile(sections: FileSection[], platform: Platform): string {
+function emitRedirectsFile(sections: FileSection[], platform: Platform): EmitResult {
   const output = "public/_redirects";
   const header = [
     "# GENERATED FILE — do not edit by hand.",
@@ -113,12 +136,12 @@ function emitRedirectsFile(sections: FileSection[], platform: Platform): string 
   );
   const body = blocks.length > 0 ? blocks.join("\n\n") : "# (no redirects defined yet)";
   writeFileSync(output, `${header}\n\n${body}\n`, "utf-8");
-  return output;
+  return { output, count: sections.reduce((n, s) => n + s.rows.length, 0) };
 }
 
 // Vercel: merge a `redirects` array into vercel.json, preserving other config.
 // Vercel redirects are 3xx only; a 200 (proxy/rewrite) belongs in `rewrites`.
-function emitVercelJson(rows: Redirect[], warnings: string[]): string {
+function emitVercelJson(rows: Redirect[], warnings: string[]): EmitResult {
   const output = "vercel.json";
   const VERCEL_CODES = new Set(["301", "302", "307", "308"]);
 
@@ -144,16 +167,32 @@ function emitVercelJson(rows: Redirect[], warnings: string[]): string {
   }
   config.redirects = redirects;
   writeFileSync(output, `${JSON.stringify(config, null, 2)}\n`, "utf-8");
-  return output;
+  return { output, count: redirects.length };
 }
 
 // AWS Amplify: emit redirects.json ([{ source, target, status }]) to paste into
 // the Amplify console or manage via IaC. Amplify has no committed-file convention.
-function emitAmplifyJson(rows: Redirect[]): string {
+function emitAmplifyJson(rows: Redirect[]): EmitResult {
   const output = "redirects.json";
   const entries = rows.map((r) => ({ source: r.source, target: r.destination, status: r.code }));
   writeFileSync(output, `${JSON.stringify(entries, null, 2)}\n`, "utf-8");
-  return output;
+  return { output, count: entries.length };
+}
+
+// Warn as the redirect count nears the platform's cap; return a fatal message if
+// it exceeds it (the caller fails the build). Platforms with no hard cap pass.
+function checkPlatformLimit(platform: Platform, count: number, warnings: string[]): string | null {
+  const limit = PLATFORM_LIMITS[platform];
+  if (!limit) return null;
+  if (count > limit.max) {
+    return `${count} redirects exceeds ${platform}'s limit of ${limit.max} (${limit.note})`;
+  }
+  if (count >= Math.floor(limit.max * LIMIT_WARN_RATIO)) {
+    warnings.push(
+      `Approaching ${platform}'s ${limit.max}-redirect limit: ${count}/${limit.max} (${limit.note})`,
+    );
+  }
+  return null;
 }
 
 // Warn if artifacts from other platforms are still lying around after a switch.
@@ -213,26 +252,32 @@ function main(): void {
   const allRows = sections.flatMap((s) => s.rows);
   const warnings: string[] = [];
 
-  let output: string;
+  let result: EmitResult;
   switch (platform) {
     case "cloudflare":
     case "netlify":
-      output = emitRedirectsFile(sections, platform);
+      result = emitRedirectsFile(sections, platform);
       break;
     case "vercel":
-      output = emitVercelJson(allRows, warnings);
+      result = emitVercelJson(allRows, warnings);
       break;
     case "amplify":
-      output = emitAmplifyJson(allRows);
+      result = emitAmplifyJson(allRows);
       break;
   }
 
   warnStaleArtifacts(platform, warnings);
+  const limitError = checkPlatformLimit(platform, result.count, warnings);
   for (const warning of warnings) console.warn(`⚠️  ${warning}`);
 
-  console.log(`✅ Wrote ${output}`);
+  if (limitError) {
+    console.error(`❌ ${limitError}`);
+    process.exit(1);
+  }
+
+  console.log(`✅ Wrote ${result.output}`);
   console.log(
-    `📊 ${allRows.length} redirect${allRows.length === 1 ? "" : "s"} from ${csvFiles.length} file(s)`,
+    `📊 ${result.count} redirect${result.count === 1 ? "" : "s"} from ${csvFiles.length} file(s)`,
   );
 }
 

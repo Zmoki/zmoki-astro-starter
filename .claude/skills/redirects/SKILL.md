@@ -57,6 +57,19 @@ Pick the file by kind: blog-post moves → `blog.csv`; resources, external links
 - The generated artifact is **committed to git** (not gitignored) — so redirect changes show in PR diffs and Vercel reads `vercel.json` from the repo source.
 - CI runs `npm run check:redirects`, which regenerates the artifact and **fails if it drifts** from what's committed. So a CSV edit without a rebuild is caught before merge — always rebuild and commit the result.
 
+## Platform limits
+
+Each host caps how many redirects the artifact may hold. The build **warns at ≥90%** of the cap and **fails the build once it's exceeded** (so you find out before deploy, not after silent drops):
+
+| `platform`   | Cap                                        | Beyond the cap                                                |
+| ------------ | ------------------------------------------ | ------------------------------------------------------------- |
+| `cloudflare` | **2,100** (2,000 static + 100 dynamic)     | Cloudflare Bulk Redirects (silently drops rules past the cap) |
+| `vercel`     | **1,024** (shared with rewrites + headers) | Edge Middleware + Edge Config                                 |
+| `netlify`    | no hard count (file-size bound)            | wildcards/placeholders; Edge Functions past ~10k              |
+| `amplify`    | no documented quota                        | —                                                             |
+
+For a personal site you'll be far under these, but the guard means a runaway generator or a bulk import can't silently blow the ceiling.
+
 ## Notes
 
 - **301 vs 302:** use `301` (permanent) for slugs that moved for good — this passes SEO signal. Use `302` (temporary) only when the move is provisional.
