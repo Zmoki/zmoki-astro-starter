@@ -37,7 +37,7 @@ The starter is a **bright, warm, minimal** look — an ivory canvas (`zmoki-crea
 
 Preview everything at `/-/astro/brand/color/`. The favicon at `public/favicon.svg` uses the same colors — swap it for your own.
 
-Type is Google Fonts wired into Tailwind's `font-sans` / `font-serif` / `font-mono` families — the site is **all-sans**: Noto Sans for headings and body, Noto Sans Mono for code (`font-serif` stays available but unused). To change them, run **`/brand-typography`** — it walks the full swap (Tailwind families, both layout font links, and the brand specimen). Preview at `/-/astro/brand/typography/`.
+Type is Google Fonts wired into Tailwind's `font-sans` / `font-serif` / `font-mono` families — the site is **all-sans**: Noto Sans for headings and body, Noto Sans Mono for code (`font-serif` stays available but unused). To change them, run **`/brand`** — it walks the full swap (Tailwind families, both layout font links, and the brand specimen). Preview at `/-/astro/brand/typography/`.
 
 ## 3. Content
 
