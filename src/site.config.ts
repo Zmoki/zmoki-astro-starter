@@ -13,7 +13,8 @@ export const site = {
   name: "Zmoki Astro Starter",
 
   /** Default meta + OG description, used on any page that doesn't set its own. */
-  description: "A website for Zmoki Astro Starter — posts, projects, and resources",
+  description:
+    "An AI-native Astro starter for personal and project sites — blog, RSS, analytics, structured data, and OG images, ready to adapt with any AI coding agent.",
 
   /** og:site_name and the RSS feed title. */
   ogSiteName: "Zmoki Astro Starter",
@@ -32,7 +33,7 @@ export const site = {
   /** Primary call to action — reused by the nav button and the hero button. */
   cta: {
     label: "Get started",
-    href: "https://github.com/Zmoki/zmoki-website-starter",
+    href: "https://github.com/Zmoki/zmoki-astro-starter",
   },
 
   /** Home-page hero — the headline and subhead at the top of the landing page. */
@@ -48,7 +49,7 @@ export const site = {
     text: "Grab the template, tell your AI agent what you want, and deploy.",
     button: {
       label: "Use this template",
-      href: "https://github.com/Zmoki/zmoki-website-starter",
+      href: "https://github.com/Zmoki/zmoki-astro-starter",
     },
   },
 
@@ -68,7 +69,7 @@ export const site = {
 
   social: {
     /** "GitHub" link in the footer. */
-    sourceRepo: "https://github.com/Zmoki/zmoki-website-starter",
+    sourceRepo: "https://github.com/Zmoki/zmoki-astro-starter",
   },
 
   /** First year shown in the footer copyright range. */

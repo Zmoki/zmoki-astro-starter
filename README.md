@@ -1,6 +1,8 @@
-# zmoki-website-starter
+# zmoki-astro-starter
 
 An Astro starter for personal websites — posts, projects, and resources. Built from [zmoki.xyz](https://zmoki.xyz) and genericized into a reusable template.
+
+**Live demo: [starter.zmoki.xyz](https://starter.zmoki.xyz/)**
 
 ## What's inside
 
@@ -18,17 +20,17 @@ An Astro starter for personal websites — posts, projects, and resources. Built
 **With `npm create astro`** — scaffold the files into a new folder:
 
 ```bash
-npm create astro@latest my-new-site -- --template Zmoki/zmoki-website-starter
+npm create astro@latest my-new-site -- --template Zmoki/zmoki-astro-starter
 ```
 
 (The `--` passes `--template` through to create-astro. It will offer to install dependencies and init git.)
 
-**With GitHub** — click **Use this template → Create a new repository** on the [repo page](https://github.com/Zmoki/zmoki-website-starter). Best when you want a hosted repo + remote from the start (e.g. to wire up Cloudflare Pages).
+**With GitHub** — click **Use this template → Create a new repository** on the [repo page](https://github.com/Zmoki/zmoki-astro-starter). Best when you want a hosted repo + remote from the start (e.g. to wire up Cloudflare Pages).
 
 **By cloning** — grab it and detach the history:
 
 ```bash
-git clone https://github.com/Zmoki/zmoki-website-starter.git my-new-site
+git clone https://github.com/Zmoki/zmoki-astro-starter.git my-new-site
 cd my-new-site && rm -rf .git && git init
 ```
 
