@@ -15,7 +15,7 @@ defined in **`src/design-tokens.mjs`** (single source of truth, consumed by
 `tailwind.config.mjs` and the brand reference page). Templates use `zmoki-*`
 utility classes only — **no inline hex**.
 
-The starter is **warm-indigo**: an ivory canvas (**`zmoki-cream`**, a *custom*
+The starter is **warm-indigo**: an ivory canvas (**`zmoki-cream`**, a _custom_
 scale), warm greys for ink/borders (**`zmoki-stone`**), and a single **indigo**
 accent (**`zmoki-indigo`**). Every other chromatic group already exists as a
 utility — it's just unused until you reach for it.
@@ -85,12 +85,12 @@ Thresholds:
 
 Pairs to check on every re-skin (`<target>` = the chosen accent group):
 
-| Foreground                                   | Background                                        | Min   |
-| -------------------------------------------- | ------------------------------------------------- | ----- |
-| Ink text `zmoki-stone-900`                   | page bg `zmoki-cream-100`, cards `white`          | 4.5:1 |
-| Muted text `zmoki-stone-500`                 | `white` / page bg                                 | 4.5:1 |
-| Inverse text `white`                         | accent fills — nav CTA, hero, CTA band, buttons   | 4.5:1 |
-| Borders / focus ring (`<target>-500`/`-600`) | `white` / page bg                                 | 3:1   |
+| Foreground                                   | Background                                      | Min   |
+| -------------------------------------------- | ----------------------------------------------- | ----- |
+| Ink text `zmoki-stone-900`                   | page bg `zmoki-cream-100`, cards `white`        | 4.5:1 |
+| Muted text `zmoki-stone-500`                 | `white` / page bg                               | 4.5:1 |
+| Inverse text `white`                         | accent fills — nav CTA, hero, CTA band, buttons | 4.5:1 |
+| Borders / focus ring (`<target>-500`/`-600`) | `white` / page bg                               | 3:1   |
 
 Rules:
 

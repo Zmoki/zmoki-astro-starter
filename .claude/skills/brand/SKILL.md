@@ -16,30 +16,30 @@ them directly.
 
 ## The guideline pages (source of truth)
 
-| Page (`/-/astro/brand/…`) | File                                        | Governs                                   |
-| ------------------------- | ------------------------------------------- | ----------------------------------------- |
-| `index/`                  | `src/pages/-/astro/brand/index.astro`       | The system home — section cards/summaries |
-| `color/`                  | `src/pages/-/astro/brand/color.astro`       | Palette, swatches, usage conventions      |
-| `typography/`             | `src/pages/-/astro/brand/typography.astro`  | Typefaces, roles, prose specimen          |
-| `forms/`                  | `src/pages/-/astro/brand/forms.astro`       | Inputs, labels, action button, states     |
-| `components/`             | `src/pages/-/astro/brand/components.astro`  | Nav, footer, hero, cards, links, buttons  |
-| `voice/`                  | `src/pages/-/astro/brand/voice.astro`       | Voice pillars, house style, rewrites      |
+| Page (`/-/astro/brand/…`) | File                                       | Governs                                   |
+| ------------------------- | ------------------------------------------ | ----------------------------------------- |
+| `index/`                  | `src/pages/-/astro/brand/index.astro`      | The system home — section cards/summaries |
+| `color/`                  | `src/pages/-/astro/brand/color.astro`      | Palette, swatches, usage conventions      |
+| `typography/`             | `src/pages/-/astro/brand/typography.astro` | Typefaces, roles, prose specimen          |
+| `forms/`                  | `src/pages/-/astro/brand/forms.astro`      | Inputs, labels, action button, states     |
+| `components/`             | `src/pages/-/astro/brand/components.astro` | Nav, footer, hero, cards, links, buttons  |
+| `voice/`                  | `src/pages/-/astro/brand/voice.astro`      | Voice pillars, house style, rewrites      |
 
 Start here: run **`/run`** and open the page you're changing. It shows the current
 guideline live, and its `.astro` frontmatter holds the data you'll usually edit.
 
-## Where each guideline is *implemented*
+## Where each guideline is _implemented_
 
 A guideline page is documentation; the behavior it documents lives in code. When
 you adapt a guideline, change **both** — the page (so the guideline stays true)
 and its implementation (so the site matches) — in the same pass.
 
-| Guideline    | Implemented in                                                        |
-| ------------ | --------------------------------------------------------------------- |
-| Color        | `src/design-tokens.mjs` (the `zmoki-*` scales) → Tailwind utilities    |
-| Typography   | `tailwind.config.mjs` (`fontFamily`, `headingFontStack`) + font `<link>`s in `BaseLayout.astro` & `BrandLayout.astro` |
-| Voice & tone | The `voice.astro` page **is** the artifact — no separate implementation |
-| Components/forms | The actual components in `src/components/` and `src/layouts/`      |
+| Guideline        | Implemented in                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Color            | `src/design-tokens.mjs` (the `zmoki-*` scales) → Tailwind utilities                                                   |
+| Typography       | `tailwind.config.mjs` (`fontFamily`, `headingFontStack`) + font `<link>`s in `BaseLayout.astro` & `BrandLayout.astro` |
+| Voice & tone     | The `voice.astro` page **is** the artifact — no separate implementation                                               |
+| Components/forms | The actual components in `src/components/` and `src/layouts/`                                                         |
 
 ## Workflow
 

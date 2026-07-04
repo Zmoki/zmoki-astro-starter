@@ -6,7 +6,7 @@ states (`forms/`).
 
 > The guidelines are **`/-/astro/brand/components/`** and
 > **`/-/astro/brand/forms/`** — open them first (`/run`). Unlike color/type, these
-> pages have **no build config to change**: the guideline *is* the real component.
+> pages have **no build config to change**: the guideline _is_ the real component.
 
 ## The governing principle: the page mirrors production
 
@@ -26,14 +26,14 @@ So a component change is **two edits that must agree**: the real component in
 
 ## Where the real components live
 
-| Block                         | Real implementation                               |
-| ----------------------------- | ------------------------------------------------- |
-| Nav, footer, meta chrome      | `src/layouts/BaseLayout.astro`                    |
-| Hero, cards, CTA band         | `src/pages/index.astro`                           |
-| Post header, prev/next, links | `src/layouts/PostLayout.astro`                    |
-| Button (all variants)         | `src/components/Button.astro`                     |
-| Form inputs, states, submit   | `src/components/BrevoForm.astro`                  |
-| Resource link                 | `src/components/ResourceLink.astro`               |
+| Block                         | Real implementation                 |
+| ----------------------------- | ----------------------------------- |
+| Nav, footer, meta chrome      | `src/layouts/BaseLayout.astro`      |
+| Hero, cards, CTA band         | `src/pages/index.astro`             |
+| Post header, prev/next, links | `src/layouts/PostLayout.astro`      |
+| Button (all variants)         | `src/components/Button.astro`       |
+| Form inputs, states, submit   | `src/components/BrevoForm.astro`    |
+| Resource link                 | `src/components/ResourceLink.astro` |
 
 `Button.astro` variants: `primary` (indigo fill), `secondary` (white + soft stone
 border), `inverse` (white, for an indigo band); sizes `md` / `lg`. It renders an

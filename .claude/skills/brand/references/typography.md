@@ -7,11 +7,11 @@
 Change the brand typefaces in one pass. The site uses exactly three Tailwind font
 families — `font-sans` / `font-serif` / `font-mono` — and the roles are fixed:
 
-| Family | Utility      | Role                                              |
-| ------ | ------------ | ------------------------------------------------- |
+| Family | Utility      | Role                                                 |
+| ------ | ------------ | ---------------------------------------------------- |
 | sans   | `font-sans`  | Headings **and** body copy + prose (global `<body>`) |
 | serif  | `font-serif` | Available but unused in the current all-sans starter |
-| mono   | `font-mono`  | Code, eyebrows, dates, nav, footer, buttons       |
+| mono   | `font-mono`  | Code, eyebrows, dates, nav, footer, buttons          |
 
 The starter is **all-sans**: Noto Sans fills both headings and body, Noto Sans
 Mono is code. `font-serif` is wired but unused — if you introduce a display serif

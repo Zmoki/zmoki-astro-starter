@@ -1,6 +1,6 @@
 # Brand — voice & tone
 
-Rewrite how the site *sounds* — the voice pillars, house style, and worked
+Rewrite how the site _sounds_ — the voice pillars, house style, and worked
 examples. Everything lives in one file:
 
 **`src/pages/-/astro/brand/voice.astro`** → renders `/-/astro/brand/voice/`.
@@ -16,15 +16,15 @@ copy you write here should itself obey the voice you're describing.
 
 ## What to edit (the data blocks, top of the file)
 
-| Const           | Drives                        | Shape                                             |
-| --------------- | ----------------------------- | ------------------------------------------------- |
-| `pillars`       | The voice principles          | `{ label, summary, detail }` — one per pillar     |
-| `mechanics`     | House-style do/don't rules    | `{ rule, right, wrong }`                           |
-| `examples`      | Side-by-side rewrites         | `{ context, wrong, right, note }`                  |
-| `sampleQuestions` | FAQ-style question models   | strings                                           |
-| `lexicon`       | Use / avoid word lists        | `{ use: [...], avoid: [...] }`                     |
-| `microcopy`     | Voice in UI copy, not prose   | `{ context, right, wrong }` (or similar)          |
-| `checklist`     | Pre-publish self-check        | strings                                           |
+| Const             | Drives                      | Shape                                         |
+| ----------------- | --------------------------- | --------------------------------------------- |
+| `pillars`         | The voice principles        | `{ label, summary, detail }` — one per pillar |
+| `mechanics`       | House-style do/don't rules  | `{ rule, right, wrong }`                      |
+| `examples`        | Side-by-side rewrites       | `{ context, wrong, right, note }`             |
+| `sampleQuestions` | FAQ-style question models   | strings                                       |
+| `lexicon`         | Use / avoid word lists      | `{ use: [...], avoid: [...] }`                |
+| `microcopy`       | Voice in UI copy, not prose | `{ context, right, wrong }` (or similar)      |
+| `checklist`       | Pre-publish self-check      | strings                                       |
 
 The section headings that render these live in the markup below the data — the
 `<h1>` is "Voice & tone" and there's a "Who's speaking" intro `<section>`. If you
@@ -55,10 +55,10 @@ npm run build   # must pass
 ```
 
 Then open `/-/astro/brand/voice/` (via `/run`) and read it top to bottom — every
-do/don't and rewrite should still make sense, and the page should *sound* like the
-voice it prescribes. Update the `contentModifiedDate` only applies to content
-collections (blog/resources/legal), **not** these internal brand pages — no date
-bump needed here.
+do/don't and rewrite should still make sense, and the page should _sound_ like the
+voice it prescribes. Note: the `contentModifiedDate` bump rule applies only to
+content collections (blog/resources/legal), **not** these internal brand pages —
+no date bump needed here.
 
 ## Notes
 

@@ -14,7 +14,6 @@ A guide is just another page under `src/pages/-/astro/brand/`, built on
 1. **Create the page** — `src/pages/-/astro/brand/<name>.astro`. Copy an existing
    page (`voice.astro` for a mostly-prose guide, `components.astro` for
    example+recipe blocks) as the starting shape. Keep the house conventions:
-
    - Wrap in `BrandLayout` with a `title` (`Brand — <Name>`) and `description`.
    - Open with the standard header: a back-link
      `← My Project X brand` → `/-/astro/brand/`, an `<h1>`, and a one-line intro.
