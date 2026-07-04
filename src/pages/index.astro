@@ -3,9 +3,8 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 
-// Kept for the sitemap (src/pages/sitemap.xml.ts imports these).
-export const publishDate = new Date("2025-01-01");
-export const contentModifiedDate = new Date("2025-01-01");
+// The landing page's publish/modified dates live in src/data/home-page.ts so the
+// sitemap can read them without importing from this page component.
 
 // Placeholder features — edit, extend, or remove.
 const features = [

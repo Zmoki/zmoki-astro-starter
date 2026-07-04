@@ -1,9 +1,7 @@
 import type { APIRoute } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
-import {
-  publishDate as indexPagePublishDate,
-  contentModifiedDate as indexPageContentModifiedDate,
-} from "@/pages/index.astro";
+import { homePagePublishDate, homePageContentModifiedDate } from "@/data/home-page";
+import { isoDate } from "@/lib/dates";
 
 export const GET: APIRoute = async ({ site }) => {
   // Get all posts from the feed collection
@@ -18,16 +16,15 @@ export const GET: APIRoute = async ({ site }) => {
   // Get all legal items from the legal collection
   const allLegalItems: CollectionEntry<"legal">[] = await getCollection("legal");
 
-  // Get the most recent post published date and calc the index page latest date
-  const recentPostPublishedDate = allFeedIems
-    .sort((a, b) => b.data.contentModifiedDate.getTime() - a.data.contentModifiedDate.getTime())[0]
-    .data.contentModifiedDate.getTime();
+  // The index page's <lastmod> is the newest of: its own dates, and the most
+  // recently modified post. Spread the post timestamps into Math.max so an empty
+  // blog collection simply falls back to the home-page dates (no [0] on []).
   const indexPageLatestDateTimestamp = Math.max(
-    recentPostPublishedDate,
-    indexPagePublishDate.getTime(),
-    indexPageContentModifiedDate.getTime(),
+    homePagePublishDate.getTime(),
+    homePageContentModifiedDate.getTime(),
+    ...allFeedIems.map((post) => post.data.contentModifiedDate.getTime()),
   );
-  const indexPageLatestDate = new Date(indexPageLatestDateTimestamp).toISOString().substring(0, 10);
+  const indexPageLatestDate = isoDate(new Date(indexPageLatestDateTimestamp));
 
   const sitemapUrl = (path: string, lastmod: string) => `
   <url>
@@ -46,28 +43,17 @@ export const GET: APIRoute = async ({ site }) => {
   ${sitemapUrl("blog/", indexPageLatestDate)}
   ${allFeedIems
     .map((post: CollectionEntry<"blog">) =>
-      sitemapUrl(
-        `blog/${post.id}/`,
-        (post.data.contentModifiedDate ?? post.data.publishDate).toISOString().substring(0, 10),
-      ),
+      sitemapUrl(`blog/${post.id}/`, isoDate(post.data.contentModifiedDate)),
     )
     .join("")}
   ${allResources
     .map((resource: CollectionEntry<"resources">) =>
-      sitemapUrl(
-        `resources/${resource.id}/`,
-        (resource.data.contentModifiedDate ?? resource.data.publishDate)
-          .toISOString()
-          .substring(0, 10),
-      ),
+      sitemapUrl(`resources/${resource.id}/`, isoDate(resource.data.contentModifiedDate)),
     )
     .join("")}
     ${allLegalItems
       .map((legalItem: CollectionEntry<"legal">) =>
-        sitemapUrl(
-          `legal/${legalItem.id}/`,
-          legalItem.data.contentModifiedDate.toISOString().substring(0, 10),
-        ),
+        sitemapUrl(`legal/${legalItem.id}/`, isoDate(legalItem.data.contentModifiedDate)),
       )
       .join("")}
 </urlset>`;
