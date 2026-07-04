@@ -150,7 +150,7 @@ function rehypeCodeBlockCopy() {
 // https://astro.build/config
 export default defineConfig({
   integrations: [mdx()],
-  site: "https://example.com",
+  site: "https://starter.zmoki.xyz",
   server: {
     port: 4321,
   },

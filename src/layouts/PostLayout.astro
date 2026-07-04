@@ -90,23 +90,22 @@ const blogPostingLd = {
     </header>
 
     <!-- Post Content -->
-    <Prose class="prose-xl 2xl:prose-2xl xl:pb-24 2xl:px-28 2xl:py-16">
+    <Prose class="prose-xl xl:prose-2xl xl:px-28 xl:py-16">
       <slot />
     </Prose>
 
     <!-- About Author -->
     <aside
-      class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white xl:p-20"
+      class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white lg:p-20"
     >
       <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">Written by {site.author.name}</h2>
       <p>
-        A short author bio goes here — say who you are and what you do. Edit it in <code
-          >src/layouts/PostLayout.astro</code
-        >. You can read more on the <a
-          href={`/blog/${site.author.aboutSlug}/`}
+        I build small, fast websites and the tools around them — this starter is one of them. Find
+        more of my work at <a
+          href={site.author.url}
           class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
-          >about</a
-        > page.
+          >{new URL(site.author.url).host}</a
+        >.
       </p>
     </aside>
 

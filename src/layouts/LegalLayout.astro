@@ -14,7 +14,7 @@ const { title, description, publishDate, contentModifiedDate } = Astro.props;
 >
   <section class="space-y-4">
     <header
-      class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center xl:p-20"
+      class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
     >
       <h1 class="text-5xl font-semibold tracking-tight xl:text-6xl" set:html={title} />
       {
@@ -26,7 +26,7 @@ const { title, description, publishDate, contentModifiedDate } = Astro.props;
         <span>Updated on <Time datetime={contentModifiedDate} /></span>
       </p>
     </header>
-    <Prose class="xl:px-28 xl:py-16">
+    <Prose class="prose-xl xl:prose-2xl xl:px-28 xl:py-16">
       <slot />
     </Prose>
   </section>

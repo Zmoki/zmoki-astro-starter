@@ -18,7 +18,7 @@ const { brevoFormId, buttonText = defaultButtonText, resourceSlug = "" } = Astro
   action={`https://${import.meta.env.PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/${brevoFormId}`}
   class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
 >
-  <section class="prose prose-lg xl:prose-2xl prose-headings:font-semibold !leading-tight md:w-1/2">
+  <section class="prose prose-headings:font-semibold !leading-tight md:w-1/2">
     <slot />
   </section>
 

@@ -34,12 +34,12 @@ A guideline page is documentation; the behavior it documents lives in code. When
 you adapt a guideline, change **both** — the page (so the guideline stays true)
 and its implementation (so the site matches) — in the same pass.
 
-| Guideline        | Implemented in                                                                                                        |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Color            | `src/design-tokens.mjs` (the `zmoki-*` scales) → Tailwind utilities                                                   |
-| Typography       | `tailwind.config.mjs` (`fontFamily`, `headingFontStack`) + font `<link>`s in `BaseLayout.astro` & `BrandLayout.astro` |
-| Voice & tone     | The `voice.astro` page **is** the artifact — no separate implementation                                               |
-| Components/forms | The actual components in `src/components/` and `src/layouts/`                                                         |
+| Guideline        | Implemented in                                                                                                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Color            | `src/design-tokens.mjs` (the `zmoki-*` scales) → Tailwind utilities                                                                                                                              |
+| Typography       | `tailwind.config.mjs` (`fontFamily`, `headingFontStack`) + font `<link>`s in `BaseLayout.astro` & `BrandLayout.astro` + the metrics-matched CLS fallback `@font-face` in `src/styles/global.css` |
+| Voice & tone     | The `voice.astro` page **is** the artifact — no separate implementation                                                                                                                          |
+| Components/forms | The actual components in `src/components/` and `src/layouts/`                                                                                                                                    |
 
 ## Workflow
 

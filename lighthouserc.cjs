@@ -5,7 +5,7 @@ module.exports = {
       url: [
         "http://localhost:4321/",
         "http://localhost:4321/blog/",
-        "http://localhost:4321/blog/2-example-post/",
+        "http://localhost:4321/blog/1-set-up-your-site/",
       ],
       numberOfRuns: 3,
     },

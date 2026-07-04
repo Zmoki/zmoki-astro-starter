@@ -7,65 +7,72 @@
  */
 export const site = {
   /** Production URL, no trailing slash. Also set as `site` in astro.config.mjs. */
-  domain: "https://example.com",
+  domain: "https://starter.zmoki.xyz",
 
   /** Short label shown in the header logo and footer copyright. */
-  name: "My Project X",
+  name: "Zmoki Astro Starter",
 
   /** Default meta + OG description, used on any page that doesn't set its own. */
-  description: "A website for My Project X — posts, projects, and resources",
+  description: "A website for Zmoki Astro Starter — posts, projects, and resources",
 
   /** og:site_name and the RSS feed title. */
-  ogSiteName: "My Project X",
+  ogSiteName: "Zmoki Astro Starter",
 
   /** RSS feed description. */
-  feedDescription: "Posts, projects, and resources from My Project X.",
+  feedDescription: "Posts and guides about building your site with the Zmoki Astro Starter.",
 
   /** Top-nav links (between the logo and the CTA button). Anchors or routes. */
   nav: [
     { label: "Features", href: "/#features" },
+    { label: "Brand", href: "/#brand" },
     { label: "Blog", href: "/blog/" },
+    { label: "SEO Checklist", href: "/resources/new-website-seo-checklist/" },
   ],
 
   /** Primary call to action — reused by the nav button and the hero button. */
   cta: {
     label: "Get started",
-    href: "/#cta",
+    href: "https://github.com/Zmoki/zmoki-website-starter",
   },
 
   /** Home-page hero — the headline and subhead at the top of the landing page. */
   hero: {
-    heading: "Build something people want",
+    heading: "A website starter your AI can make its own.",
     subhead:
-      "A one-line pitch for My Project X — what it does and who it's for. Edit it in src/site.config.ts.",
+      "An Astro starter for personal and project sites — landing page, blog, RSS, analytics, and email forms already wired. It ships with AGENTS.md, so Claude Code, Codex, Cursor, or any AI coding agent understands the codebase and rebrands it for you.",
   },
 
   /** Closing CTA band at the bottom of the home page. */
   finalCta: {
     heading: "Ready to get started?",
-    text: "Swap this for your closing pitch, then point the button wherever you need.",
-    button: { label: "Get in touch", href: "mailto:hey@example.com" },
+    text: "Grab the template, tell your AI agent what you want, and deploy.",
+    button: {
+      label: "Use this template",
+      href: "https://github.com/Zmoki/zmoki-website-starter",
+    },
   },
 
   author: {
-    /** Shown in the post author bio. */
-    name: "Your Name",
+    /** Shown in the post author bio and the footer copyright. */
+    name: "Zarema Khalilova",
+    /** Personal website — linked from the footer copyright. */
+    url: "https://zmoki.xyz",
     /** Feed slug the author name links to (an "about me" post). */
-    aboutSlug: "1-about-me",
+    aboutSlug: "1-set-up-your-site",
   },
 
   contact: {
     /** Shown in the Contact sidebar panel; also the mailto: target. */
-    email: "hey@example.com",
+    email: "hey@zmoki.xyz",
   },
 
   social: {
-    /** "Source Code" link in the footer. */
-    sourceRepo: "https://github.com/your-name/your-repo",
+    /** "GitHub" link in the footer. */
+    sourceRepo: "https://github.com/Zmoki/zmoki-website-starter",
   },
 
   /** First year shown in the footer copyright range. */
-  copyrightStartYear: 2025,
+  copyrightStartYear: 2026,
 
   /** Deploy-time settings (hosting). See SETUP.md §6. */
   deploy: {
