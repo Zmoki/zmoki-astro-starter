@@ -17,7 +17,7 @@ import type { AstroGlobal } from "astro";
 // resolve to the same absolute URLs; they diverge only under `astro dev`.
 
 export interface PageUrls {
-  /** Production origin (astro.config `site`), e.g. https://example.com. */
+  /** Production origin (astro.config `site`), e.g. https://starter.zmoki.xyz. */
   readonly siteOrigin: URL;
   /** Absolute canonical URL of the current page (always production origin). */
   readonly canonical: string;
