@@ -4,6 +4,8 @@ import type { CollectionEntry } from "astro:content";
 import Time from "@/components/Time.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
+import { getOgImage } from "@/og/manifest";
+import { pageUrls } from "@/lib/urls";
 
 export interface Props {
   title: string;
@@ -19,10 +21,13 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
 // BlogPosting structured data (schema.org Article) → Google rich result.
 // Article has no required properties; we include the recommended ones the page
-// actually backs up. Absolute URLs + production domain so the markup is correct
-// regardless of dev/prod. See the /structured-data skill and Google's Article
-// reference. https://developers.google.com/search/docs/appearance/structured-data/article
-const canonicalUrl = new URL(Astro.url.pathname, site.domain).toString();
+// actually backs up. All absolute URLs come from the shared pageUrls() helper
+// (src/lib/urls.ts) — the same source BaseLayout uses for canonical + og:image —
+// so the structured data can't drift from the meta tags. The image reuses the
+// page's OG card via the manifest. See the /structured-data skill and Google's
+// Article reference: https://developers.google.com/search/docs/appearance/structured-data/article
+const urls = pageUrls(Astro);
+const ogImage = await getOgImage(Astro.url.pathname);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -33,15 +38,15 @@ const blogPostingLd = {
   author: {
     "@type": "Person",
     name: site.author.name,
-    url: new URL(`/blog/${site.author.aboutSlug}/`, site.domain).toString(),
+    url: urls.absolute(`/blog/${site.author.aboutSlug}/`),
   },
   publisher: {
     "@type": "Organization",
     name: site.name,
-    url: site.domain,
+    url: urls.siteOrigin.toString(),
   },
-  image: new URL(`/og-images${Astro.url.pathname}wide.jpg`, site.domain).toString(),
-  mainEntityOfPage: canonicalUrl,
+  image: urls.absolute(ogImage.path),
+  mainEntityOfPage: urls.canonical,
 };
 ---
 

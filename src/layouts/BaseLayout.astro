@@ -4,6 +4,7 @@ import Analytics from "@/components/Analytics.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
+import { pageUrls } from "@/lib/urls";
 
 export interface Props {
   title: string;
@@ -26,20 +27,18 @@ const {
   wide = false,
 } = Astro.props;
 
-const isProduction = import.meta.env.PROD;
-
-const siteBaseUrl = Astro.site;
-const currentBaseUrl = isProduction ? siteBaseUrl : `http://localhost:${Astro.url.port}`;
-
 const pagePathname = Astro.url.pathname;
 const isPageArticle = publishDate && contentModifiedDate;
 
-const canonicalURL = new URL(pagePathname, siteBaseUrl).toString();
+// All absolute URLs (canonical, OG, structured data) come from one helper so
+// they can't drift apart — see src/lib/urls.ts.
+const urls = pageUrls(Astro);
+const canonicalURL = urls.canonical;
 
 // OG image (+ alt) for this page, from the manifest. Generated on the fly by
 // /og/[...path].png.ts — see src/og/. Falls back to the site's default card.
 const ogImage = await getOgImage(pagePathname);
-const pageImageUrl = new URL(ogImage.path, currentBaseUrl).toString();
+const pageImageUrl = urls.assetUrl(ogImage.path);
 
 const currentYear = new Date().getFullYear();
 const copyrightYears =
@@ -75,7 +74,7 @@ const fontsHref =
       rel="alternate"
       type="application/rss+xml"
       title="RSS Feed"
-      href={new URL("rss.xml", siteBaseUrl).toString()}
+      href={urls.absolute("/rss.xml")}
     />
 
     <!-- Open Graph meta tags -->
