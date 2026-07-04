@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Time from "@/components/Time.astro";
+import Prose from "@/components/Prose.astro";
 import BrevoForm from "@/components/BrevoForm.astro";
 
 export interface Props {
@@ -54,11 +55,9 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
     <div class="flex flex-col gap-4">
       <!-- Post Content -->
-      <div
-        class="prose prose-xl border-zmoki-stone-200 xl:prose-2xl prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16 xl:px-32 xl:py-16"
-      >
+      <Prose class="prose-xl xl:prose-2xl xl:px-32 xl:py-16">
         <slot />
-      </div>
+      </Prose>
       {
         form && (
           <div class="order-first">

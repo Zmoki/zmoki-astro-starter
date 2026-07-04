@@ -344,7 +344,7 @@ Built-in providers ship as self-gating components in `src/components/analytics/`
 | `contact_email_clicked`       | BaseLayout inline script     | `email`                         |
 | `post_viewed`                 | blog/[...slug] inline script | `post_slug`, `post_title`       |
 | `post_navigation_clicked`     | PostLayout inline script     | `direction`, `destination_slug` |
-| `code_block_copied`           | PostLayout inline script     | `snippet_length`                |
+| `code_block_copied`           | Prose component              | `snippet_length`                |
 | `resource_link_clicked`       | ResourceLink inline script   | `resource_slug`, `is_external`  |
 | `gate_viewed`                 | BrevoForm inline script      | `resource_slug`, `form_id`      |
 | `newsletter_form_submitted`   | BrevoForm inline script      | `form_id`, `resource_slug`      |
@@ -366,6 +366,7 @@ The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_for
 | `BaseLayout.astro`        | Shell: nav, meta, footer, analytics                          |
 | `PostLayout.astro`        | Blog post wrapper                                            |
 | `PostCard.astro`          | Post list item on index page                                 |
+| `Prose.astro`             | Content-card panel for rendered MD/MDX + code-copy behavior  |
 | `PostImage.astro`         | Image with caption in posts                                  |
 | `RawVideo.astro`          | Video embed                                                  |
 | `Video.astro`             | Video with controls                                          |

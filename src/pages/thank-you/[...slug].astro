@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
+import Prose from "@/components/Prose.astro";
 import { site } from "@/site.config";
 
 export async function getStaticPaths() {
@@ -48,9 +49,7 @@ const randomFeedPosts = shuffled.slice(0, 3);
       />
     </header>
 
-    <section
-      class="prose prose-xl border-zmoki-stone-200 lg:prose-2xl prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16 lg:px-28 lg:py-16"
-    >
+    <Prose class="prose-xl lg:prose-2xl lg:px-28 lg:py-16">
       <p>Thank you for signing up!</p>
       <p>I've just sent <a href={url} set:html={name} /> to the email address you provided.</p>
       <p>It should arrive in your inbox in the next minute or two.</p>
@@ -90,7 +89,7 @@ const randomFeedPosts = shuffled.slice(0, 3);
           }
         </ul>
       </section>
-    </section>
+    </Prose>
   </section>
 </BaseLayout>
 

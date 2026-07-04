@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Time from "@/components/Time.astro";
+import Prose from "@/components/Prose.astro";
 
 const { title, description, publishDate, contentModifiedDate } = Astro.props;
 ---
@@ -25,10 +26,8 @@ const { title, description, publishDate, contentModifiedDate } = Astro.props;
         <span>Updated on <Time datetime={contentModifiedDate} /></span>
       </p>
     </header>
-    <section
-      class="prose border-zmoki-stone-200 prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16 xl:px-28 xl:py-16"
-    >
+    <Prose class="xl:px-28 xl:py-16">
       <slot />
-    </section>
+    </Prose>
   </section>
 </BaseLayout>

@@ -2,6 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import Time from "@/components/Time.astro";
+import Prose from "@/components/Prose.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
@@ -89,11 +90,9 @@ const blogPostingLd = {
     </header>
 
     <!-- Post Content -->
-    <div
-      class="prose prose-xl border-zmoki-stone-200 2xl:prose-2xl prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16 xl:pb-24 2xl:px-28 2xl:py-16"
-    >
+    <Prose class="prose-xl 2xl:prose-2xl xl:pb-24 2xl:px-28 2xl:py-16">
       <slot />
-    </div>
+    </Prose>
 
     <!-- About Author -->
     <aside
@@ -150,56 +149,13 @@ const blogPostingLd = {
   </article>
 
   <script is:inline>
-    // Post-navigation tracking.
+    // Post-navigation tracking. (Code-block copy behavior lives in <Prose>.)
     document.querySelectorAll("a[data-nav-direction]").forEach(function (el) {
       el.addEventListener("click", function () {
         window.track?.("post_navigation_clicked", {
           direction: this.dataset.navDirection,
           destination_slug: this.dataset.navSlug,
         });
-      });
-    });
-
-    // Copy-to-clipboard for code blocks — the button is injected by the
-    // rehypeCodeBlockCopy plugin. A single handler per button does both the copy
-    // and the code_block_copied event (previously split across two scripts that
-    // each re-queried and re-bound every button).
-    document.querySelectorAll('[data-copy-button="true"]').forEach(function (btn) {
-      btn.addEventListener("click", async function () {
-        var wrapper = btn.closest(".relative");
-        var codeBlock = wrapper && wrapper.querySelector("pre code");
-        var code = codeBlock ? codeBlock.textContent || "" : "";
-
-        window.track?.("code_block_copied", { snippet_length: code.length });
-        if (!code) return;
-
-        var original = btn.textContent;
-        var markCopied = function () {
-          btn.textContent = "Copied";
-          setTimeout(function () {
-            btn.textContent = original;
-          }, 2000);
-        };
-
-        try {
-          await navigator.clipboard.writeText(code);
-          markCopied();
-        } catch {
-          // Fallback for browsers without the async clipboard API.
-          var textArea = document.createElement("textarea");
-          textArea.value = code;
-          textArea.style.position = "fixed";
-          textArea.style.opacity = "0";
-          document.body.appendChild(textArea);
-          textArea.select();
-          try {
-            document.execCommand("copy");
-            markCopied();
-          } catch (fallbackErr) {
-            console.error("Failed to copy code:", fallbackErr);
-          }
-          document.body.removeChild(textArea);
-        }
       });
     });
   </script>

@@ -1,0 +1,75 @@
+---
+// The content-card panel for rendered Markdown/MDX (post body, resource + legal
+// pages, thank-you copy): the shared prose+card styling in one place, plus the
+// copy-to-clipboard behavior for code blocks.
+//
+// The copy button is injected into *all* rendered content by the
+// rehypeCodeBlockCopy plugin, so its wiring lives here rather than in one layout
+// — that way every page that renders prose (not just blog posts) gets working
+// copy buttons. Pass `class` for the per-use bits that vary: the prose size
+// (`prose-xl`), the `prose-2xl` breakpoint, and large-screen padding.
+export interface Props {
+  class?: string;
+}
+
+const { class: extra = "" } = Astro.props;
+
+const base =
+  "prose border-zmoki-stone-200 prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16";
+---
+
+<div class:list={[base, extra]}>
+  <slot />
+</div>
+
+<script is:inline>
+  // Scoped to THIS Prose instance: bind copy handlers to the code-block buttons
+  // in the panel above only (document.currentScript is this script; its previous
+  // element sibling is that panel's <div>). rehypeCodeBlockCopy injects the
+  // buttons; the copy is tracked via the vendor-neutral facade. Kept as a sibling
+  // *after* the div — a script inside .prose would become its :last-child and
+  // steal the prose/space-y last-child margin reset.
+  (function () {
+    var root = document.currentScript.previousElementSibling;
+    if (!root) return;
+
+    root.querySelectorAll('[data-copy-button="true"]').forEach(function (btn) {
+      btn.addEventListener("click", async function () {
+        var wrapper = btn.closest(".relative");
+        var codeBlock = wrapper && wrapper.querySelector("pre code");
+        var code = codeBlock ? codeBlock.textContent || "" : "";
+
+        window.track?.("code_block_copied", { snippet_length: code.length });
+        if (!code) return;
+
+        var original = btn.textContent;
+        var markCopied = function () {
+          btn.textContent = "Copied";
+          setTimeout(function () {
+            btn.textContent = original;
+          }, 2000);
+        };
+
+        try {
+          await navigator.clipboard.writeText(code);
+          markCopied();
+        } catch {
+          // Fallback for browsers without the async clipboard API.
+          var textArea = document.createElement("textarea");
+          textArea.value = code;
+          textArea.style.position = "fixed";
+          textArea.style.opacity = "0";
+          document.body.appendChild(textArea);
+          textArea.select();
+          try {
+            document.execCommand("copy");
+            markCopied();
+          } catch (fallbackErr) {
+            console.error("Failed to copy code:", fallbackErr);
+          }
+          document.body.removeChild(textArea);
+        }
+      });
+    });
+  })();
+</script>
