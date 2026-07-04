@@ -38,11 +38,11 @@ Read the PNG to eyeball it. Always finish with a build (below).
 
 ### Change the card colors
 
-Cards read from the design tokens, so a **re-skin does this for you** — run the `brand-colors` skill and the cards follow. To tune only the cards, edit the token picks in `src/og/theme.ts` (`bg`, `ink`, `muted`, `accent`, …). Every value is passed through `culori`'s `formatHex` (see Gotchas).
+Cards read from the design tokens, so a **re-skin does this for you** — run the `/brand` skill and the cards follow. To tune only the cards, edit the token picks in `src/og/theme.ts` (`bg`, `ink`, `muted`, `accent`, …). Every value is passed through `culori`'s `formatHex` (see Gotchas).
 
 ### Change the card font
 
-Edit `src/og/fonts.ts` and drop the new `.woff`/`.ttf` (Satori needs the file, not a CSS `@font-face`) into `src/og/fonts/`, then use its `name` in `card.ts` styles. **This is separate from the site's Google Fonts** — if you swap the brand typeface (`brand-typography` skill), update these too or the cards won't match.
+Edit `src/og/fonts.ts` and drop the new `.woff`/`.ttf` (Satori needs the file, not a CSS `@font-face`) into `src/og/fonts/`, then use its `name` in `card.ts` styles. **This is separate from the site's Google Fonts** — if you swap the brand typeface (`/brand` skill), update these too or the cards won't match.
 
 ### Tweak a card's layout or copy
 

@@ -7,7 +7,7 @@
 // devDependency); to refresh them, re-copy files/noto-sans-latin-{400,700}-normal.woff.
 //
 // NOTE: this is the OG card font, separate from the site's Google Fonts. If you
-// swap the brand font (the `brand-typography` skill), update these too so the
+// swap the brand font (the `/brand` skill), update these too so the
 // social cards match.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";

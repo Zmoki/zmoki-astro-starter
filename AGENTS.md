@@ -38,7 +38,7 @@ PORT=$(( 4300 + $(echo "$PWD" | cksum | cut -d' ' -f1) % 100 ))
 Project skills live in `.claude/skills/`:
 
 - `/run` — launch the Astro dev server (`.claude/skills/run/SKILL.md`)
-- `/brand-typography` — swap the site's fonts end to end (`.claude/skills/brand-typography/SKILL.md`)
+- `/brand` — work on brand guidelines end to end: colors, typography, voice & tone, and the internal brand pages (`.claude/skills/brand/SKILL.md`)
 - `/redirects` — add or edit URL redirects (`.claude/skills/redirects/SKILL.md`)
 - `/og-images` — customize the OG / social-share image cards (`.claude/skills/og-images/SKILL.md`)
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
@@ -445,8 +445,8 @@ OG images are **purpose-built cards rendered at build time** — no browser, no 
 
 - **`src/og/manifest.ts`** — the single source of truth. `getOgEntries()` enumerates every card (home, blog index, each post / resource page / legal page, plus a `default` fallback); each entry carries `{ key, template, title, description, eyebrow, alt }`. `getOgImage(pathname)` returns the `{ path, alt }` for a page. Consumed by both the endpoint (to render) and `BaseLayout` (for `og:image` + `og:image:alt`).
 - **`src/og/card.ts`** — two Satori templates: `article` (eyebrow · title · description · brand footer) and `site` (brand mark · name · tagline). Built as Satori vdom nodes directly (no JSX).
-- **`src/og/theme.ts`** — card colors pulled from `src/design-tokens.mjs`, so a re-skin (the `brand-colors` skill) recolors the cards automatically. Tokens are run through `culori`'s `formatHex` because Tailwind v4's default palettes are `oklch()` strings, which the resvg rasterizer doesn't render reliably.
-- **`src/og/fonts.ts`** — bundles the Noto Sans Latin subset (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's Google Fonts — if you swap the brand font (`brand-typography` skill), update these too.
+- **`src/og/theme.ts`** — card colors pulled from `src/design-tokens.mjs`, so a re-skin (the `/brand` skill) recolors the cards automatically. Tokens are run through `culori`'s `formatHex` because Tailwind v4's default palettes are `oklch()` strings, which the resvg rasterizer doesn't render reliably.
+- **`src/og/fonts.ts`** — bundles the Noto Sans Latin subset (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's Google Fonts — if you swap the brand font (`/brand` skill), update these too.
 - **`src/pages/og/[...path].png.ts`** — `getStaticPaths()` from the manifest, `GET()` → Satori (vdom → SVG) → resvg (SVG → PNG). `astro build` emits `dist/og/**/*.png`; `astro dev` renders the same route on request. Cards are **1200×630** PNGs.
 
 Because the images are produced by `astro build`, production (Cloudflare Pages) and CI get them for free — there's no separate generate step and no binaries in git. `src/pages/rss.xml.ts` references each post's card at `/og/blog/{id}.png`.

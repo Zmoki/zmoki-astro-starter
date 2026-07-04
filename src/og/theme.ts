@@ -1,6 +1,6 @@
 // Card colors for the OG image templates, pulled from the same design tokens as
 // the rest of the site (src/design-tokens.mjs). Because these read straight from
-// the tokens, a palette change / re-skin (the `brand-colors` skill) recolors the
+// the tokens, a palette change / re-skin (the `/brand` skill) recolors the
 // generated OG cards too — no separate place to keep in sync.
 import { formatHex } from "culori";
 import { colors } from "@/design-tokens.mjs";
