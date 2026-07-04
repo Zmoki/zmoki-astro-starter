@@ -39,6 +39,7 @@ jobs:
         with:
           name: lighthouse-reports
           path: .lighthouseci/
+          include-hidden-files: true
           retention-days: 30
 
       - name: Comment PR with Lighthouse results
