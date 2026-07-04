@@ -1,4 +1,5 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
+import { fonts } from "./src/design-tokens.mjs";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
@@ -151,6 +152,32 @@ function rehypeCodeBlockCopy() {
 export default defineConfig({
   integrations: [mdx()],
   site: "https://starter.zmoki.xyz",
+  // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
+  // served same-origin from /_astro/fonts, with automatic optimized fallback
+  // metrics (zero CLS) and preload links. The site is all-sans — a body/heading
+  // sans (weights 400–700 incl. italic) and a monospace for code. The family
+  // names + CSS variables are the single source in src/design-tokens.mjs; only
+  // the provider / weights / styles / subsets are set here.
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: fonts.sans.name,
+      cssVariable: fonts.sans.variable,
+      weights: ["400 700"],
+      styles: ["normal", "italic"],
+      subsets: ["latin"],
+      fallbacks: ["system-ui", "sans-serif"],
+    },
+    {
+      provider: fontProviders.google(),
+      name: fonts.mono.name,
+      cssVariable: fonts.mono.variable,
+      weights: ["400 700"],
+      styles: ["normal"],
+      subsets: ["latin"],
+      fallbacks: ["ui-monospace", "monospace"],
+    },
+  ],
   server: {
     port: 4321,
   },

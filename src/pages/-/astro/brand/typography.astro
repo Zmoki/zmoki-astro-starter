@@ -1,6 +1,6 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
-import { colors } from "@/design-tokens.mjs";
+import { colors, fonts } from "@/design-tokens.mjs";
 
 // Pull real tokens so the link-treatment swatches can never drift from
 // what Tailwind actually generates (mirrors the Color page approach).
@@ -40,7 +40,7 @@ const typeScale = [
   {
     label: "Body",
     classes: "text-lg xl:text-xl",
-    sample: "The base reading size — Noto Sans, set clean.",
+    sample: `The base reading size — ${fonts.sans.name}, set clean.`,
     usage: "Global body (BaseLayout)",
   },
 ] as const;
@@ -135,9 +135,9 @@ const linkTreatments = [
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Typography</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
-      Headings and body share one typeface: Noto Sans. Code uses Noto Sans Mono — plus a tuned <code
-        class="font-mono">.prose</code
-      > layer for written content. Every specimen below renders with its real utility classes.
+      Headings and body share one typeface: {fonts.sans.name}. Code uses {fonts.mono.name} — plus a tuned
+      <code class="font-mono">.prose</code> layer for written content. Every specimen below renders with
+      its real utility classes.
     </p>
   </header>
 
@@ -150,7 +150,7 @@ const linkTreatments = [
   <div class="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
     <section class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm md:p-8">
       <p class="text-zmoki-stone-500 text-xs font-medium">Headings &amp; body · font-sans</p>
-      <p class="mt-2 font-sans text-5xl font-bold">Noto Sans</p>
+      <p class="mt-2 font-sans text-5xl font-bold">{fonts.sans.name}</p>
       <p class="text-zmoki-stone-500 mt-3 text-lg">
         One typeface for everything — headings (h1–h6), the wordmark, body copy, and prose. Variable
         weight, 100–900.
@@ -159,7 +159,7 @@ const linkTreatments = [
     </section>
     <section class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm md:p-8">
       <p class="text-zmoki-stone-500 text-xs font-medium">Code · font-mono</p>
-      <p class="mt-2 font-mono text-5xl font-bold">Noto Sans Mono</p>
+      <p class="mt-2 font-mono text-5xl font-bold">{fonts.mono.name}</p>
       <p class="text-zmoki-stone-500 mt-3 text-lg">Code, tokens, and literal specimens.</p>
       <p class="mt-4 font-mono text-2xl">AaBbCc 0123 — æ ß ç</p>
     </section>
@@ -321,7 +321,7 @@ const linkTreatments = [
     >
       <h1>The shape of a sentence</h1>
       <p>
-        Prose body and headings are both set in Noto Sans at <code>prose-xl</code>, with <strong
+        Prose body and headings are both set in {fonts.sans.name} at <code>prose-xl</code>, with <strong
           >ink-colored bold</strong
         >. This is a base <a href="/">internal link</a>, an
         <a href="https://example.com" data-external="true">external link</a>, a

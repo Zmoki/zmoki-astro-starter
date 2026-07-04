@@ -14,20 +14,20 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 
 ## Tech stack
 
-| Layer               | Tool                                                           | Version      |
-| ------------------- | -------------------------------------------------------------- | ------------ |
-| Framework           | Astro                                                          | ^7.0         |
-| Language            | TypeScript                                                     | via Astro    |
-| Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4           |
-| Content             | MDX via @astrojs/mdx                                           | ^7           |
-| Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Google Fonts |
-| Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in       | posthog-js   |
-| Email/Forms         | Brevo                                                          | —            |
-| OG images           | Satori + resvg (build-time PNG endpoint)                       | —            |
-| RSS                 | @astrojs/rss                                                   | —            |
-| Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)      | —            |
-| Performance         | Lighthouse CI (@lhci/cli)                                      | —            |
-| Formatting          | Prettier + prettier-plugin-astro + prettier-plugin-tailwindcss | —            |
+| Layer               | Tool                                                                       | Version                       |
+| ------------------- | -------------------------------------------------------------------------- | ----------------------------- |
+| Framework           | Astro                                                                      | ^7.0                          |
+| Language            | TypeScript                                                                 | via Astro                     |
+| Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography                 | ^4                            |
+| Content             | MDX via @astrojs/mdx                                                       | ^7                            |
+| Fonts               | Sans (headings + body) + mono (code) — families in `src/design-tokens.mjs` | Astro Fonts API (self-hosted) |
+| Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in                   | posthog-js                    |
+| Email/Forms         | Brevo                                                                      | —                             |
+| OG images           | Satori + resvg (build-time PNG endpoint)                                   | —                             |
+| RSS                 | @astrojs/rss                                                               | —                             |
+| Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)                  | —                             |
+| Performance         | Lighthouse CI (@lhci/cli)                                                  | —                             |
+| Formatting          | Prettier + prettier-plugin-astro + prettier-plugin-tailwindcss             | —                             |
 
 Dev server default port is **4321**. When running multiple worktrees simultaneously, derive a stable per-worktree port with:
 
@@ -175,7 +175,7 @@ Props are defined in the file; the one with non-obvious behavior is **`wide`** (
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
-Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
+Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
 ### `PostLayout.astro`
 
@@ -231,7 +231,7 @@ Soft + bright is the global default in `tailwind.config.mjs`: the `borderRadius`
 
 Set in `tailwind.config.mjs`:
 
-- Headings (Noto Sans), body (`stone-700`), bold (ink `stone-900`)
+- Headings (the brand sans), body (`stone-700`), bold (ink `stone-900`)
 - Links: `accent` (indigo-600), clean 1px underline; hover deepens to `indigo-700` with a 2px underline
 - `[data-external]` and `[data-resource]` links: also accent indigo
 - `[data-anchor]` links: accent indigo
@@ -296,7 +296,7 @@ Dispatcher for the analytics providers in `src/components/analytics/` (see **Ana
 
 ### Fonts
 
-`BaseLayout` and `BrandLayout` load Google Fonts **non-render-blocking**: `<link rel="preload" as="style">` + `<link rel="stylesheet" media="print" onload="this.media='all'">` (with a `<noscript>` fallback), so text paints immediately in the fallback and the font never blocks First Contentful Paint. Only **Noto Sans** and **Noto Sans Mono** are requested, weights **400–700** (the range the site actually uses). The shared URL lives in a `fontsHref` const in each layout — keep the two in sync.
+Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guides/fonts/)** (stable in Astro 7). The family **names + CSS variables are a single source of truth in `src/design-tokens.mjs`** (`export const fonts` — sitting alongside the color tokens): a **sans** (body + headings) and a **mono** (code). **`astro.config.mjs`** reads those into the `fonts` array and adds the provider/axes (`fontProviders.google()`, `weights: ["400 700"]` variable range covering 400/500/600/700, `subsets: ["latin"]`, the sans also `styles: ["normal", "italic"]`). At build time Astro downloads + subsets the fonts, emits them to `/_astro/fonts/`, and serves them **same-origin** (no Google request at runtime — faster, and privacy-friendly). `BaseLayout` and `BrandLayout` render them with `<Font cssVariable={fonts.sans.variable} preload />` + `<Font cssVariable={fonts.mono.variable} />` (from `astro:assets`); the `preload` on the sans face keeps hero text fast. Astro injects the `@font-face` rules **and an automatic optimized metrics-matched fallback** (so `font-display: swap` swaps with zero CLS — no hand-tuned fallback face to maintain). Templates never name the family directly: `tailwind.config.mjs` maps `font-sans`/`font-mono` to those CSS variables (which already include the fallback chain), and the brand specimen pages render `fonts.sans.name`/`fonts.mono.name` — so a font swap changes `src/design-tokens.mjs` in one place and nothing drifts. The OG card fonts (`src/og/fonts.ts`) are a separate bundled set tied to their own `.woff` files — update those too.
 
 ---
 
@@ -346,7 +346,7 @@ OG images are **purpose-built cards rendered at build time** — no browser, no 
 - **`src/og/manifest.ts`** — the single source of truth. `getOgEntries()` enumerates every card (home, blog index, each post / resource page / legal page, plus a `default` fallback); each entry carries `{ key, template, title, description, eyebrow, alt }`. `getOgImage(pathname)` returns the `{ path, alt }` for a page. Consumed by both the endpoint (to render) and `BaseLayout` (for `og:image` + `og:image:alt`).
 - **`src/og/card.ts`** — two Satori templates: `article` (eyebrow · title · description · brand footer) and `site` (brand mark · name · tagline). Built as Satori vdom nodes directly (no JSX).
 - **`src/og/theme.ts`** — card colors pulled from `src/design-tokens.mjs`, so a re-skin (the `/brand` skill) recolors the cards automatically. Tokens are run through `culori`'s `formatHex` because Tailwind v4's default palettes are `oklch()` strings, which the resvg rasterizer doesn't render reliably.
-- **`src/og/fonts.ts`** — bundles the Noto Sans Latin subset (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's Google Fonts — if you swap the brand font (`/brand` skill), update these too.
+- **`src/og/fonts.ts`** — bundles a Latin subset of the brand sans (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's self-hosted fonts (its own committed `.woff` files) — if you swap the brand font (`/brand` skill), update these too.
 - **`src/pages/og/[...path].png.ts`** — `getStaticPaths()` from the manifest, `GET()` → Satori (vdom → SVG) → resvg (SVG → PNG). `astro build` emits `dist/og/**/*.png`; `astro dev` renders the same route on request. Cards are **1200×630** PNGs.
 
 Because the images are produced by `astro build`, production (Cloudflare Pages) and CI get them for free — there's no separate generate step and no binaries in git. `src/pages/rss.xml.ts` references each post's card at `/og/blog/{id}.png`.
