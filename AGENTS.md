@@ -40,6 +40,7 @@ Project skills live in `.claude/skills/`:
 - `/run` — launch the Astro dev server (`.claude/skills/run/SKILL.md`)
 - `/brand-typography` — swap the site's fonts end to end (`.claude/skills/brand-typography/SKILL.md`)
 - `/redirects` — add or edit URL redirects (`.claude/skills/redirects/SKILL.md`)
+- `/og-images` — customize the OG / social-share image cards (`.claude/skills/og-images/SKILL.md`)
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 
 ---
@@ -414,3 +415,5 @@ OG images are **purpose-built cards rendered at build time** — no browser, no 
 - **`src/pages/og/[...path].png.ts`** — `getStaticPaths()` from the manifest, `GET()` → Satori (vdom → SVG) → resvg (SVG → PNG). `astro build` emits `dist/og/**/*.png`; `astro dev` renders the same route on request. Cards are **1200×630** PNGs.
 
 Because the images are produced by `astro build`, production (Cloudflare Pages) and CI get them for free — there's no separate generate step and no binaries in git. `src/pages/rss.xml.ts` references each post's card at `/og/blog/{id}.png`.
+
+**The `/og-images` skill (`.claude/skills/og-images/SKILL.md`) is the source of truth** for customizing the cards (layout, colors, fonts, template variants, which pages get a card) — see it rather than duplicating the details here.
