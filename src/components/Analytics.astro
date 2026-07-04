@@ -1,15 +1,32 @@
 ---
-// Renders PostHog only when analytics is actually configured: not explicitly
-// disabled (PUBLIC_ANALYTICS_ENABLED !== "false") AND both the project token
-// and host are present. Without a host, PostHog requests
-// `<host>/static/array.js` from the current origin, 404s, and logs a console
-// error (e.g. in the Lighthouse build, where these env vars are empty).
-import PostHog from "@/components/posthog.astro";
+// Analytics dispatcher.
+//
+// Renders every built-in analytics provider, each gated on its own env vars so
+// an unconfigured provider emits nothing (no 404ing script, no dent to the
+// Lighthouse Best-Practices score). Multiple providers can run at once — they
+// all chain onto the same vendor-neutral facade, so a single tracked event fans
+// out to all of them.
+//
+// Call sites (BaseLayout, PostLayout) fire events through `window.track(event,
+// props)` and never name a vendor. Each provider component defines/extends
+// `window.track` to forward into its own API:
+//   PostHog → posthog.capture(event, props)
+//   GTM     → dataLayer.push({ event, ...props })
+// To add a provider: create a component in src/components/analytics/ that
+// renders its loader snippet and chains onto window.track, add its enable check
+// here, then render it below.
+//
+// PUBLIC_ANALYTICS_ENABLED="false" is a global kill switch (e.g. for dev) that
+// disables all providers regardless of their individual config.
+import PostHog from "@/components/analytics/posthog.astro";
+import Gtm from "@/components/analytics/gtm.astro";
 
-const analyticsEnabled =
-  import.meta.env.PUBLIC_ANALYTICS_ENABLED !== "false" &&
-  !!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN &&
-  !!import.meta.env.PUBLIC_POSTHOG_HOST;
+const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED !== "false";
+
+const posthogEnabled =
+  !!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN && !!import.meta.env.PUBLIC_POSTHOG_HOST;
+const gtmEnabled = !!import.meta.env.PUBLIC_GTM_CONTAINER_ID;
 ---
 
-{analyticsEnabled && <PostHog />}
+{analyticsEnabled && posthogEnabled && <PostHog />}
+{analyticsEnabled && gtmEnabled && <Gtm />}

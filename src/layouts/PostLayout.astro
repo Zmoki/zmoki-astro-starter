@@ -118,7 +118,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   <script is:inline>
     document.querySelectorAll("a[data-nav-direction]").forEach(function (el) {
       el.addEventListener("click", function () {
-        window.posthog?.capture("post_navigation_clicked", {
+        window.track?.("post_navigation_clicked", {
           direction: this.dataset.navDirection,
           destination_slug: this.dataset.navSlug,
         });
@@ -129,7 +129,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
       btn.addEventListener("click", function () {
         var wrapper = btn.closest(".relative");
         var codeBlock = wrapper && wrapper.querySelector("pre code");
-        window.posthog?.capture("code_block_copied", {
+        window.track?.("code_block_copied", {
           snippet_length: codeBlock ? (codeBlock.textContent || "").length : 0,
         });
       });

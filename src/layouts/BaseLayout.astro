@@ -140,7 +140,7 @@ const fontsHref =
 
     <script is:inline>
       document.querySelector('a[href^="mailto:"]')?.addEventListener("click", function () {
-        window.posthog?.capture("contact_email_clicked", {
+        window.track?.("contact_email_clicked", {
           email: this.getAttribute("href").replace("mailto:", ""),
         });
       });

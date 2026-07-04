@@ -6,6 +6,9 @@
 
 # CSP: replace a.example.com (your PostHog/analytics host) and i.example.com
 # (your image/media host) with your own domains, or remove them if unused.
+# Google Tag Manager hosts (googletagmanager.com / google-analytics.com) are
+# included for the GTM provider — drop them if you don't use GTM. Note: tags you
+# add *inside* GTM may need their own hosts allowlisted here too.
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com https://a.example.com; frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://i.example.com; media-src 'self' https://i.example.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cloudflareinsights.com https://a.example.com; object-src 'none'; frame-ancestors 'none';
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com https://a.example.com https://www.googletagmanager.com; frame-src https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://i.example.com https://www.googletagmanager.com https://www.google-analytics.com; media-src 'self' https://i.example.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cloudflareinsights.com https://a.example.com https://www.googletagmanager.com https://www.google-analytics.com; object-src 'none'; frame-ancestors 'none';
   Permissions-Policy: accelerometer=(), camera=(), display-capture=(), encrypted-media=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(self "https://challenges.cloudflare.com"), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), xr-spatial-tracking=(), autoplay=(self "https://challenges.cloudflare.com"), cross-origin-isolated=(self "https://challenges.cloudflare.com"), fullscreen=(self "https://challenges.cloudflare.com")

@@ -57,7 +57,10 @@ The pages under `/-/astro/brand/` are a living style guide (internal, noindex). 
 
 Copy `.env.example` to `.env` and fill in what you use:
 
-- **PostHog** — `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`. Set `PUBLIC_ANALYTICS_ENABLED=false` to turn it off in dev.
+- **Analytics** — provider-agnostic and multi-provider; set the env vars for the tools you use and each activates on its own. Built in:
+  - **PostHog** — `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`.
+  - **Google Tag Manager** — `PUBLIC_GTM_CONTAINER_ID` (`GTM-XXXXXXX`); wire GA4/Ads/etc. inside the GTM UI.
+  - `PUBLIC_ANALYTICS_ENABLED=false` turns **all** analytics off (e.g. in dev). If you use a GTM host beyond the defaults, allowlist it in the CSP in `public/_headers`. See AGENTS.md → Analytics to add another provider.
 - **Brevo** — `PUBLIC_BREVO_ACCOUNT_ID`, plus a `form` block in a resource's frontmatter to show a signup form.
 - **Cloudflare Turnstile** — `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` for bot protection on forms.
 
