@@ -62,6 +62,10 @@
   posthog.init(apiKey || "", {
     api_host: apiHost || "",
     defaults: "2026-01-30",
+    // Capture $pageleave (on pagehide/beforeunload) so Web Analytics can compute
+    // accurate bounce rate + session duration. Set explicitly: this is an MPA, so
+    // every navigation is a full page load and each page needs its own pageleave.
+    capture_pageleave: true,
   });
 
   // Chain onto the shared track() facade so events reach every provider.
