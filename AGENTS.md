@@ -40,6 +40,7 @@ Project skills live in `.claude/skills/`:
 - `/run` — launch the Astro dev server (`.claude/skills/run/SKILL.md`)
 - `/brand-typography` — swap the site's fonts end to end (`.claude/skills/brand-typography/SKILL.md`)
 - `/redirects` — add or edit URL redirects (`.claude/skills/redirects/SKILL.md`)
+- `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 
 ---
 
