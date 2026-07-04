@@ -57,6 +57,8 @@ npm run build            # production build (also emits OG images to dist/og/)
 npm run timeline:blog    # generate blog-timeline.csv
 npm run build:redirects  # compile src/redirects/*.csv → host redirect artifact (runs automatically before build)
 npm run check:redirects  # CI guard: rebuild redirects and fail if the committed artifact drifted
+npm run build:headers    # compile src/headers/headers.config.ts → host header artifact (runs automatically before build)
+npm run check:headers    # CI guard: rebuild headers and fail if the committed artifact drifted
 npm run check:sd         # CI guard: validate schema.org JSON-LD in dist/ (run after build)
 npm run lhci:mobile      # Lighthouse CI mobile
 npm run lhci:desktop     # Lighthouse CI desktop
@@ -74,8 +76,9 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 2. **Type check** — `npm run check`
 3. **Lint** — `npm run lint`
 4. **Redirects drift check** — `npm run check:redirects` (rebuilds the redirect artifact and fails if it differs from what's committed)
-5. **Build** — `npm run build`
-6. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
+5. **Headers drift check** — `npm run check:headers` (rebuilds the header artifact and fails if it differs from what's committed)
+6. **Build** — `npm run build`
+7. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
 
 Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`.
 
@@ -268,7 +271,7 @@ Built-in providers ship as self-gating components in `src/components/analytics/`
 
 `Analytics.astro` is the dispatcher: it renders every provider (each emits nothing when its own env vars are absent) under one global kill switch, `PUBLIC_ANALYTICS_ENABLED !== "false"`.
 
-**To add a provider:** drop a component in `src/components/analytics/` that renders its loader snippet and chains onto `window.track` (wrap the previous `track` so events still reach earlier providers), then render it from `Analytics.astro`. Add its host to the CSP in `public/_headers` and its env var to `src/env.d.ts` + `.env.example`.
+**To add a provider:** drop a component in `src/components/analytics/` that renders its loader snippet and chains onto `window.track` (wrap the previous `track` so events still reach earlier providers), then render it from `Analytics.astro`. Add its host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`) and its env var to `src/env.d.ts` + `.env.example`.
 
 ### Tracked events
 
@@ -310,12 +313,7 @@ Dispatcher for the analytics providers in `src/components/analytics/` (see **Ana
 
 If DNS, zone settings, or Cloudflare Pages project config need changing, edit the Terraform config in that repo — not the Cloudflare dashboard directly.
 
-**`public/_headers`** — HTTP response headers applied by Cloudflare Pages per URL pattern. Current rules:
-
-- `/-/astro/*` and `/thank-you/*` — `X-Robots-Tag: noindex`
-- `/*` — `Content-Security-Policy` and `Permissions-Policy`
-
-Edit this file directly for header changes (not Terraform).
+**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.deploy.platform`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). When adding an analytics/asset host, add it to the CSP directive arrays in `headers.config.ts`. If your Cloudflare zone (Terraform) also sets some of these security headers, drop them there to avoid duplicates.
 
 **Redirects** — authored as platform-neutral CSV in **`src/redirects/`** and compiled by `scripts/generate-redirects.ts` into the artifact for the host set by **`site.deploy.platform`** in `src/site.config.ts` (`public/_redirects` for Cloudflare/Netlify, `vercel.json` for Vercel, `redirects.json` for Amplify). The artifact is **committed** and CI's `npm run check:redirects` fails on drift, so rebuild (`npm run build:redirects`) and commit it alongside any CSV change.
 

@@ -66,6 +66,12 @@ const brandPages = [
 // Lighthouse categories — the starter scores a perfect 100 on all four, desktop
 // and mobile, on every page. Reproduce with `npm run lhci:desktop` / `:mobile`.
 const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
+
+// securityheaders.com report for the deployed site. Update the grade below if it
+// changes (the scan is live). See public/_headers → src/headers/headers.config.ts.
+const securityReport =
+  "https://securityheaders.com/?q=https%3A%2F%2Fstarter.zmoki.xyz%2F&followRedirects=on";
+const securityGrade = "A";
 ---
 
 <BaseLayout
@@ -150,6 +156,15 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
           ))
         }
       </div>
+      <p class="mt-8">
+        <a
+          href={securityReport}
+          class="border-zmoki-green-200 bg-zmoki-green-50 text-zmoki-green-700 hover:bg-zmoki-green-100 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
+        >
+          Security Headers: {securityGrade}
+          <span aria-hidden="true">↗</span>
+        </a>
+      </p>
     </div>
   </section>
 

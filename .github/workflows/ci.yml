@@ -34,6 +34,9 @@ jobs:
       - name: Redirects drift check
         run: npm run check:redirects
 
+      - name: Headers drift check
+        run: npm run check:headers
+
       - name: Build
         run: npm run build
         env:

@@ -4,6 +4,9 @@ An Astro starter for personal websites — posts, projects, and resources. Built
 
 **Live demo: [starter.zmoki.xyz](https://starter.zmoki.xyz/)**
 
+[![Security Headers](https://img.shields.io/badge/security%20headers-A-brightgreen)](https://securityheaders.com/?q=https%3A%2F%2Fstarter.zmoki.xyz%2F&followRedirects=on)
+[![Lighthouse](https://img.shields.io/badge/lighthouse-100%2F100%2F100%2F100-brightgreen)](https://starter.zmoki.xyz/)
+
 ## What's inside
 
 - **Astro 5** + **Tailwind CSS** with a small, documented design-token system

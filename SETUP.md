@@ -60,7 +60,7 @@ Copy `.env.example` to `.env` and fill in what you use (every var is declared an
 - **Analytics** — provider-agnostic and multi-provider; set the env vars for the tools you use and each activates on its own. Built in:
   - **PostHog** — `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`.
   - **Google Tag Manager** — `PUBLIC_GTM_CONTAINER_ID` (`GTM-XXXXXXX`); wire GA4/Ads/etc. inside the GTM UI.
-  - `PUBLIC_ANALYTICS_ENABLED=false` turns **all** analytics off (e.g. in dev). If you use a GTM host beyond the defaults, allowlist it in the CSP in `public/_headers`. See AGENTS.md → Analytics to add another provider.
+  - `PUBLIC_ANALYTICS_ENABLED=false` turns **all** analytics off (e.g. in dev). If you use a GTM host beyond the defaults, allowlist it in the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`). See AGENTS.md → Analytics to add another provider.
 - **Brevo** — `PUBLIC_BREVO_ACCOUNT_ID`, plus a `form` block in a resource's frontmatter to show a signup form.
 - **Cloudflare Turnstile** — `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` for bot protection on forms.
 
@@ -83,7 +83,7 @@ Then run `npm run build:redirects` (it also runs automatically on every `npm run
 
 The generated artifact is **committed** — run `npm run build:redirects` and commit it alongside any CSV change. CI runs `npm run check:redirects` and fails if the committed artifact is out of date, so drift can't reach production.
 
-Update `public/_headers` (Cloudflare/Netlify header rules) as needed. See the **Deploy & infrastructure** section in `AGENTS.md`.
+Response headers work exactly like redirects: author them platform-neutrally in `src/headers/headers.config.ts`, run `npm run build:headers`, and commit the regenerated artifact for your platform (`public/_headers` / `vercel.json` / `customHeaders.json`). CI's `npm run check:headers` guards drift. See `src/headers/README.md` and the **Deploy & infrastructure** section in `AGENTS.md`. **Note:** the config ships the standard security headers (HSTS, `X-Content-Type-Options`, `Referrer-Policy`, …); if your CDN/DNS layer also sets them, drop them there to avoid duplicates.
 
 ## 7. Lighthouse report hosting
 
