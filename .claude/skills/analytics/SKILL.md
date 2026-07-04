@@ -12,7 +12,7 @@ Call sites never name a vendor. They fire events through a global facade — `wi
 
 - **`src/components/analytics/*.astro`** — one component per provider. Each renders its loader snippet **and** defines/extends `window.track`.
 - **`src/components/Analytics.astro`** — the **dispatcher**. Computes each provider's enable flag from env vars and renders it, all under one global kill switch `PUBLIC_ANALYTICS_ENABLED !== "false"`. A provider that isn't configured emits **nothing** — no 404ing script, no Lighthouse Best-Practices hit.
-- Tracked events fire from inline scripts in `src/layouts/BaseLayout.astro` and `src/layouts/PostLayout.astro`.
+- Tracked events fire from inline scripts across layouts, pages, and components — see the **Tracked events (catalog)** section below for the full list and where each lives.
 
 Built-in providers: **PostHog** (`PUBLIC_POSTHOG_PROJECT_TOKEN` + `PUBLIC_POSTHOG_HOST`) and **Google Tag Manager** (`PUBLIC_GTM_CONTAINER_ID`).
 
@@ -97,7 +97,27 @@ Fire it from the relevant inline script with the neutral facade — **never** na
 window.track?.("event_name", { some_prop: value });
 ```
 
-Existing call sites: `src/layouts/BaseLayout.astro` (`contact_email_clicked`) and `src/layouts/PostLayout.astro` (`post_navigation_clicked`, `code_block_copied`) — copy their pattern. Keep event names `snake_case`. Then **add a row to the "Tracked events" table in `AGENTS.md` → Analytics** (event, where fired, properties).
+Copy the pattern from an existing call site (e.g. `src/layouts/BaseLayout.astro` → `contact_email_clicked`, or `src/components/Prose.astro` → `code_block_copied`). Keep event names `snake_case`. Then **add a row to the catalog below** (event, where fired, properties). To associate the visitor with an id (e.g. after a form submit), call `window.identify?.(id)` — it fans out the same way.
+
+## Tracked events (catalog)
+
+The events this starter fires today. All go through `window.track(...)` and reach every active provider. Property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
+
+| Event                         | Where fired                 | Properties                      |
+| ----------------------------- | --------------------------- | ------------------------------- |
+| `contact_email_clicked`       | `BaseLayout.astro`          | `email`                         |
+| `post_viewed`                 | `blog/[...slug].astro`      | `post_slug`, `post_title`       |
+| `post_navigation_clicked`     | `PostLayout.astro`          | `direction`, `destination_slug` |
+| `code_block_copied`           | `Prose.astro`               | `snippet_length`                |
+| `resource_link_clicked`       | `ResourceLink.astro`        | `resource_slug`, `is_external`  |
+| `gate_viewed`                 | `BrevoForm.astro`           | `resource_slug`, `form_id`      |
+| `newsletter_form_submitted`   | `BrevoForm.astro`           | `form_id`, `resource_slug`      |
+| `resource_download_confirmed` | `thank-you/[...slug].astro` | `resource_name`, `resource_url` |
+| `resource_downloaded`         | `thank-you/[...slug].astro` | `resource_name`, `asset_url`    |
+
+`newsletter_form_submitted` is preceded by an `identify(email)` call.
+
+**Lead-magnet gate funnel:** `gate_viewed` → `newsletter_form_submitted` → `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded` (clicked the direct download).
 
 ## Step 5 — Disable analytics (D)
 

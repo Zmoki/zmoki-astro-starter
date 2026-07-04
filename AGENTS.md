@@ -339,23 +339,7 @@ Built-in providers ship as self-gating components in `src/components/analytics/`
 
 ### Tracked events
 
-| Event                         | Where fired                  | Properties                      |
-| ----------------------------- | ---------------------------- | ------------------------------- |
-| `contact_email_clicked`       | BaseLayout inline script     | `email`                         |
-| `post_viewed`                 | blog/[...slug] inline script | `post_slug`, `post_title`       |
-| `post_navigation_clicked`     | PostLayout inline script     | `direction`, `destination_slug` |
-| `code_block_copied`           | Prose component              | `snippet_length`                |
-| `resource_link_clicked`       | ResourceLink inline script   | `resource_slug`, `is_external`  |
-| `gate_viewed`                 | BrevoForm inline script      | `resource_slug`, `form_id`      |
-| `newsletter_form_submitted`   | BrevoForm inline script      | `form_id`, `resource_slug`      |
-| `resource_download_confirmed` | Thank-you inline script      | `resource_name`, `resource_url` |
-| `resource_downloaded`         | Thank-you inline script      | `resource_name`, `asset_url`    |
-
-`newsletter_form_submitted` is preceded by an `identify(email)` call. These all fire via `window.track(...)` and reach every active provider. Pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). Note: property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
-
-The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_form_submitted`
-→ `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded`
-(clicked the direct download).
+All events fire via `window.track(...)` and reach every active provider; pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). **The `/analytics` skill (`.claude/skills/analytics/SKILL.md`) is the source of truth** for the tracked-events catalog (each event, where it fires, its properties, and the lead-magnet funnel) and for adding a new event — see it rather than duplicating the list here.
 
 ---
 
