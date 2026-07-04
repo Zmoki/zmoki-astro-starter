@@ -170,8 +170,18 @@ Files: `src/content/blog/{order}-{slug}.mdx` (most) or `.md`
     title: string
     description: string
   }
+  asset?: {                 // optional gated deliverable (lead magnet)
+    file: string            // path in public/downloads/ or an external URL
+    label?: string          // download button text (default "Download now")
+  }
 }
 ```
+
+A resource with both a `form` and an `asset` is a **lead-magnet gate**: the `form`
+captures an email (Brevo emails the asset + redirects to `/thank-you/resources/{slug}/`),
+and the thank-you page also shows the `asset` as a **direct download** so delivery doesn't
+depend solely on the email. This is not access control — files under `public/` are publicly
+reachable if the URL leaks.
 
 ### `legal` — privacy, terms
 
@@ -310,13 +320,21 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 
 ## Analytics events (PostHog)
 
-| Event                     | Where fired              | Properties                      |
-| ------------------------- | ------------------------ | ------------------------------- |
-| `contact_email_clicked`   | BaseLayout inline script | `email`                         |
-| `post_navigation_clicked` | PostLayout inline script | `direction`, `destination_slug` |
-| `code_block_copied`       | PostLayout inline script | `snippet_length`                |
+| Event                        | Where fired                | Properties                      |
+| ---------------------------- | -------------------------- | ------------------------------- |
+| `contact_email_clicked`      | BaseLayout inline script   | `email`                         |
+| `post_navigation_clicked`    | PostLayout inline script   | `direction`, `destination_slug` |
+| `code_block_copied`          | PostLayout inline script   | `snippet_length`                |
+| `gate_viewed`                | BrevoForm inline script    | `resource_slug`, `form_id`      |
+| `newsletter_form_submitted`  | BrevoForm inline script    | `form_id`, `resource_slug`      |
+| `resource_download_confirmed`| Thank-you inline script    | `resource_name`, `resource_url` |
+| `resource_downloaded`        | Thank-you inline script    | `resource_name`, `asset_file`   |
 
 PostHog captures all listed events plus pageviews automatically.
+
+The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_form_submitted`
+→ `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded`
+(clicked the direct download).
 
 ---
 

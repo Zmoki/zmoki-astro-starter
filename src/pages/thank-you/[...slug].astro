@@ -1,6 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 
 export async function getStaticPaths() {
@@ -11,11 +12,15 @@ export async function getStaticPaths() {
 
   return allResources.map((resource) => ({
     params: { slug: `resources/${resource.id}/` },
-    props: { name: resource.data.name, url: `/resources/${resource.id}/` },
+    props: {
+      name: resource.data.name,
+      url: `/resources/${resource.id}/`,
+      asset: resource.data.asset ?? null,
+    },
   }));
 }
 
-const { name, url } = Astro.props;
+const { name, url, asset } = Astro.props;
 
 // Get 3 random feed posts
 const allFeedPosts: CollectionEntry<"blog">[] = await getCollection("blog");
@@ -49,6 +54,22 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
           href={`mailto:${site.contact.email}`}>{site.contact.email}</a
         >.
       </p>
+      {
+        asset && (
+          <p class="not-prose">
+            <Button
+              href={asset.file}
+              size="lg"
+              download
+              id="resource-download"
+              data-resource-name={name}
+              data-asset-file={asset.file}
+            >
+              {asset.label ?? "Download now"}
+            </Button>
+          </p>
+        )
+      }
       <section>
         <h2>While you wait...</h2>
         <p>You might also find these posts useful:</p>
@@ -70,5 +91,12 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
   window.posthog?.capture("resource_download_confirmed", {
     resource_name: resourceName,
     resource_url: resourceUrl,
+  });
+
+  document.getElementById("resource-download")?.addEventListener("click", function () {
+    window.posthog?.capture("resource_downloaded", {
+      resource_name: this.getAttribute("data-resource-name") || "",
+      asset_file: this.getAttribute("data-asset-file") || "",
+    });
   });
 </script>

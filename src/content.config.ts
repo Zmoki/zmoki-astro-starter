@@ -38,6 +38,17 @@ const resources = defineCollection({
         description: z.string(),
       })
       .optional(),
+    // The gated deliverable. Lives in `public/downloads/` (served statically) or
+    // is an external URL. Surfaced as a direct download on the thank-you page so
+    // delivery does not depend solely on the Brevo email. Note: files under
+    // `public/` are publicly reachable if the URL leaks — this is a lead-magnet
+    // gate, not access control.
+    asset: z
+      .object({
+        file: z.string(),
+        label: z.string().optional(),
+      })
+      .optional(),
   }),
 });
 
