@@ -4,7 +4,7 @@ import plugin from "tailwindcss/plugin";
 
 // Headings (h1–h6 + wordmark) share the body sans family — one clean typeface
 // across the whole site (modern B2B, no serif contrast).
-const headingFontStack = "'Noto Sans', system-ui, sans-serif";
+const headingFontStack = "'Noto Sans', 'Noto Sans Fallback', system-ui, sans-serif";
 
 // Warm near-black ink for text, headings, and prose. Sourced from the Tailwind
 // stone palette (also available as `zmoki-stone-900`) so it sits warm against
@@ -36,6 +36,11 @@ export default {
             "h1, h2, h3, h4, h5, h6": {
               fontFamily: headingFontStack,
             },
+            // Tailwind Typography wraps inline <code> in literal backtick
+            // characters via ::before/::after — drop them so inline code reads
+            // as clean monospace, not `quoted`.
+            "code::before": { content: '""' },
+            "code::after": { content: '""' },
             // Links: indigo accent with a clean, thin underline that thickens on
             // hover — no brutalist dotted/dashed borders.
             a: {
@@ -64,7 +69,7 @@ export default {
       // font-sans / font-serif / font-mono. These also feed the prose layer.
       // The site is all-sans; `font-serif` stays available but is unused.
       fontFamily: {
-        sans: ["Noto Sans", "system-ui", "sans-serif"],
+        sans: ["Noto Sans", "Noto Sans Fallback", "system-ui", "sans-serif"],
         serif: ["Noto Serif", "Georgia", "serif"],
         mono: ["Noto Sans Mono", "ui-monospace", "monospace"],
       },

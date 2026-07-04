@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/* Metrics-matched fallback for Noto Sans. The web font loads non-render-blocking
+   (see BaseLayout), so text first paints in a fallback and then swaps — which
+   reflows and costs CLS. This face makes the local fallback (Arial) occupy the
+   exact same space as Noto Sans, so the swap causes no layout shift.
+   Overrides are computed from the real font metrics (@capsizecss/unpack):
+   Noto Sans upm 1000 / ascent 1069 / descent -293 / xWidthAvg 474 vs Arial. */
+@font-face {
+  font-family: "Noto Sans Fallback";
+  src: local("Arial");
+  ascent-override: 99.55%;
+  descent-override: 27.29%;
+  line-gap-override: 0%;
+  size-adjust: 107.38%;
+}
+
 /* Keep the existing Tailwind v3-style JS config — theme tokens (cream/stone/
    indigo), prose overrides, the typography and base-layer plugins — working
    under Tailwind v4 via the compat directive. */

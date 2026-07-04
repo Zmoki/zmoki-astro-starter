@@ -45,13 +45,18 @@ const copyrightYears =
   currentYear > site.copyrightStartYear
     ? `${site.copyrightStartYear}–${currentYear}`
     : `${site.copyrightStartYear}`;
+// Bare host (no protocol) for the footer copyright link, e.g. "zmoki.xyz".
+const authorSiteLabel = new URL(site.author.url).host;
 
 // The site is all-sans: Noto Sans (headings + body) and Noto Sans Mono (code).
 // Only weights 400–700 are used, so we request just that range (smaller files).
 // Loaded non-render-blocking (preload + media=print/onload swap) so text paints
 // immediately in the fallback and never blocks First Contentful Paint.
+// display=optional + the metrics-matched "Noto Sans Fallback" (src/styles/
+// global.css) means the fallback renders at Noto Sans's dimensions and the web
+// font never swaps in mid-render, so there's zero font-driven layout shift (CLS).
 const fontsHref =
-  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=optional";
 ---
 
 <!doctype html>
@@ -137,7 +142,7 @@ const fontsHref =
     </header>
 
     <!-- Main content -->
-    <main class:list={["w-full flex-1", !wide && "mx-auto max-w-3xl px-4 py-10 lg:py-16"]}>
+    <main class:list={["w-full flex-1", !wide && "mx-auto max-w-4xl px-4 py-10 lg:py-16"]}>
       <slot />
     </main>
 
@@ -154,12 +159,15 @@ const fontsHref =
       <div
         class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8"
       >
-        <p>&copy; {site.name} {copyrightYears}</p>
+        <p>
+          &copy; {copyrightYears} · {site.author.name} ·{" "}
+          <a href={site.author.url}>{authorSiteLabel}</a>
+        </p>
         <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">
           <a href="/legal/privacy/">Privacy</a>
           <a href="/legal/terms/">Terms</a>
           <a href={`mailto:${site.contact.email}`}>Contact</a>
-          <a href={site.social.sourceRepo} target="_blank" rel="noopener noreferrer">Source</a>
+          <a href={site.social.sourceRepo}>GitHub</a>
         </nav>
       </div>
     </footer>

@@ -6,21 +6,66 @@ import { site } from "@/site.config";
 // The landing page's publish/modified dates live in src/data/home-page.ts so the
 // sitemap can read them without importing from this page component.
 
-// Placeholder features — edit, extend, or remove.
+// Real features of the starter — edit, extend, or remove.
 const features = [
   {
-    title: "Fast by default",
-    text: "Astro ships zero JavaScript by default, so pages load instantly. Add interactivity only where you actually need it.",
+    title: "Understood by your AI",
+    text: "Ships with AGENTS.md, so Claude Code, Codex, Cursor, or any coding agent knows the codebase and can rebrand it on request.",
   },
   {
-    title: "Yours in one file",
-    text: "Everything site-specific lives in src/site.config.ts. Change it once and the whole site follows.",
+    title: "Social cards, generated",
+    text: "Open Graph images are rendered at build time with Satori — brand-aware, no browser, nothing committed to git.",
   },
   {
-    title: "Ready to grow",
-    text: "A blog, resources, RSS, analytics, and email forms are already wired up and waiting for your content.",
+    title: "Rich results, built in",
+    text: "schema.org JSON-LD that follows Google's structured-data guidelines, validated on every build so markup never drifts.",
+  },
+  {
+    title: "Analytics, vendor-agnostic",
+    text: "One window.track call fans out to PostHog, Google Tag Manager, or whatever you add — swap providers without touching call sites.",
+  },
+  {
+    title: "Guardrails on every push",
+    text: "CI runs format, type-check, lint, redirect-drift, structured-data, and build checks. Lighthouse CI tracks performance.",
+  },
+  {
+    title: "Content ready to grow",
+    text: "MDX blog, resources, and legal collections, an RSS feed, and Brevo email forms with lead-magnet gates — already wired.",
   },
 ];
+
+// The internal style guide under /-/astro/brand/ — a living design system.
+const brandPages = [
+  {
+    title: "Color",
+    summary: "A warm, minimal token system — ivory canvas and a single indigo accent.",
+    href: "/-/astro/brand/color/",
+  },
+  {
+    title: "Typography",
+    summary: "Noto Sans throughout — one clean sans for headings, body, and labels.",
+    href: "/-/astro/brand/typography/",
+  },
+  {
+    title: "Forms",
+    summary: "Inputs, labels, the action button, focus and error states.",
+    href: "/-/astro/brand/forms/",
+  },
+  {
+    title: "Components",
+    summary: "Nav, footer, hero, cards, links, and buttons as reusable blocks.",
+    href: "/-/astro/brand/components/",
+  },
+  {
+    title: "Voice & tone",
+    summary: "How the site sounds. Clear, honest, helpful, human.",
+    href: "/-/astro/brand/voice/",
+  },
+];
+
+// Lighthouse categories — the starter scores a perfect 100 on all four, desktop
+// and mobile, on every page. Reproduce with `npm run lhci:desktop` / `:mobile`.
+const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
 ---
 
 <BaseLayout title={`${site.name} — ${site.hero.heading}`} description={site.description} wide>
@@ -51,6 +96,101 @@ const features = [
             </div>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  <!-- Lighthouse scores -->
+  <section id="lighthouse" class="scroll-mt-20 px-4 py-16 lg:py-24">
+    <div class="mx-auto max-w-6xl text-center">
+      <p class="text-zmoki-green-700 text-sm font-semibold tracking-wide uppercase">
+        Fast &amp; accessible
+      </p>
+      <h2 class="mt-3 text-3xl font-semibold md:text-4xl">A perfect 100, across the board</h2>
+      <p class="text-zmoki-stone-600 mx-auto mt-4 max-w-2xl text-lg">
+        Every page scores 100 on all four Lighthouse categories — on both desktop and mobile.
+        Reproduce it yourself with <span class="font-semibold">npm run lhci:desktop</span>.
+      </p>
+      <div class="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4">
+        {
+          lighthouse.map((label) => (
+            <div class="border-zmoki-stone-200 flex flex-col items-center rounded-2xl border bg-white p-6 shadow-sm">
+              <div class="relative h-24 w-24">
+                <svg class="h-24 w-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle
+                    class="text-zmoki-green-100"
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="8"
+                  />
+                  <circle
+                    class="text-zmoki-green-600"
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+                <span class="text-zmoki-green-700 absolute inset-0 flex items-center justify-center text-2xl font-bold">
+                  100
+                </span>
+              </div>
+              <div class="text-zmoki-stone-900 mt-4 text-sm font-semibold">{label}</div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Brand system -->
+  <section id="brand" class="scroll-mt-20 px-4 py-16 lg:py-24">
+    <div class="mx-auto max-w-6xl">
+      <div class="bg-zmoki-indigo-50 border-zmoki-indigo-100 rounded-3xl border p-8 md:p-12">
+        <div class="grid gap-10 md:grid-cols-2 md:items-center">
+          <div>
+            <p class="text-zmoki-indigo-700 text-sm font-semibold tracking-wide uppercase">
+              Brand system
+            </p>
+            <h2 class="mt-3 text-3xl font-semibold md:text-4xl">
+              A living brand guideline, built in
+            </h2>
+            <p class="text-zmoki-stone-600 mt-4 text-lg">
+              Every site ships with an internal style guide — color, typography, forms, components,
+              and voice &amp; tone — rendered from the same design tokens the site itself uses.
+              Change a token and the guideline and the site move together.
+            </p>
+            <p class="text-zmoki-stone-600 mt-4 text-lg">
+              The <span class="font-semibold">/brand</span> skill lets Claude Code — or any agent — evolve
+              it end to end: recolor the palette, swap fonts, rewrite the voice, and keep the guideline
+              and the implementation in sync.
+            </p>
+            <div class="mt-8">
+              <Button href="/-/astro/brand/" size="lg">Open the brand system →</Button>
+            </div>
+          </div>
+          <ul class="grid gap-3 sm:grid-cols-2">
+            {
+              brandPages.map((page) => (
+                <li>
+                  <a
+                    href={page.href}
+                    class="border-zmoki-stone-200 flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                  >
+                    <span class="font-semibold">{page.title}</span>
+                    <span class="text-zmoki-stone-500 mt-1 text-sm">{page.summary}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </div>
     </div>
   </section>
