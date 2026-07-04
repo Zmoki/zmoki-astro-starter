@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
-/* Fonts (Noto Sans + Noto Sans Mono) are self-hosted via Astro's Fonts API —
-   configured in astro.config.mjs, injected by the <Font> components in the
-   layouts, and referenced through the --font-noto-sans* CSS variables (see
-   tailwind.config.mjs). Astro generates the optimized metrics-matched fallback
-   automatically, so no hand-tuned @font-face is needed here. */
+/* The brand fonts are self-hosted via Astro's Fonts API — family names + CSS
+   variables live in src/design-tokens.mjs, wired up in astro.config.mjs, and
+   injected by the <Font> components in the layouts. Astro generates the
+   optimized metrics-matched fallback automatically, so no hand-tuned @font-face
+   is needed here. */
 
 /* Keep the existing Tailwind v3-style JS config — theme tokens (cream/stone/
    indigo), prose overrides, the typography and base-layer plugins — working

@@ -98,3 +98,23 @@ export const colors = {
   ...Object.fromEntries(paletteNames.map((name) => [`zmoki-${name}`, twColors[name]])),
   ...customPalettes,
 };
+
+// Brand typefaces — the single source of truth for the font *names* and their
+// CSS variables. Self-hosted via Astro's Fonts API (astro.config.mjs reads
+// `name` + `variable` from here); Tailwind maps font-sans/font-mono to the
+// variables; the layouts' <Font> tags and the brand specimen pages read these
+// too — so a font swap changes one place and never drifts across display text.
+// To switch fonts, edit `name`/`variable` here, then the family's provider /
+// weights / styles / subsets in astro.config.mjs.
+// The `variable` literals are pinned in the type so they satisfy the Fonts API's
+// `<Font cssVariable>` prop (Astro types it as a union of the configured names).
+/**
+ * @type {{
+ *   sans: { name: string, variable: "--font-noto-sans" },
+ *   mono: { name: string, variable: "--font-noto-sans-mono" },
+ * }}
+ */
+export const fonts = {
+  sans: { name: "Noto Sans", variable: "--font-noto-sans" },
+  mono: { name: "Noto Sans Mono", variable: "--font-noto-sans-mono" },
+};

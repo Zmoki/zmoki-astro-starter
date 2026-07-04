@@ -1,4 +1,5 @@
 import { defineConfig, fontProviders } from "astro/config";
+import { fonts } from "./src/design-tokens.mjs";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
@@ -153,14 +154,15 @@ export default defineConfig({
   site: "https://starter.zmoki.xyz",
   // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
   // served same-origin from /_astro/fonts, with automatic optimized fallback
-  // metrics (zero CLS) and preload links. The site is all-sans — Noto Sans
-  // (body + headings, weights 400–700 incl. italic) and Noto Sans Mono (code).
-  // Referenced everywhere via the CSS variables below (see tailwind.config.mjs).
+  // metrics (zero CLS) and preload links. The site is all-sans — a body/heading
+  // sans (weights 400–700 incl. italic) and a monospace for code. The family
+  // names + CSS variables are the single source in src/design-tokens.mjs; only
+  // the provider / weights / styles / subsets are set here.
   fonts: [
     {
       provider: fontProviders.google(),
-      name: "Noto Sans",
-      cssVariable: "--font-noto-sans",
+      name: fonts.sans.name,
+      cssVariable: fonts.sans.variable,
       weights: ["400 700"],
       styles: ["normal", "italic"],
       subsets: ["latin"],
@@ -168,8 +170,8 @@ export default defineConfig({
     },
     {
       provider: fontProviders.google(),
-      name: "Noto Sans Mono",
-      cssVariable: "--font-noto-sans-mono",
+      name: fonts.mono.name,
+      cssVariable: fonts.mono.variable,
       weights: ["400 700"],
       styles: ["normal"],
       subsets: ["latin"],

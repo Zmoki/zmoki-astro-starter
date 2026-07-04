@@ -1,12 +1,13 @@
-import { colors as brandColors } from "./src/design-tokens.mjs";
+import { colors as brandColors, fonts } from "./src/design-tokens.mjs";
 import twColors from "tailwindcss/colors";
 import plugin from "tailwindcss/plugin";
 
 // Headings (h1–h6 + wordmark) share the body sans family — one clean typeface
 // across the whole site (modern B2B, no serif contrast).
-// The --font-noto-sans* variables are defined by Astro's Fonts API (see
-// astro.config.mjs) and already expand to the web font + its optimized fallback.
-const headingFontStack = "var(--font-noto-sans)";
+// The font CSS variables are defined by Astro's Fonts API (see astro.config.mjs)
+// and already expand to the web font + its optimized fallback. Family names +
+// variables are the single source in src/design-tokens.mjs.
+const headingFontStack = `var(${fonts.sans.variable})`;
 
 // Warm near-black ink for text, headings, and prose. Sourced from the Tailwind
 // stone palette (also available as `zmoki-stone-900`) so it sits warm against
@@ -73,9 +74,9 @@ export default {
       // their optimized fallbacks. The site is all-sans; `font-serif` stays
       // available but is unused.
       fontFamily: {
-        sans: ["var(--font-noto-sans)"],
+        sans: [`var(${fonts.sans.variable})`],
         serif: ["Noto Serif", "Georgia", "serif"],
-        mono: ["var(--font-noto-sans-mono)"],
+        mono: [`var(${fonts.mono.variable})`],
       },
       // Brand color tokens live in src/design-tokens.mjs (single source
       // of truth, also consumed by the /-/astro/brand/ reference page).

@@ -1,6 +1,7 @@
 ---
 import "@/styles/global.css";
 import { Font } from "astro:assets";
+import { fonts } from "@/design-tokens.mjs";
 import Analytics from "@/components/Analytics.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
@@ -56,8 +57,8 @@ const authorSiteLabel = new URL(site.author.url).host;
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <Font cssVariable="--font-noto-sans" preload />
-    <Font cssVariable="--font-noto-sans-mono" />
+    <Font cssVariable={fonts.sans.variable} preload />
+    <Font cssVariable={fonts.mono.variable} />
 
     <title>{title}</title>
     <meta name="description" content={description} />

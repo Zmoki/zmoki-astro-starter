@@ -2,6 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
+import { fonts } from "@/design-tokens.mjs";
 
 // The landing page's publish/modified dates live in src/data/home-page.ts so the
 // sitemap can read them without importing from this page component.
@@ -43,7 +44,7 @@ const brandPages = [
   },
   {
     title: "Typography",
-    summary: "Noto Sans throughout — one clean sans for headings, body, and labels.",
+    summary: `${fonts.sans.name} throughout — one clean sans for headings, body, and labels.`,
     href: "/-/astro/brand/typography/",
   },
   {
