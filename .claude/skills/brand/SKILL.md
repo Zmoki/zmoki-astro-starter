@@ -34,12 +34,12 @@ A guideline page is documentation; the behavior it documents lives in code. When
 you adapt a guideline, change **both** — the page (so the guideline stays true)
 and its implementation (so the site matches) — in the same pass.
 
-| Guideline        | Implemented in                                                                                                                                                                                   |
-| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Color            | `src/design-tokens.mjs` (the `zmoki-*` scales) → Tailwind utilities                                                                                                                              |
-| Typography       | `tailwind.config.mjs` (`fontFamily`, `headingFontStack`) + font `<link>`s in `BaseLayout.astro` & `BrandLayout.astro` + the metrics-matched CLS fallback `@font-face` in `src/styles/global.css` |
-| Voice & tone     | The `voice.astro` page **is** the artifact — no separate implementation                                                                                                                          |
-| Components/forms | The actual components in `src/components/` and `src/layouts/`                                                                                                                                    |
+| Guideline        | Implemented in                                                                                                                                                                                                         |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Color            | `src/design-tokens.mjs` (the `zmoki-*` scales) → Tailwind utilities                                                                                                                                                    |
+| Typography       | `astro.config.mjs` (`fonts` — self-hosted via Astro's Fonts API) + `tailwind.config.mjs` (`fontFamily`, `headingFontStack` → the `--font-*` CSS variables) + `<Font>` tags in `BaseLayout.astro` & `BrandLayout.astro` |
+| Voice & tone     | The `voice.astro` page **is** the artifact — no separate implementation                                                                                                                                                |
+| Components/forms | The actual components in `src/components/` and `src/layouts/`                                                                                                                                                          |
 
 ## Workflow
 
@@ -87,5 +87,6 @@ reference adds specific checks (contrast, compiled utilities, retired-font grep)
   don't ship a failing pair. Details in `references/colors.md`.
 - **Don't reintroduce role tokens** (`zmoki-primary`, `-accent`, …). The system is
   palette-group-based, not semantic-role-based.
-- **Keep the two font `<link>`s in sync** — `BaseLayout.astro` and
-  `BrandLayout.astro` each load their own.
+- **Font definitions live once in `astro.config.mjs`** (`fonts`). Both layouts
+  render `<Font>` tags that reference it — there's no per-layout font URL to keep
+  in sync; change the family in the config, not the layouts.

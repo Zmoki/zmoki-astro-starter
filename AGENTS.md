@@ -14,20 +14,20 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 
 ## Tech stack
 
-| Layer               | Tool                                                           | Version      |
-| ------------------- | -------------------------------------------------------------- | ------------ |
-| Framework           | Astro                                                          | ^7.0         |
-| Language            | TypeScript                                                     | via Astro    |
-| Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4           |
-| Content             | MDX via @astrojs/mdx                                           | ^7           |
+| Layer               | Tool                                                           | Version                       |
+| ------------------- | -------------------------------------------------------------- | ----------------------------- |
+| Framework           | Astro                                                          | ^7.0                          |
+| Language            | TypeScript                                                     | via Astro                     |
+| Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4                            |
+| Content             | MDX via @astrojs/mdx                                           | ^7                            |
 | Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Astro Fonts API (self-hosted) |
-| Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in       | posthog-js   |
-| Email/Forms         | Brevo                                                          | —            |
-| OG images           | Satori + resvg (build-time PNG endpoint)                       | —            |
-| RSS                 | @astrojs/rss                                                   | —            |
-| Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)      | —            |
-| Performance         | Lighthouse CI (@lhci/cli)                                      | —            |
-| Formatting          | Prettier + prettier-plugin-astro + prettier-plugin-tailwindcss | —            |
+| Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in       | posthog-js                    |
+| Email/Forms         | Brevo                                                          | —                             |
+| OG images           | Satori + resvg (build-time PNG endpoint)                       | —                             |
+| RSS                 | @astrojs/rss                                                   | —                             |
+| Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)      | —                             |
+| Performance         | Lighthouse CI (@lhci/cli)                                      | —                             |
+| Formatting          | Prettier + prettier-plugin-astro + prettier-plugin-tailwindcss | —                             |
 
 Dev server default port is **4321**. When running multiple worktrees simultaneously, derive a stable per-worktree port with:
 
