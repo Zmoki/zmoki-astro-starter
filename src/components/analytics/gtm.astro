@@ -35,4 +35,13 @@ const containerId = import.meta.env.PUBLIC_GTM_CONTAINER_ID;
       window.dataLayer.push(Object.assign({ event: event }, props || {}));
     };
   })(window.track);
+
+  // Same for identify() — push a `user_id` so GTM tags (GA4, etc.) can key on it.
+  window.identify = (function (prev) {
+    return function (id, props) {
+      if (prev) prev(id, props);
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push(Object.assign({ event: "identify", user_id: id }, props || {}));
+    };
+  })(window.identify);
 </script>

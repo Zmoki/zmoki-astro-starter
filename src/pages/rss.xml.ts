@@ -12,16 +12,10 @@ const parser = new MarkdownIt({
 });
 
 /**
- * Strips import statements from MDX content
+ * Strips (single-line) import statements from MDX content.
  */
 function stripImports(content: string): string {
-  // Remove import statements (single line imports)
-  let processed = content.replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "");
-
-  // Also handle multi-line imports if any
-  processed = processed.replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "");
-
-  return processed.trim();
+  return content.replace(/^import\s+.*?from\s+["'][^"']+["'];?\s*$/gm, "").trim();
 }
 
 /**
@@ -43,9 +37,13 @@ function convertRelativeUrlsToAbsolute(html: string, siteUrl: string): string {
 
 /**
  * Converts MDX components to HTML for RSS feed
- * Handles <Image> and <Video> components using regex parsing
+ * Handles <Image> and <Video> components using regex parsing.
+ *
+ * Note: this parses MDX/HTML with regexes, which is inherently brittle (attribute
+ * ordering, nested figures, etc.). It's kept intentionally narrow — only the
+ * components this starter actually ships in posts — rather than a full parser.
  */
-function convertMdxComponentsToHtml(content: string, _siteUrl: string, _postSlug: string): string {
+function convertMdxComponentsToHtml(content: string): string {
   let processed = content;
 
   // First, handle <figure> tags with Image components - process them as a unit
@@ -118,7 +116,7 @@ export async function GET(context: { site: string | undefined }) {
       let processedContent = stripImports(post.body ?? "");
 
       // Then convert MDX components to HTML
-      processedContent = convertMdxComponentsToHtml(processedContent, siteUrl, post.id);
+      processedContent = convertMdxComponentsToHtml(processedContent);
 
       // Then render the Markdown to HTML using markdown-it
       let contentHtml = parser.render(processedContent);

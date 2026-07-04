@@ -134,69 +134,12 @@ loader (`astro/loaders`) pointing at `src/content/<collection>/`. Entries expose
 `.id` (the slug, from the filename) and are rendered with `render(entry)`
 imported from `astro:content` (not the legacy `entry.render()`).
 
-### `blog` — posts
+**The schemas themselves live in `src/content.config.ts` (zod-enforced) — read them there; don't mirror them here.** There are three collections — **`blog`** (posts), **`resources`** (downloadable resources + external links), and **`legal`** (privacy, terms). What the schema _can't_ tell you, and you need to know:
 
-```ts
-{
-  order: number; // sort order (higher = newer), used for prev/next nav
-  title: string;
-  description: string;
-  publishDate: Date;
-  contentModifiedDate: Date;
-}
-```
-
-Files: `src/content/blog/{order}-{slug}.mdx` (most) or `.md`
-
-> **Rule:** whenever you edit content in any collection file (`blog`, `resources`, `legal`), bump `contentModifiedDate` to today's date.
-
-### `resources` — downloadable resources and external links
-
-```ts
-{
-  type: "page" | "link"
-  name: string            // short display name
-  title: string
-  description: string
-  url?: string            // for type: "link"
-  publishDate: Date
-  contentModifiedDate: Date
-  order: number
-  form?: {                // optional Brevo email form
-    brevoFormId: string
-    buttonText: string
-    title: string
-    description: string
-  }
-  platform?: {
-    name: string
-    title: string
-    description: string
-  }
-  asset?: {                 // optional gated deliverable (lead magnet)
-    url: string             // public URL to the file (host it externally, not in-repo)
-    label?: string          // download button text (default "Download now")
-  }
-}
-```
-
-A resource with both a `form` and an `asset` is a **lead-magnet gate**: the `form`
-captures an email (Brevo emails the asset + redirects to `/thank-you/resources/{slug}/`),
-and the thank-you page also shows the `asset` as a **direct download** so delivery doesn't
-depend solely on the email. Host the asset file externally (R2, S3, a CDN/bucket, Brevo's
-own hosting) and point `asset.url` at it — don't commit binaries to this repo. This is not
-access control — a public URL is reachable by anyone who has it.
-
-### `legal` — privacy, terms
-
-```ts
-{
-  title: string;
-  description: string;
-  publishDate: Date;
-  contentModifiedDate: Date;
-}
-```
+- **Filenames & order** — `blog` posts are `src/content/blog/{order}-{slug}.{md,mdx}`. `order` (higher = newer) drives prev/next post nav and blog-list ordering.
+- **Rule:** whenever you edit content in any collection file (`blog`, `resources`, `legal`), bump its `contentModifiedDate` to today's date.
+- **`resources` `type`** — `"page"` renders a `/resources/{slug}/` page; `"link"` is just an external link (uses `url`) with no page of its own.
+- **`resources` lead-magnet gate** — a resource carrying both a `form` and an `asset` captures an email via Brevo (which emails the asset and redirects to `/thank-you/resources/{slug}/`); the thank-you page _also_ surfaces the `asset` as a direct download so delivery doesn't depend solely on the email. Host the asset externally (R2, S3, a CDN/bucket, Brevo's own hosting) — don't commit binaries. This is not access control: a public URL is reachable by anyone who has it.
 
 ---
 
@@ -223,19 +166,7 @@ access control — a public URL is reachable by anyone who has it.
 
 ### `BaseLayout.astro`
 
-Props:
-
-```ts
-{
-  title: string
-  description?: string        // default: site.description from src/site.config.ts
-  publishDate?: Date
-  contentModifiedDate?: Date
-  wide?: boolean              // default: false. true = full-width <main> for
-                             // landing-page sections that own their containers;
-                             // false = centered max-w-3xl container for articles
-}
-```
+Props are defined in the file; the one with non-obvious behavior is **`wide`** (default `false`) — `true` gives a full-width `<main>` for landing-page sections that own their own containers, `false` a centered `max-w-3xl` container for articles. (`description` defaults to `site.description`.)
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
@@ -316,7 +247,7 @@ Three custom rehype plugins applied to all MDX/Markdown content:
 
 2. **`rehypeExternalLinks`** — adds `target="_blank"` + `rel="noopener noreferrer"` + `data-external="true"` to `http://`, `https://`, and `mailto:` links; adds `data-resource="true"` to `/resources/` links; adds `data-anchor="true"` to `#` anchor links. These attributes drive Tailwind prose color overrides.
 
-3. **`rehypeCodeBlockCopy`** — wraps every `<pre><code>` block in a `<div class="relative">` and injects a "Copy" button (`data-copy-button="true"`). Button copy logic is in `PostLayout.astro` client script.
+3. **`rehypeCodeBlockCopy`** — wraps every `<pre><code>` block in a `<div class="relative">` and injects a "Copy" button (`data-copy-button="true"`). The copy behavior is wired up in `Prose.astro` (which renders all MD/MDX content), so it works on every prose page, not just blog posts.
 
 Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 
@@ -326,10 +257,12 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 
 Analytics is **provider-agnostic** and supports **multiple providers at once**. Call sites never name a vendor — they fire events through a global facade `window.track(event, props)` (always called optionally: `window.track?.(...)`). Each active provider chains onto `window.track`, so one call fans out to all of them.
 
+Alongside `track`, providers chain a second facade `window.identify(id, props)` — call it (optionally: `window.identify?.(...)`) to associate the current visitor with an id. Every call site (page or component) uses these two facades and **never** touches a vendor SDK (`window.posthog`, `dataLayer`, …) directly, so a new provider needs no changes at the call sites.
+
 Built-in providers ship as self-gating components in `src/components/analytics/`:
 
-- **`posthog.astro`** — PostHog. Active when `PUBLIC_POSTHOG_PROJECT_TOKEN` **and** `PUBLIC_POSTHOG_HOST` are set. `track` → `posthog.capture(event, props)`.
-- **`gtm.astro`** — Google Tag Manager. Active when `PUBLIC_GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`) is set. `track` → `dataLayer.push({ event, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
+- **`posthog.astro`** — PostHog. Active when `PUBLIC_POSTHOG_PROJECT_TOKEN` **and** `PUBLIC_POSTHOG_HOST` are set. `track` → `posthog.capture(event, props)`; `identify` → `posthog.identify(id, props)`.
+- **`gtm.astro`** — Google Tag Manager. Active when `PUBLIC_GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`) is set. `track` → `dataLayer.push({ event, ...props })`; `identify` → `dataLayer.push({ event: "identify", user_id: id, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
 
 `Analytics.astro` is the dispatcher: it renders every provider (each emits nothing when its own env vars are absent) under one global kill switch, `PUBLIC_ANALYTICS_ENABLED !== "false"`.
 
@@ -337,42 +270,16 @@ Built-in providers ship as self-gating components in `src/components/analytics/`
 
 ### Tracked events
 
-| Event                         | Where fired              | Properties                      |
-| ----------------------------- | ------------------------ | ------------------------------- |
-| `contact_email_clicked`       | BaseLayout inline script | `email`                         |
-| `post_navigation_clicked`     | PostLayout inline script | `direction`, `destination_slug` |
-| `code_block_copied`           | PostLayout inline script | `snippet_length`                |
-| `gate_viewed`                 | BrevoForm inline script  | `resource_slug`, `form_id`      |
-| `newsletter_form_submitted`   | BrevoForm inline script  | `form_id`, `resource_slug`      |
-| `resource_download_confirmed` | Thank-you inline script  | `resource_name`, `resource_url` |
-| `resource_downloaded`         | Thank-you inline script  | `resource_name`, `asset_url`    |
-
-These fire via `window.track(...)` and reach every active provider. Pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). Note: property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
-
-The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_form_submitted`
-→ `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded`
-(clicked the direct download).
+All events fire via `window.track(...)` and reach every active provider; pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). **The `/analytics` skill (`.claude/skills/analytics/SKILL.md`) is the source of truth** for the tracked-events catalog (each event, where it fires, its properties, and the lead-magnet funnel) and for adding a new event — see it rather than duplicating the list here.
 
 ---
 
-## Components
+Components live in **`src/components/`** — they're small and self-documenting, so read them there rather than maintaining a catalog here. The ones with non-obvious contracts:
 
-| Component                 | Purpose                                                      |
-| ------------------------- | ------------------------------------------------------------ |
-| `BaseLayout.astro`        | Shell: nav, meta, footer, analytics                          |
-| `PostLayout.astro`        | Blog post wrapper                                            |
-| `PostCard.astro`          | Post list item on index page                                 |
-| `PostImage.astro`         | Image with caption in posts                                  |
-| `RawVideo.astro`          | Video embed                                                  |
-| `Video.astro`             | Video with controls                                          |
-| `Button.astro`            | Reusable button; renders `<a>` when given `href` (see below) |
-| `BrevoForm.astro`         | Email signup form (Brevo)                                    |
-| `ResourceLink.astro`      | Renders a resource link in sidebar/resource pages            |
-| `Time.astro`              | Renders `<time>` element with formatted date                 |
-| `Analytics.astro`         | Dispatcher: renders every analytics provider (see Analytics) |
-| `JsonLd.astro`            | Renders a schema.org JSON-LD block (see `/structured-data`)  |
-| `analytics/posthog.astro` | PostHog provider — loader + `track` facade                   |
-| `analytics/gtm.astro`     | Google Tag Manager provider — loader + `track` facade        |
+- **`Prose.astro`** — the content-card panel for rendered MD/MDX (post body, resource + legal pages, thank-you copy): the shared card+prose styling plus the code-block copy behavior, scoped per instance. `BrevoForm`'s inline `prose prose-lg` is a deliberately different, non-card pattern.
+- **`Button.astro`**, **`Analytics.astro`**, **Fonts** — see the subsections below.
+- **`analytics/*.astro`** — one component per analytics provider (loader + `track`/`identify` facade); see **Analytics** above and the `/analytics` skill.
+- **`JsonLd.astro`** — renders a schema.org JSON-LD block; see the `/structured-data` skill.
 
 ### `Button.astro`
 
@@ -416,20 +323,9 @@ Edit this file directly for header changes (not Terraform).
 
 ## Environment variables
 
-**Source of truth: `src/env.d.ts`** — all `PUBLIC_*` env vars must be declared here first. `.env.example` must mirror it (same keys, no values).
+**`src/env.d.ts` is the source of truth** — every `PUBLIC_*` var is declared and documented there (one JSDoc line each: purpose + when it applies), and **`.env.example`** mirrors the same keys as a copy-me template (`cp .env.example .env`). Read those two files rather than a table here; all vars are optional (an unset provider just stays off). Which of them CI's build needs as secrets is listed under **CI** above.
 
-Current variables:
-
-| Variable                               | Required | Purpose                                            |
-| -------------------------------------- | -------- | -------------------------------------------------- |
-| `PUBLIC_POSTHOG_PROJECT_TOKEN`         | No       | PostHog analytics token (required to load PostHog) |
-| `PUBLIC_POSTHOG_HOST`                  | No       | PostHog host URL (required to load PostHog)        |
-| `PUBLIC_GTM_CONTAINER_ID`              | No       | Google Tag Manager container ID (`GTM-XXXXXXX`)    |
-| `PUBLIC_ANALYTICS_ENABLED`             | No       | Set to `"false"` to force-disable all analytics    |
-| `PUBLIC_BREVO_ACCOUNT_ID`              | No       | Brevo email form integration                       |
-| `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY` | No       | Cloudflare Turnstile bot protection                |
-
-When adding a new env var: add it to `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment.
+When adding a new env var: declare it (with a doc comment) in `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment. If the provider exposes a browser global, add it to the `Window` interface in `src/env.d.ts` too.
 
 ---
 

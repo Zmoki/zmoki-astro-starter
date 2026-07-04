@@ -77,15 +77,15 @@ const { brevoFormId, buttonText = defaultButtonText, resourceSlug = "" } = Astro
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
 
 <script is:inline define:vars={{ resourceSlug }}>
-  window.posthog?.capture("gate_viewed", {
+  window.track?.("resource_gate_viewed", {
     resource_slug: resourceSlug,
     form_id: document.getElementById("brevo-form")?.getAttribute("action") || "",
   });
 
   document.getElementById("brevo-form")?.addEventListener("submit", function () {
     var email = document.getElementById("EMAIL")?.value || "";
-    window.posthog?.identify(email);
-    window.posthog?.capture("newsletter_form_submitted", {
+    window.identify?.(email);
+    window.track?.("resource_gate_submitted", {
       form_id: this.getAttribute("action") || "",
       resource_slug: resourceSlug,
     });

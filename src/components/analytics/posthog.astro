@@ -71,4 +71,12 @@
       window.posthog && window.posthog.capture(event, props);
     };
   })(window.track);
+
+  // Same for identify() — associate the current user with an id across providers.
+  window.identify = (function (prev) {
+    return function (id, props) {
+      if (prev) prev(id, props);
+      window.posthog && window.posthog.identify(id, props);
+    };
+  })(window.identify);
 </script>

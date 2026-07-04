@@ -2,6 +2,7 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
+import Prose from "@/components/Prose.astro";
 import { site } from "@/site.config";
 
 export async function getStaticPaths() {
@@ -22,9 +23,16 @@ export async function getStaticPaths() {
 
 const { name, url, asset } = Astro.props;
 
-// Get 3 random feed posts
+// Show 3 random posts. `sort(() => Math.random() - 0.5)` is a biased shuffle, so
+// use Fisher-Yates on a copy (the collection array is otherwise shared). Note the
+// pick is fixed at build time — this is a static page, not per-visit random.
 const allFeedPosts: CollectionEntry<"blog">[] = await getCollection("blog");
-const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3);
+const shuffled = [...allFeedPosts];
+for (let i = shuffled.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+}
+const randomFeedPosts = shuffled.slice(0, 3);
 ---
 
 <BaseLayout
@@ -41,9 +49,7 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
       />
     </header>
 
-    <section
-      class="prose prose-xl border-zmoki-stone-200 lg:prose-2xl prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16 lg:px-28 lg:py-16"
-    >
+    <Prose class="prose-xl lg:prose-2xl lg:px-28 lg:py-16">
       <p>Thank you for signing up!</p>
       <p>I've just sent <a href={url} set:html={name} /> to the email address you provided.</p>
       <p>It should arrive in your inbox in the next minute or two.</p>
@@ -83,18 +89,18 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
           }
         </ul>
       </section>
-    </section>
+    </Prose>
   </section>
 </BaseLayout>
 
 <script is:inline define:vars={{ resourceName: name, resourceUrl: url }}>
-  window.posthog?.capture("resource_download_confirmed", {
+  window.track?.("resource_download_confirmed", {
     resource_name: resourceName,
     resource_url: resourceUrl,
   });
 
   document.getElementById("resource-download")?.addEventListener("click", function () {
-    window.posthog?.capture("resource_downloaded", {
+    window.track?.("resource_downloaded", {
       resource_name: this.getAttribute("data-resource-name") || "",
       asset_url: this.getAttribute("data-asset-url") || "",
     });

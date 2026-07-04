@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import Time from "@/components/Time.astro";
 
 const { data, id } = Astro.props as CollectionEntry<"blog">;
 const { title, description, contentModifiedDate } = data;
@@ -14,15 +15,7 @@ const { title, description, contentModifiedDate } = data;
     </h2>
     {description && <p class="text-zmoki-stone-600" set:html={description} />}
     <p class="text-zmoki-stone-500 order-first text-sm">
-      <time datetime={contentModifiedDate.toISOString()}>
-        {
-          contentModifiedDate.toLocaleDateString("en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        }
-      </time>
+      <Time datetime={contentModifiedDate} />
     </p>
   </a>
 </article>
