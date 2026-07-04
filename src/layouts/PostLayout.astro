@@ -2,6 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import Time from "@/components/Time.astro";
+import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 
 export interface Props {
@@ -15,6 +16,33 @@ export interface Props {
 
 const { title, description, publishDate, contentModifiedDate, prevPost, nextPost } = Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
+
+// BlogPosting structured data (schema.org Article) → Google rich result.
+// Article has no required properties; we include the recommended ones the page
+// actually backs up. Absolute URLs + production domain so the markup is correct
+// regardless of dev/prod. See the /structured-data skill and Google's Article
+// reference. https://developers.google.com/search/docs/appearance/structured-data/article
+const canonicalUrl = new URL(Astro.url.pathname, site.domain).toString();
+const blogPostingLd = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  ...(description ? { description } : {}),
+  datePublished: publishDate.toISOString(),
+  dateModified: contentModifiedDate.toISOString(),
+  author: {
+    "@type": "Person",
+    name: site.author.name,
+    url: new URL(`/blog/${site.author.aboutSlug}/`, site.domain).toString(),
+  },
+  publisher: {
+    "@type": "Organization",
+    name: site.name,
+    url: site.domain,
+  },
+  image: new URL(`/og-images${Astro.url.pathname}wide.jpg`, site.domain).toString(),
+  mainEntityOfPage: canonicalUrl,
+};
 ---
 
 <BaseLayout
@@ -23,6 +51,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   publishDate={publishDate}
   contentModifiedDate={contentModifiedDate}
 >
+  <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">
     <!-- Post Header -->
     <header
