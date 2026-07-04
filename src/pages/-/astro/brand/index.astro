@@ -48,10 +48,10 @@ const sections = [
   description="The brand and design system guideline for My Project X"
 >
   <header
-    class="mb-8 overflow-hidden rounded-xl border-2 border-zmoki-neutral-900 bg-zmoki-neutral-900 text-slate-50"
+    class="border-zmoki-neutral-900 bg-zmoki-neutral-900 mb-8 overflow-hidden rounded-xl border-2 text-slate-50"
   >
     <div class="px-6 py-10 md:px-10 md:py-14">
-      <p class="font-mono text-xs uppercase tracking-normal opacity-70">My Project X</p>
+      <p class="font-mono text-xs tracking-normal uppercase opacity-70">My Project X</p>
       <h1 class="mt-2 text-4xl font-semibold md:text-6xl">Design system</h1>
       <p class="mt-4 max-w-2xl text-xl md:text-2xl">
         The living guideline for how My Project X looks and feels — a flat, monochrome, brutalist
@@ -69,21 +69,21 @@ const sections = [
         section.href ? (
           <a
             href={section.href}
-            class="group flex flex-col gap-3 rounded-xl border-2 border-zmoki-neutral-900 bg-white p-6 transition-transform hover:-translate-y-1 md:p-8"
+            class="group border-zmoki-neutral-900 flex flex-col gap-3 rounded-xl border-2 bg-white p-6 transition-transform hover:-translate-y-1 md:p-8"
           >
             <span class={`h-2 w-12 rounded-full ${section.accent}`} />
             <h2 class="text-2xl font-semibold md:text-3xl">
               <span class="border-b-4 border-dotted border-current">{section.title}</span>
             </h2>
             <p class="opacity-80">{section.summary}</p>
-            <span class="mt-2 font-mono text-xs uppercase tracking-normal opacity-60">View →</span>
+            <span class="mt-2 font-mono text-xs tracking-normal uppercase opacity-60">View →</span>
           </a>
         ) : (
           <div class="flex flex-col gap-3 rounded-xl border-2 border-dashed border-slate-300 bg-white/50 p-6 md:p-8">
             <span class={`h-2 w-12 rounded-full opacity-30 ${section.accent}`} />
             <h2 class="text-2xl font-semibold opacity-50 md:text-3xl">{section.title}</h2>
             <p class="opacity-50">{section.summary}</p>
-            <span class="mt-2 font-mono text-xs uppercase tracking-normal opacity-40">
+            <span class="mt-2 font-mono text-xs tracking-normal uppercase opacity-40">
               Coming soon
             </span>
           </div>

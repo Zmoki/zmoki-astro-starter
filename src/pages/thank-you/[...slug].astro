@@ -10,8 +10,8 @@ export async function getStaticPaths() {
   );
 
   return allResources.map((resource) => ({
-    params: { slug: `resources/${resource.slug}/` },
-    props: { name: resource.data.name, url: `/resources/${resource.slug}/` },
+    params: { slug: `resources/${resource.id}/` },
+    props: { name: resource.data.name, url: `/resources/${resource.id}/` },
   }));
 }
 
@@ -28,7 +28,7 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
 >
   <section class="space-y-4">
     <header
-      class="flex flex-col gap-6 rounded-xl border-2 border-zmoki-neutral-900 bg-white px-4 py-8 md:items-center md:p-16 md:text-center lg:p-20"
+      class="border-zmoki-neutral-900 flex flex-col gap-6 rounded-xl border-2 bg-white px-4 py-8 md:items-center md:p-16 md:text-center lg:p-20"
     >
       <h1
         class="bg-zmoki-neutral-900 text-5xl font-semibold lg:text-6xl"
@@ -37,7 +37,7 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
     </header>
 
     <section
-      class="prose prose-xl max-w-none rounded-xl border border-zmoki-neutral-900 bg-white px-4 py-8 lg:prose-2xl prose-headings:font-semibold md:p-16 lg:px-28 lg:py-16 [&_a]:text-zmoki-neutral-900"
+      class="prose prose-xl border-zmoki-neutral-900 lg:prose-2xl prose-headings:font-semibold [&_a]:text-zmoki-neutral-900 max-w-none rounded-xl border bg-white px-4 py-8 md:p-16 lg:px-28 lg:py-16"
     >
       <p>Thank you for signing up!</p>
       <p>I've just sent <a href={url} set:html={name} /> to the email address you provided.</p>
@@ -56,7 +56,7 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
           {
             randomFeedPosts.map((post) => (
               <li>
-                <a href={`/blog/${post.slug}/`} set:html={post.data.title} />
+                <a href={`/blog/${post.id}/`} set:html={post.data.title} />
               </li>
             ))
           }

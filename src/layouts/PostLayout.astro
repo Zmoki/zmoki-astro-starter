@@ -26,12 +26,12 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   <article class="space-y-4">
     <!-- Post Header -->
     <header
-      class="flex flex-col gap-6 rounded-xl bg-white px-4 py-8 outline-dashed outline-8 -outline-offset-2 outline-zmoki-neutral-900 md:items-center md:p-16 md:text-center lg:p-20"
+      class="outline-zmoki-neutral-900 flex flex-col gap-6 rounded-xl bg-white px-4 py-8 outline-8 -outline-offset-2 outline-dashed md:items-center md:p-16 md:text-center lg:p-20"
     >
       <h1 class="text-4xl font-semibold xl:text-6xl" set:html={title} />
       {description && <p class="text-2xl xl:text-3xl" set:html={description} />}
       <p
-        class="order-first flex flex-col gap-2 font-mono text-xs uppercase tracking-normal opacity-70 md:flex-row lg:gap-4 xl:text-sm"
+        class="order-first flex flex-col gap-2 font-mono text-xs tracking-normal uppercase opacity-70 md:flex-row lg:gap-4 xl:text-sm"
       >
         {
           isContentModified ? (
@@ -54,14 +54,14 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
     <!-- Post Content -->
     <div
-      class="prose prose-xl max-w-none rounded-xl border-2 border-zmoki-neutral-900 bg-white px-4 py-8 2xl:prose-2xl prose-headings:font-semibold md:p-16 xl:pb-24 2xl:px-28 2xl:py-16"
+      class="prose prose-xl border-zmoki-neutral-900 2xl:prose-2xl prose-headings:font-semibold max-w-none rounded-xl border-2 bg-white px-4 py-8 md:p-16 xl:pb-24 2xl:px-28 2xl:py-16"
     >
       <slot />
     </div>
 
     <!-- About Author -->
     <aside
-      class="space-y-2 rounded-xl border-2 border-zmoki-neutral-900 bg-white px-4 py-8 leading-normal text-zmoki-neutral-900 md:bg-zmoki-neutral-700 md:p-16 md:text-slate-50 xl:p-20"
+      class="border-zmoki-neutral-900 text-zmoki-neutral-900 md:bg-zmoki-neutral-700 space-y-2 rounded-xl border-2 bg-white px-4 py-8 leading-normal md:p-16 md:text-slate-50 xl:p-20"
     >
       <h2 class="pb-4 text-3xl font-medium xl:text-4xl">Written by {site.author.name}</h2>
       <p>
@@ -80,13 +80,13 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
       {
         prevPost && (
           <a
-            href={`/blog/${prevPost.slug}/`}
+            href={`/blog/${prevPost.id}/`}
             data-nav-direction="prev"
-            data-nav-slug={prevPost.slug}
-            class="flex flex-col gap-2 rounded-xl border-2 border-l-8 border-solid border-zmoki-neutral-900 bg-white px-6 pb-10 pt-8"
+            data-nav-slug={prevPost.id}
+            class="border-zmoki-neutral-900 flex flex-col gap-2 rounded-xl border-2 border-l-8 border-solid bg-white px-6 pt-8 pb-10"
           >
-            <div class="font-mono text-sm uppercase tracking-normal opacity-70">Previous</div>
-            <div class="text-2xl font-medium leading-normal">
+            <div class="font-mono text-sm tracking-normal uppercase opacity-70">Previous</div>
+            <div class="text-2xl leading-normal font-medium">
               <span
                 set:html={prevPost.data.title}
                 class="border-b-4 border-dotted border-current"
@@ -100,13 +100,13 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
       {
         nextPost && (
           <a
-            href={`/blog/${nextPost.slug}/`}
+            href={`/blog/${nextPost.id}/`}
             data-nav-direction="next"
-            data-nav-slug={nextPost.slug}
-            class="flex flex-col gap-2 rounded-xl border-2 border-r-8 border-solid border-zmoki-neutral-900 bg-white px-6 pb-10 pt-8 text-right md:col-start-2"
+            data-nav-slug={nextPost.id}
+            class="border-zmoki-neutral-900 flex flex-col gap-2 rounded-xl border-2 border-r-8 border-solid bg-white px-6 pt-8 pb-10 text-right md:col-start-2"
           >
-            <div class="font-mono text-sm uppercase tracking-normal opacity-70">Next</div>
-            <div class="text-2xl font-medium leading-normal">
+            <div class="font-mono text-sm tracking-normal uppercase opacity-70">Next</div>
+            <div class="text-2xl leading-normal font-medium">
               <span
                 set:html={nextPost.data.title}
                 class="border-b-4 border-dotted border-current"

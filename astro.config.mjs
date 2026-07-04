@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
-import tailwind from "@astrojs/tailwind";
+import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
+import { unified } from "@astrojs/markdown-remark";
 import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
@@ -148,12 +149,18 @@ function rehypeCodeBlockCopy() {
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind(), mdx()],
+  integrations: [mdx()],
   site: "https://example.com",
   server: {
     port: 4321,
   },
+  vite: {
+    plugins: [tailwindcss()],
+  },
   markdown: {
+    // Astro 7 defaults to the Sätteri processor; opt back into the unified
+    // (remark/rehype) pipeline so the custom plugins below keep working.
+    processor: unified(),
     shikiConfig: {
       theme: "catppuccin-latte",
     },

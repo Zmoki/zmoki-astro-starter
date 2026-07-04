@@ -1,5 +1,5 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 import ResourceLayout from "@/layouts/ResourceLayout.astro";
 
 export async function getStaticPaths() {
@@ -9,13 +9,13 @@ export async function getStaticPaths() {
   );
 
   return items.map((item) => ({
-    params: { slug: item.slug },
+    params: { slug: item.id },
     props: item,
   }));
 }
 
 const item = Astro.props as CollectionEntry<"resources">;
-const { Content } = await item.render();
+const { Content } = await render(item);
 ---
 
 <ResourceLayout {...item.data}><Content /></ResourceLayout>

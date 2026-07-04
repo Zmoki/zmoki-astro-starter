@@ -12,30 +12,9 @@ const ink = twColors.neutral[900];
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
-  safelist: [
-    // Copy button classes added dynamically in rehype plugin
-    "relative",
-    "absolute",
-    "top-2",
-    "right-2",
-    "px-3",
-    "py-1.5",
-    "text-xs",
-    "font-medium",
-    "font-mono",
-    "uppercase",
-    "tracking-normal",
-    "rounded-sm",
-    "bg-zmoki-neutral-900",
-    "text-white",
-    "hover:bg-zmoki-neutral-900/80",
-    "focus:outline-none",
-    "focus:ring-2",
-    "focus:ring-zmoki-neutral-900",
-    "focus:ring-offset-2",
-    "transition-colors",
-    "duration-200",
-  ],
+  // Note: the copy-button classes injected by the rehype plugin are kept via
+  // `@source inline(...)` in src/styles/global.css — Tailwind v4 dropped the
+  // JS `safelist` option.
   theme: {
     // Brutalist: flat (no shadows) and sharp (no rounded corners) everywhere.
     // Overriding the scales here flattens every `shadow-*` / `rounded-*` utility

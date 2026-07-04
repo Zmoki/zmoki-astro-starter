@@ -1,4 +1,6 @@
 ---
+import "@/styles/global.css";
+
 export interface Props {
   title: string;
   description?: string;
@@ -25,7 +27,7 @@ const { title, description } = Astro.props;
     {description && <meta name="description" content={description} />}
   </head>
   <body
-    class="min-h-full bg-zmoki-neutral-200 font-sans text-lg leading-tight tracking-tight text-zmoki-neutral-900 xl:text-xl"
+    class="bg-zmoki-neutral-200 text-zmoki-neutral-900 min-h-full font-sans text-lg leading-tight tracking-tight xl:text-xl"
   >
     <main class="mx-auto w-full max-w-5xl p-4 lg:py-12">
       <slot />

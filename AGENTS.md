@@ -16,10 +16,10 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 
 | Layer               | Tool                                                           | Version      |
 | ------------------- | -------------------------------------------------------------- | ------------ |
-| Framework           | Astro                                                          | ^5.16        |
+| Framework           | Astro                                                          | ^7.0         |
 | Language            | TypeScript                                                     | via Astro    |
-| Styling             | Tailwind CSS + @tailwindcss/typography                         | ^3           |
-| Content             | MDX via @astrojs/mdx                                           | —            |
+| Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4           |
+| Content             | MDX via @astrojs/mdx                                           | ^7           |
 | Fonts               | Noto Serif (headings), Noto Sans (body), Noto Sans Mono        | Google Fonts |
 | Analytics           | PostHog                                                        | posthog-js   |
 | Email/Forms         | Brevo                                                          | —            |
@@ -119,7 +119,12 @@ The single source of truth for everything personal to a site: domain, name, desc
 
 ---
 
-## Content collections (`src/content/config.ts`)
+## Content collections (`src/content.config.ts`)
+
+Collections use the **Content Layer API** — each is defined with a `glob()`
+loader (`astro/loaders`) pointing at `src/content/<collection>/`. Entries expose
+`.id` (the slug, from the filename) and are rendered with `render(entry)`
+imported from `astro:content` (not the legacy `entry.render()`).
 
 ### `blog` — posts
 
@@ -264,6 +269,8 @@ After any palette change, run `npm run build` and check `/-/astro/brand/color/`.
 
 Flat + brutalist is enforced globally in `tailwind.config.mjs`: the `borderRadius` and `boxShadow` scales are overridden to `0` / `none`, so every `rounded-*` is sharp and every `shadow-*` is flat. Cards/panels are defined by `border-2 border-zmoki-neutral-900` instead of shadows. Supporting greys also use Tailwind `slate-*` directly (input borders, code-block bg). `tailwind.config.mjs` defines a single `ink = twColors.neutral[900]` constant for the prose/link CSS that can't reference a utility class.
 
+**Tailwind v4 wiring:** the `@tailwindcss/vite` plugin (in `astro.config.mjs`) replaces the old `@astrojs/tailwind` integration. Styles enter through `src/styles/global.css` (`@import "tailwindcss"`), imported once each in `BaseLayout.astro` and `BrandLayout.astro`. The v3-style `tailwind.config.mjs` above is kept via the `@config` directive in that CSS file, and the copy-button classes the rehype plugin injects are preserved with `@source inline(...)` (v4 dropped the JS `safelist` option).
+
 ### Prose typography overrides
 
 Set in `tailwind.config.mjs`, all using the `ink` (= `zmoki-neutral-900`) constant:
@@ -276,6 +283,12 @@ Set in `tailwind.config.mjs`, all using the `ink` (= `zmoki-neutral-900`) consta
 ---
 
 ## Custom Astro/Markdown pipeline (`astro.config.mjs`)
+
+Astro 7 defaults to the Sätteri Markdown processor, which doesn't run
+remark/rehype plugins. This project opts back into the unified pipeline via
+`@astrojs/markdown-remark` — `markdown.processor: unified()` in
+`astro.config.mjs` — so the plugins below (and `shikiConfig`,
+`remarkRehype` handlers) keep working.
 
 Three custom rehype plugins applied to all MDX/Markdown content:
 

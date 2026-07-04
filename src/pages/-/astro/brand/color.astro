@@ -25,9 +25,9 @@ const families = (names: string[]) =>
 
 <BrandLayout title="Brand — Color" description="My Project X brand color palette and tokens">
   <header
-    class="mb-8 rounded-xl border-2 border-zmoki-neutral-900 bg-zmoki-neutral-700 px-6 py-10 text-white md:px-10"
+    class="border-zmoki-neutral-900 bg-zmoki-neutral-700 mb-8 rounded-xl border-2 px-6 py-10 text-white md:px-10"
   >
-    <a href="/-/astro/brand/" class="font-mono text-xs uppercase tracking-normal opacity-80"
+    <a href="/-/astro/brand/" class="font-mono text-xs tracking-normal uppercase opacity-80"
       >← My Project X brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Color</h1>
@@ -42,21 +42,21 @@ const families = (names: string[]) =>
     </p>
   </header>
 
-  <h2 class="mb-4 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Neutrals</h2>
+  <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Neutrals</h2>
   <div class="space-y-3">
     {
       families(greyNames).map((family) => (
-        <section class="overflow-hidden rounded-xl border-2 border-zmoki-neutral-900 bg-white">
+        <section class="border-zmoki-neutral-900 overflow-hidden rounded-xl border-2 bg-white">
           <div class="flex items-center justify-between gap-4 px-5 pt-4">
             <h3 class="text-lg font-semibold">{family.name}</h3>
-            <p class="font-mono text-xs uppercase tracking-normal opacity-60">{family.key}</p>
+            <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
           </div>
           <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
             {family.shades.map(({ shade, hex }) => (
               <div>
                 <div class="h-12" style={`background-color: ${hex}`} />
                 <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
-                <p class="font-mono text-[10px] uppercase leading-tight opacity-50">{hex}</p>
+                <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
               </div>
             ))}
           </div>
@@ -65,21 +65,21 @@ const families = (names: string[]) =>
     }
   </div>
 
-  <h2 class="mb-4 mt-10 px-1 font-mono text-sm uppercase tracking-normal opacity-60">Colors</h2>
+  <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Colors</h2>
   <div class="space-y-3">
     {
       families(colorNames).map((family) => (
-        <section class="overflow-hidden rounded-xl border-2 border-zmoki-neutral-900 bg-white">
+        <section class="border-zmoki-neutral-900 overflow-hidden rounded-xl border-2 bg-white">
           <div class="flex items-center justify-between gap-4 px-5 pt-4">
             <h3 class="text-lg font-semibold">{family.name}</h3>
-            <p class="font-mono text-xs uppercase tracking-normal opacity-60">{family.key}</p>
+            <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
           </div>
           <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
             {family.shades.map(({ shade, hex }) => (
               <div>
                 <div class="h-12" style={`background-color: ${hex}`} />
                 <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
-                <p class="font-mono text-[10px] uppercase leading-tight opacity-50">{hex}</p>
+                <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
               </div>
             ))}
           </div>
@@ -91,22 +91,22 @@ const families = (names: string[]) =>
   {
     customNames.length > 0 && (
       <>
-        <h2 class="mb-4 mt-10 px-1 font-mono text-sm uppercase tracking-normal opacity-60">
+        <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
           Custom
         </h2>
         <div class="space-y-3">
           {families(customNames).map((family) => (
-            <section class="overflow-hidden rounded-xl border-2 border-zmoki-neutral-900 bg-white">
+            <section class="border-zmoki-neutral-900 overflow-hidden rounded-xl border-2 bg-white">
               <div class="flex items-center justify-between gap-4 px-5 pt-4">
                 <h3 class="text-lg font-semibold">{family.name}</h3>
-                <p class="font-mono text-xs uppercase tracking-normal opacity-60">{family.key}</p>
+                <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
               </div>
               <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
                 {family.shades.map(({ shade, hex }) => (
                   <div>
                     <div class="h-12" style={`background-color: ${hex}`} />
                     <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
-                    <p class="font-mono text-[10px] uppercase leading-tight opacity-50">{hex}</p>
+                    <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
                   </div>
                 ))}
               </div>
@@ -119,7 +119,7 @@ const families = (names: string[]) =>
 
   <!-- Usage in code -->
   <section
-    class="mt-10 rounded-xl border-2 border-zmoki-neutral-900 bg-slate-700 p-6 text-white md:p-8"
+    class="border-zmoki-neutral-900 mt-10 rounded-xl border-2 bg-slate-700 p-6 text-white md:p-8"
   >
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
     <p class="mb-4 opacity-90">

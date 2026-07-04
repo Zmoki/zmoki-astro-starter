@@ -1,17 +1,17 @@
 ---
 import type { CollectionEntry } from "astro:content";
 
-const { data, slug } = Astro.props as CollectionEntry<"blog">;
+const { data, id } = Astro.props as CollectionEntry<"blog">;
 const { title, description, contentModifiedDate } = data;
 ---
 
-<article class="overflow-hidden rounded-lg border-2 border-zmoki-neutral-900 bg-white">
-  <a href={`/blog/${slug}/`} class="flex h-full w-full flex-col gap-2 p-6 text-xl md:p-8">
-    <h3 class="pb-2 text-2xl font-semibold leading-normal xl:text-3xl">
+<article class="border-zmoki-neutral-900 overflow-hidden rounded-lg border-2 bg-white">
+  <a href={`/blog/${id}/`} class="flex h-full w-full flex-col gap-2 p-6 text-xl md:p-8">
+    <h3 class="pb-2 text-2xl leading-normal font-semibold xl:text-3xl">
       <span set:html={title} class="border-b-4 border-dotted border-current" />
     </h3>
     {description && <p class="opacity-80" set:html={description} />}
-    <p class="order-first font-mono text-xs uppercase tracking-normal opacity-70">
+    <p class="order-first font-mono text-xs tracking-normal uppercase opacity-70">
       <time datetime={contentModifiedDate.toISOString()}>
         {
           contentModifiedDate.toLocaleDateString("en-US", {
