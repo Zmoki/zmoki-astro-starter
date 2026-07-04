@@ -55,7 +55,7 @@ The pages under `/-/astro/brand/` are a living style guide (internal, noindex). 
 
 ## 5. Analytics and forms (optional but wired)
 
-Copy `.env.example` to `.env` and fill in what you use:
+Copy `.env.example` to `.env` and fill in what you use (every var is declared and documented in `src/env.d.ts`). The features and the vars that unlock them:
 
 - **Analytics** — provider-agnostic and multi-provider; set the env vars for the tools you use and each activates on its own. Built in:
   - **PostHog** — `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`.
