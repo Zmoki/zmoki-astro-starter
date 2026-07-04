@@ -43,6 +43,7 @@ Project skills live in `.claude/skills/`:
 - `/og-images` — customize the OG / social-share image cards (`.claude/skills/og-images/SKILL.md`)
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 - `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
+- `/structured-data` — add/edit schema.org JSON-LD for Google rich results, per Google's docs (`.claude/skills/structured-data/SKILL.md`)
 
 ---
 
@@ -54,6 +55,7 @@ npm run build            # production build (also emits OG images to dist/og/)
 npm run timeline:blog    # generate blog-timeline.csv
 npm run build:redirects  # compile src/redirects/*.csv → host redirect artifact (runs automatically before build)
 npm run check:redirects  # CI guard: rebuild redirects and fail if the committed artifact drifted
+npm run check:sd         # CI guard: validate schema.org JSON-LD in dist/ (run after build)
 npm run lhci:mobile      # Lighthouse CI mobile
 npm run lhci:desktop     # Lighthouse CI desktop
 npm run format           # Prettier format all files
@@ -71,6 +73,7 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 3. **Lint** — `npm run lint`
 4. **Redirects drift check** — `npm run check:redirects` (rebuilds the redirect artifact and fails if it differs from what's committed)
 5. **Build** — `npm run build`
+6. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
 
 Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`.
 
@@ -236,7 +239,7 @@ Props:
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
-Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
+Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
 ### `PostLayout.astro`
 
@@ -367,6 +370,7 @@ The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_for
 | `ResourceLink.astro`      | Renders a resource link in sidebar/resource pages            |
 | `Time.astro`              | Renders `<time>` element with formatted date                 |
 | `Analytics.astro`         | Dispatcher: renders every analytics provider (see Analytics) |
+| `JsonLd.astro`            | Renders a schema.org JSON-LD block (see `/structured-data`)  |
 | `analytics/posthog.astro` | PostHog provider — loader + `track` facade                   |
 | `analytics/gtm.astro`     | Google Tag Manager provider — loader + `track` facade        |
 
