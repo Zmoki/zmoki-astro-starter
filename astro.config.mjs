@@ -1,4 +1,4 @@
-import { defineConfig } from "astro/config";
+import { defineConfig, fontProviders } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
@@ -151,6 +151,31 @@ function rehypeCodeBlockCopy() {
 export default defineConfig({
   integrations: [mdx()],
   site: "https://starter.zmoki.xyz",
+  // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
+  // served same-origin from /_astro/fonts, with automatic optimized fallback
+  // metrics (zero CLS) and preload links. The site is all-sans — Noto Sans
+  // (body + headings, weights 400–700 incl. italic) and Noto Sans Mono (code).
+  // Referenced everywhere via the CSS variables below (see tailwind.config.mjs).
+  fonts: [
+    {
+      provider: fontProviders.google(),
+      name: "Noto Sans",
+      cssVariable: "--font-noto-sans",
+      weights: ["400 700"],
+      styles: ["normal", "italic"],
+      subsets: ["latin"],
+      fallbacks: ["system-ui", "sans-serif"],
+    },
+    {
+      provider: fontProviders.google(),
+      name: "Noto Sans Mono",
+      cssVariable: "--font-noto-sans-mono",
+      weights: ["400 700"],
+      styles: ["normal"],
+      subsets: ["latin"],
+      fallbacks: ["ui-monospace", "monospace"],
+    },
+  ],
   server: {
     port: 4321,
   },

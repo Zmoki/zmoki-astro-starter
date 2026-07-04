@@ -4,7 +4,9 @@ import plugin from "tailwindcss/plugin";
 
 // Headings (h1–h6 + wordmark) share the body sans family — one clean typeface
 // across the whole site (modern B2B, no serif contrast).
-const headingFontStack = "'Noto Sans', 'Noto Sans Fallback', system-ui, sans-serif";
+// The --font-noto-sans* variables are defined by Astro's Fonts API (see
+// astro.config.mjs) and already expand to the web font + its optimized fallback.
+const headingFontStack = "var(--font-noto-sans)";
 
 // Warm near-black ink for text, headings, and prose. Sourced from the Tailwind
 // stone palette (also available as `zmoki-stone-900`) so it sits warm against
@@ -65,13 +67,15 @@ export default {
           },
         },
       }),
-      // Brand type families (variable, from Google Fonts) — utilities
-      // font-sans / font-serif / font-mono. These also feed the prose layer.
-      // The site is all-sans; `font-serif` stays available but is unused.
+      // Brand type families — utilities font-sans / font-serif / font-mono.
+      // These also feed the prose layer. The Noto families are self-hosted via
+      // Astro's Fonts API (astro.config.mjs); the CSS variables already include
+      // their optimized fallbacks. The site is all-sans; `font-serif` stays
+      // available but is unused.
       fontFamily: {
-        sans: ["Noto Sans", "Noto Sans Fallback", "system-ui", "sans-serif"],
+        sans: ["var(--font-noto-sans)"],
         serif: ["Noto Serif", "Georgia", "serif"],
-        mono: ["Noto Sans Mono", "ui-monospace", "monospace"],
+        mono: ["var(--font-noto-sans-mono)"],
       },
       // Brand color tokens live in src/design-tokens.mjs (single source
       // of truth, also consumed by the /-/astro/brand/ reference page).

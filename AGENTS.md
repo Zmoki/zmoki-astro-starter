@@ -20,7 +20,7 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 | Language            | TypeScript                                                     | via Astro    |
 | Styling             | Tailwind CSS (@tailwindcss/vite) + @tailwindcss/typography     | ^4           |
 | Content             | MDX via @astrojs/mdx                                           | ^7           |
-| Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Google Fonts |
+| Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Astro Fonts API (self-hosted) |
 | Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in       | posthog-js   |
 | Email/Forms         | Brevo                                                          | —            |
 | OG images           | Satori + resvg (build-time PNG endpoint)                       | —            |
@@ -175,7 +175,7 @@ Props are defined in the file; the one with non-obvious behavior is **`wide`** (
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
-Sets `<html lang="en">`, loads Google Fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
+Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
 ### `PostLayout.astro`
 
@@ -296,7 +296,7 @@ Dispatcher for the analytics providers in `src/components/analytics/` (see **Ana
 
 ### Fonts
 
-`BaseLayout` and `BrandLayout` load Google Fonts with a plain `<link rel="stylesheet">` (preceded by `preconnect` hints to warm the connection). `display=swap` paints text immediately in the fallback and swaps in the web font once it loads; the metrics-matched **Noto Sans Fallback** (`src/styles/global.css`) is sized to Noto Sans's dimensions, so that swap causes no layout shift (CLS). Only **Noto Sans** and **Noto Sans Mono** are requested, weights **400–700** (the range the site actually uses). The shared URL lives in a `fontsHref` const in each layout — keep the two in sync.
+Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guides/fonts/)** (stable in Astro 7), configured once in **`astro.config.mjs`** under the `fonts` array: **Noto Sans** (body + headings) and **Noto Sans Mono** (code), each from `fontProviders.google()`, `weights: ["400 700"]` (variable range covering 400/500/600/700), `subsets: ["latin"]`, Noto Sans also `styles: ["normal", "italic"]`. At build time Astro downloads + subsets the fonts, emits them to `/_astro/fonts/`, and serves them **same-origin** (no Google request at runtime — faster, and privacy-friendly). `BaseLayout` and `BrandLayout` render them with `<Font cssVariable="--font-noto-sans" preload />` + `<Font cssVariable="--font-noto-sans-mono" />` (from `astro:assets`); the `preload` on the sans face keeps hero text fast. Astro injects the `@font-face` rules **and an automatic optimized metrics-matched fallback** (so `font-display: swap` swaps with zero CLS — no hand-tuned fallback face to maintain). Templates never name the family directly: `tailwind.config.mjs` maps `font-sans` → `var(--font-noto-sans)` and `font-mono` → `var(--font-noto-sans-mono)` (the CSS variables Astro defines, which already include the fallback chain). To swap the brand font, edit the `fonts` array in `astro.config.mjs`; the OG card fonts (`src/og/fonts.ts`) are separate — update those too.
 
 ---
 
@@ -346,7 +346,7 @@ OG images are **purpose-built cards rendered at build time** — no browser, no 
 - **`src/og/manifest.ts`** — the single source of truth. `getOgEntries()` enumerates every card (home, blog index, each post / resource page / legal page, plus a `default` fallback); each entry carries `{ key, template, title, description, eyebrow, alt }`. `getOgImage(pathname)` returns the `{ path, alt }` for a page. Consumed by both the endpoint (to render) and `BaseLayout` (for `og:image` + `og:image:alt`).
 - **`src/og/card.ts`** — two Satori templates: `article` (eyebrow · title · description · brand footer) and `site` (brand mark · name · tagline). Built as Satori vdom nodes directly (no JSX).
 - **`src/og/theme.ts`** — card colors pulled from `src/design-tokens.mjs`, so a re-skin (the `/brand` skill) recolors the cards automatically. Tokens are run through `culori`'s `formatHex` because Tailwind v4's default palettes are `oklch()` strings, which the resvg rasterizer doesn't render reliably.
-- **`src/og/fonts.ts`** — bundles the Noto Sans Latin subset (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's Google Fonts — if you swap the brand font (`/brand` skill), update these too.
+- **`src/og/fonts.ts`** — bundles the Noto Sans Latin subset (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's self-hosted fonts — if you swap the brand font (`/brand` skill), update these too.
 - **`src/pages/og/[...path].png.ts`** — `getStaticPaths()` from the manifest, `GET()` → Satori (vdom → SVG) → resvg (SVG → PNG). `astro build` emits `dist/og/**/*.png`; `astro dev` renders the same route on request. Cards are **1200×630** PNGs.
 
 Because the images are produced by `astro build`, production (Cloudflare Pages) and CI get them for free — there's no separate generate step and no binaries in git. `src/pages/rss.xml.ts` references each post's card at `/og/blog/{id}.png`.

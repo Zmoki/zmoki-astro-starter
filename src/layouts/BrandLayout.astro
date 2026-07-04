@@ -1,5 +1,6 @@
 ---
 import "@/styles/global.css";
+import { Font } from "astro:assets";
 
 export interface Props {
   title: string;
@@ -7,10 +8,6 @@ export interface Props {
 }
 
 const { title, description } = Astro.props;
-
-// Same all-sans font load as BaseLayout (see note there).
-const fontsHref =
-  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=swap";
 ---
 
 <!doctype html>
@@ -20,9 +17,8 @@ const fontsHref =
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={fontsHref} />
+    <Font cssVariable="--font-noto-sans" preload />
+    <Font cssVariable="--font-noto-sans-mono" />
 
     <title>{title}</title>
     {description && <meta name="description" content={description} />}

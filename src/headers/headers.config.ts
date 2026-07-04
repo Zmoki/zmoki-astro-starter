@@ -38,7 +38,7 @@ const cspDirectives: Record<string, string[]> = {
     "https://www.googletagmanager.com",
   ],
   "frame-src": ["https://challenges.cloudflare.com"],
-  "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+  "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
     "'self'",
     "data:",
@@ -46,7 +46,7 @@ const cspDirectives: Record<string, string[]> = {
     "https://www.google-analytics.com",
   ],
   "media-src": ["'self'"],
-  "font-src": ["'self'", "https://fonts.gstatic.com"],
+  "font-src": ["'self'"],
   "connect-src": [
     "'self'",
     "https://cloudflareinsights.com",
