@@ -66,10 +66,10 @@ For **each major**, separately:
   links and serves, and that content-pipeline output is intact (copy buttons
   `data-copy-button`, external-link `data-external`, shiki `astro-code`). See
   the `/run` skill.
-- After a **puppeteer** bump, actually run OG generation against a live server:
-  `npm run preview &` then `npm run og:generate 4321` — verify all images emit.
-  The generated `public/og-images/**` are build artifacts; `rm` them before
-  committing (don't stage them).
+- After a **satori**, **@resvg/resvg-js**, or **culori** bump, run `npm run build`
+  and open a couple of `dist/og/**.png` — confirm the cards still render with the
+  brand colors, fonts, and text (a broken font/color pipeline still "builds" but
+  produces blank or black cards). See `src/og/`.
 
 ## 5. Lockfile hygiene (critical for CI)
 

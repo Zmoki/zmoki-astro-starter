@@ -3,6 +3,7 @@ import "@/styles/global.css";
 import Analytics from "@/components/Analytics.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
+import { getOgImage } from "@/og/manifest";
 
 export interface Props {
   title: string;
@@ -35,10 +36,10 @@ const isPageArticle = publishDate && contentModifiedDate;
 
 const canonicalURL = new URL(pagePathname, siteBaseUrl).toString();
 
-const pageImageWideUrl = new URL(
-  `/og-images${isPageArticle ? pagePathname : "/"}wide.jpg`,
-  currentBaseUrl,
-).toString();
+// OG image (+ alt) for this page, from the manifest. Generated on the fly by
+// /og/[...path].png.ts — see src/og/. Falls back to the site's default card.
+const ogImage = await getOgImage(pagePathname);
+const pageImageUrl = new URL(ogImage.path, currentBaseUrl).toString();
 
 const currentYear = new Date().getFullYear();
 const copyrightYears =
@@ -84,10 +85,11 @@ const fontsHref =
     <meta property="og:type" content={isPageArticle ? "article" : "website"} />
     <meta property="og:site_name" content={site.ogSiteName} />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:image" content={pageImageWideUrl} />
-    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image" content={pageImageUrl} />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="675" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImage.alt} />
     {
       isPageArticle && (
         <meta property="article:published_time" content={publishDate.toISOString()} />
@@ -99,6 +101,8 @@ const fontsHref =
       )
     }
     <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:image" content={pageImageUrl} />
+    <meta property="twitter:image:alt" content={ogImage.alt} />
 
     <Analytics />
   </head>
