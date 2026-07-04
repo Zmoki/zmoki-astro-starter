@@ -110,14 +110,14 @@ The events this starter fires today. All go through `window.track(...)` and reac
 | `post_navigation_clicked`     | `PostLayout.astro`          | `direction`, `destination_slug` |
 | `code_block_copied`           | `Prose.astro`               | `snippet_length`                |
 | `resource_link_clicked`       | `ResourceLink.astro`        | `resource_slug`, `is_external`  |
-| `gate_viewed`                 | `BrevoForm.astro`           | `resource_slug`, `form_id`      |
-| `newsletter_form_submitted`   | `BrevoForm.astro`           | `form_id`, `resource_slug`      |
+| `resource_gate_viewed`        | `BrevoForm.astro`           | `resource_slug`, `form_id`      |
+| `resource_gate_submitted`     | `BrevoForm.astro`           | `form_id`, `resource_slug`      |
 | `resource_download_confirmed` | `thank-you/[...slug].astro` | `resource_name`, `resource_url` |
 | `resource_downloaded`         | `thank-you/[...slug].astro` | `resource_name`, `asset_url`    |
 
-`newsletter_form_submitted` is preceded by an `identify(email)` call.
+`resource_gate_submitted` is preceded by an `identify(email)` call. (Every resource-funnel event shares the `resource_` prefix.)
 
-**Lead-magnet gate funnel:** `gate_viewed` → `newsletter_form_submitted` → `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded` (clicked the direct download).
+**Lead-magnet gate funnel:** `resource_gate_viewed` → `resource_gate_submitted` → `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded` (clicked the direct download).
 
 ## Step 5 — Disable analytics (D)
 
