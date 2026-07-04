@@ -13,9 +13,10 @@ families — `font-sans` / `font-serif` / `font-mono` — and the roles are fixe
 | serif  | `font-serif` | Available but unused in the current all-sans starter |
 | mono   | `font-mono`  | Code, eyebrows, dates, nav, footer, buttons          |
 
-The starter is **all-sans**: Noto Sans fills both headings and body, Noto Sans
-Mono is code. `font-serif` is wired but unused — if you introduce a display serif
-for headings, that's the family to set (and see the last note).
+The starter is **all-sans**: one sans fills both headings and body, a mono is
+code (the shipped default is Noto Sans / Noto Sans Mono — see `src/design-tokens.mjs`).
+`font-serif` is wired but unused — if you introduce a display serif for headings,
+that's the family to set (and see the last note).
 
 Fonts are **self-hosted via [Astro's Fonts API](https://docs.astro.build/en/guides/fonts/)**
 (stable in Astro 7): downloaded + subset at build, served same-origin from
