@@ -51,7 +51,16 @@ const siteEntry = (key: string, title: string, description: string): OgEntry => 
 
 const DEFAULT_ENTRY: OgEntry = siteEntry("default", site.name, site.description);
 
-async function buildEntries(): Promise<RoutedEntry[]> {
+// Memoized so the three getCollection() calls and the array build run once per
+// process, not on every getOgImage() call — BaseLayout resolves an OG image for
+// every page (and PostLayout again for each post), so this is hit N+ times.
+let entriesPromise: Promise<RoutedEntry[]> | null = null;
+
+function buildEntries(): Promise<RoutedEntry[]> {
+  return (entriesPromise ??= computeEntries());
+}
+
+async function computeEntries(): Promise<RoutedEntry[]> {
   const posts: CollectionEntry<"blog">[] = await getCollection("blog");
   const resources: CollectionEntry<"resources">[] = await getCollection(
     "resources",
