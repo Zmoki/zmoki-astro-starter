@@ -25,7 +25,7 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 | Email/Forms         | Brevo                                                          | —            |
 | OG images           | Puppeteer (script)                                             | —            |
 | RSS                 | @astrojs/rss                                                   | —            |
-| Syntax highlighting | Shiki, theme: `catppuccin-latte`                               | —            |
+| Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)      | —            |
 | Performance         | Lighthouse CI (@lhci/cli)                                      | —            |
 | Formatting          | Prettier + prettier-plugin-astro + prettier-plugin-tailwindcss | —            |
 

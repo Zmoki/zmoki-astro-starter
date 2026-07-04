@@ -162,7 +162,9 @@ export default defineConfig({
     // (remark/rehype) pipeline so the custom plugins below keep working.
     processor: unified(),
     shikiConfig: {
-      theme: "catppuccin-latte",
+      // Dark theme: light tokens on a dark background clear WCAG AA (the light
+      // `catppuccin-latte` failed contrast on several token colors).
+      theme: "catppuccin-mocha",
     },
     remarkPlugins: [remarkDefinitionList],
     remarkRehype: { handlers: defListHastHandlers },
