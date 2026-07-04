@@ -88,13 +88,13 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
 </BaseLayout>
 
 <script is:inline define:vars={{ resourceName: name, resourceUrl: url }}>
-  window.posthog?.capture("resource_download_confirmed", {
+  window.track?.("resource_download_confirmed", {
     resource_name: resourceName,
     resource_url: resourceUrl,
   });
 
   document.getElementById("resource-download")?.addEventListener("click", function () {
-    window.posthog?.capture("resource_downloaded", {
+    window.track?.("resource_downloaded", {
       resource_name: this.getAttribute("data-resource-name") || "",
       asset_url: this.getAttribute("data-asset-url") || "",
     });

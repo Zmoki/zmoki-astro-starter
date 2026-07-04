@@ -37,7 +37,7 @@ const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
 </PostLayout>
 
 <script is:inline define:vars={{ postSlug: post.id, postTitle: post.data.title }}>
-  window.posthog?.capture("post_viewed", {
+  window.track?.("post_viewed", {
     post_slug: postSlug,
     post_title: postTitle,
   });

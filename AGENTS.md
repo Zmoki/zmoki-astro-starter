@@ -326,10 +326,12 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 
 Analytics is **provider-agnostic** and supports **multiple providers at once**. Call sites never name a vendor — they fire events through a global facade `window.track(event, props)` (always called optionally: `window.track?.(...)`). Each active provider chains onto `window.track`, so one call fans out to all of them.
 
+Alongside `track`, providers chain a second facade `window.identify(id, props)` — call it (optionally: `window.identify?.(...)`) to associate the current visitor with an id. Every call site (page or component) uses these two facades and **never** touches a vendor SDK (`window.posthog`, `dataLayer`, …) directly, so a new provider needs no changes at the call sites.
+
 Built-in providers ship as self-gating components in `src/components/analytics/`:
 
-- **`posthog.astro`** — PostHog. Active when `PUBLIC_POSTHOG_PROJECT_TOKEN` **and** `PUBLIC_POSTHOG_HOST` are set. `track` → `posthog.capture(event, props)`.
-- **`gtm.astro`** — Google Tag Manager. Active when `PUBLIC_GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`) is set. `track` → `dataLayer.push({ event, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
+- **`posthog.astro`** — PostHog. Active when `PUBLIC_POSTHOG_PROJECT_TOKEN` **and** `PUBLIC_POSTHOG_HOST` are set. `track` → `posthog.capture(event, props)`; `identify` → `posthog.identify(id, props)`.
+- **`gtm.astro`** — Google Tag Manager. Active when `PUBLIC_GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`) is set. `track` → `dataLayer.push({ event, ...props })`; `identify` → `dataLayer.push({ event: "identify", user_id: id, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
 
 `Analytics.astro` is the dispatcher: it renders every provider (each emits nothing when its own env vars are absent) under one global kill switch, `PUBLIC_ANALYTICS_ENABLED !== "false"`.
 
@@ -337,17 +339,19 @@ Built-in providers ship as self-gating components in `src/components/analytics/`
 
 ### Tracked events
 
-| Event                         | Where fired              | Properties                      |
-| ----------------------------- | ------------------------ | ------------------------------- |
-| `contact_email_clicked`       | BaseLayout inline script | `email`                         |
-| `post_navigation_clicked`     | PostLayout inline script | `direction`, `destination_slug` |
-| `code_block_copied`           | PostLayout inline script | `snippet_length`                |
-| `gate_viewed`                 | BrevoForm inline script  | `resource_slug`, `form_id`      |
-| `newsletter_form_submitted`   | BrevoForm inline script  | `form_id`, `resource_slug`      |
-| `resource_download_confirmed` | Thank-you inline script  | `resource_name`, `resource_url` |
-| `resource_downloaded`         | Thank-you inline script  | `resource_name`, `asset_url`    |
+| Event                         | Where fired                  | Properties                      |
+| ----------------------------- | ---------------------------- | ------------------------------- |
+| `contact_email_clicked`       | BaseLayout inline script     | `email`                         |
+| `post_viewed`                 | blog/[...slug] inline script | `post_slug`, `post_title`       |
+| `post_navigation_clicked`     | PostLayout inline script     | `direction`, `destination_slug` |
+| `code_block_copied`           | PostLayout inline script     | `snippet_length`                |
+| `resource_link_clicked`       | ResourceLink inline script   | `resource_slug`, `is_external`  |
+| `gate_viewed`                 | BrevoForm inline script      | `resource_slug`, `form_id`      |
+| `newsletter_form_submitted`   | BrevoForm inline script      | `form_id`, `resource_slug`      |
+| `resource_download_confirmed` | Thank-you inline script      | `resource_name`, `resource_url` |
+| `resource_downloaded`         | Thank-you inline script      | `resource_name`, `asset_url`    |
 
-These fire via `window.track(...)` and reach every active provider. Pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). Note: property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
+`newsletter_form_submitted` is preceded by an `identify(email)` call. These all fire via `window.track(...)` and reach every active provider. Pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). Note: property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
 
 The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_form_submitted`
 → `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded`
