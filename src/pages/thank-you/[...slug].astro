@@ -22,9 +22,16 @@ export async function getStaticPaths() {
 
 const { name, url, asset } = Astro.props;
 
-// Get 3 random feed posts
+// Show 3 random posts. `sort(() => Math.random() - 0.5)` is a biased shuffle, so
+// use Fisher-Yates on a copy (the collection array is otherwise shared). Note the
+// pick is fixed at build time — this is a static page, not per-visit random.
 const allFeedPosts: CollectionEntry<"blog">[] = await getCollection("blog");
-const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3);
+const shuffled = [...allFeedPosts];
+for (let i = shuffled.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+}
+const randomFeedPosts = shuffled.slice(0, 3);
 ---
 
 <BaseLayout
