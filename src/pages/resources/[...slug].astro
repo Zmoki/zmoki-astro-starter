@@ -18,4 +18,4 @@ const item = Astro.props as CollectionEntry<"resources">;
 const { Content } = await render(item);
 ---
 
-<ResourceLayout {...item.data}><Content /></ResourceLayout>
+<ResourceLayout {...item.data} slug={item.id}><Content /></ResourceLayout>

@@ -171,8 +171,19 @@ Files: `src/content/blog/{order}-{slug}.mdx` (most) or `.md`
     title: string
     description: string
   }
+  asset?: {                 // optional gated deliverable (lead magnet)
+    url: string             // public URL to the file (host it externally, not in-repo)
+    label?: string          // download button text (default "Download now")
+  }
 }
 ```
+
+A resource with both a `form` and an `asset` is a **lead-magnet gate**: the `form`
+captures an email (Brevo emails the asset + redirects to `/thank-you/resources/{slug}/`),
+and the thank-you page also shows the `asset` as a **direct download** so delivery doesn't
+depend solely on the email. Host the asset file externally (R2, S3, a CDN/bucket, Brevo's
+own hosting) and point `asset.url` at it — don't commit binaries to this repo. This is not
+access control — a public URL is reachable by anyone who has it.
 
 ### `legal` — privacy, terms
 
@@ -324,13 +335,21 @@ Built-in providers ship as self-gating components in `src/components/analytics/`
 
 ### Tracked events
 
-| Event                     | Where fired              | Properties                      |
-| ------------------------- | ------------------------ | ------------------------------- |
-| `contact_email_clicked`   | BaseLayout inline script | `email`                         |
-| `post_navigation_clicked` | PostLayout inline script | `direction`, `destination_slug` |
-| `code_block_copied`       | PostLayout inline script | `snippet_length`                |
+| Event                         | Where fired              | Properties                      |
+| ----------------------------- | ------------------------ | ------------------------------- |
+| `contact_email_clicked`       | BaseLayout inline script | `email`                         |
+| `post_navigation_clicked`     | PostLayout inline script | `direction`, `destination_slug` |
+| `code_block_copied`           | PostLayout inline script | `snippet_length`                |
+| `gate_viewed`                 | BrevoForm inline script  | `resource_slug`, `form_id`      |
+| `newsletter_form_submitted`   | BrevoForm inline script  | `form_id`, `resource_slug`      |
+| `resource_download_confirmed` | Thank-you inline script  | `resource_name`, `resource_url` |
+| `resource_downloaded`         | Thank-you inline script  | `resource_name`, `asset_url`    |
 
 These fire via `window.track(...)` and reach every active provider. Pageviews are captured automatically by each provider (PostHog natively; GTM via whatever pageview tag you configure). Note: property support varies by provider — GTM/PostHog carry full props; some vendors (e.g. Fathom) ignore them.
+
+The gate funnel for a lead-magnet resource is: `gate_viewed` → `newsletter_form_submitted`
+→ `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded`
+(clicked the direct download).
 
 ---
 

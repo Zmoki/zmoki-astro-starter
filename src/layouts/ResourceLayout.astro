@@ -9,6 +9,7 @@ export interface Props {
   description?: string;
   publishDate: Date;
   contentModifiedDate: Date;
+  slug?: string;
   form?: {
     brevoFormId: string;
     buttonText: string;
@@ -17,7 +18,7 @@ export interface Props {
   };
 }
 
-const { title, description, publishDate, contentModifiedDate, form } = Astro.props;
+const { title, description, publishDate, contentModifiedDate, slug, form } = Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 ---
 
@@ -61,7 +62,11 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
       {
         form && (
           <div class="order-first">
-            <BrevoForm brevoFormId={form.brevoFormId} buttonText={form.buttonText}>
+            <BrevoForm
+              brevoFormId={form.brevoFormId}
+              buttonText={form.buttonText}
+              resourceSlug={slug}
+            >
               <h2 set:html={form.title} />
               <p set:html={form.description} />
               <p>
