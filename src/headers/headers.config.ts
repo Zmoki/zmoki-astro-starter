@@ -14,19 +14,18 @@
  */
 
 // ── Content-Security-Policy ───────────────────────────────────────────────────
-// Authored as directives → arrays of sources, joined into the header string
-// below. Add a host by pushing it onto the relevant directive.
+// Directives → arrays of sources, joined into the header string below. Add a
+// host by pushing it onto the relevant directive.
 //
 // Third-party hosts in use: Cloudflare (Web Analytics + Turnstile), Google Tag
-// Manager / Analytics (for the GTM provider — drop if unused), Google Fonts.
-//
-// `https://starter.zmoki.xyz` is this site's own origin. It's listed for the
-// PostHog analytics + image/media hosts assuming a same-origin reverse proxy
-// (e.g. PostHog behind your own domain). It's redundant with `'self'` for
-// same-origin requests, but kept explicit; if you proxy PostHog under a
-// *dedicated subdomain* instead, replace it with that host in `script-src`,
-// `connect-src`, `img-src`, and `media-src`.
-const SITE_ORIGIN = "https://starter.zmoki.xyz";
+// Manager / Analytics (GTM provider — drop if unused), Google Fonts.
+
+// PostHog host — the origin the PostHog snippet loads its script from (script-src)
+// and sends events to (connect-src); a dedicated reverse-proxy subdomain here.
+// Keep this in sync with `PUBLIC_POSTHOG_HOST` (src/env.d.ts): the env var drives
+// the runtime snippet, this literal drives the committed CSP artifact — the
+// drift-checked `public/_headers` can't read env, so it's duplicated.
+const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
@@ -35,7 +34,7 @@ const cspDirectives: Record<string, string[]> = {
     "'unsafe-inline'",
     "https://static.cloudflareinsights.com",
     "https://challenges.cloudflare.com",
-    SITE_ORIGIN,
+    POSTHOG_HOST,
     "https://www.googletagmanager.com",
   ],
   "frame-src": ["https://challenges.cloudflare.com"],
@@ -43,16 +42,15 @@ const cspDirectives: Record<string, string[]> = {
   "img-src": [
     "'self'",
     "data:",
-    SITE_ORIGIN,
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
   ],
-  "media-src": ["'self'", SITE_ORIGIN],
+  "media-src": ["'self'"],
   "font-src": ["'self'", "https://fonts.gstatic.com"],
   "connect-src": [
     "'self'",
     "https://cloudflareinsights.com",
-    SITE_ORIGIN,
+    POSTHOG_HOST,
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
   ],

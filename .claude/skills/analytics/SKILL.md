@@ -36,6 +36,8 @@ No code changes. Tell the user to set the env vars (in `.env` for dev, in the ho
 
 Both can be on at once. `PUBLIC_ANALYTICS_ENABLED=false` turns everything off regardless.
 
+**PostHog CSP host.** The snippet loads its script from (`script-src`) and sends events to (`connect-src`) `PUBLIC_POSTHOG_HOST`, so that origin must be in the CSP or the browser blocks it in production. A cross-origin host needs an explicit allowlist entry — PostHog Cloud (`app.posthog.com`) is cross-origin, and so is a **reverse-proxy subdomain** on your own domain. It's set via the `POSTHOG_HOST` constant in **`src/headers/headers.config.ts`** (in `script-src` and `connect-src`) — **keep it in sync with `PUBLIC_POSTHOG_HOST`**. The value is duplicated on purpose: the env var drives the runtime snippet, but the committed, drift-checked `public/_headers` artifact can't read env (CI's `check:headers` regenerates it without secrets), so the CSP needs a literal. After editing, run `npm run build:headers` and commit the regenerated `public/_headers`.
+
 ## Step 3 — Add a new provider (B)
 
 Four steps. Let `<p>` be the provider slug (e.g. `plausible`).
@@ -87,7 +89,7 @@ Four steps. Let `<p>` be the provider slug (e.g. `plausible`).
 
 3. **Env vars** — declare each new `PUBLIC_*` var in **`src/env.d.ts`** first, then add it (empty, with a comment) to **`.env.example`**. If the vendor exposes a new global, add it to the `Window` interface in `src/env.d.ts` (like `posthog` / `dataLayer`).
 
-4. **CSP** — allowlist the vendor's script/connect (and any pixel `img-src`) hosts in **`public/_headers`** (`Content-Security-Policy`). Without this the browser blocks the script in production. GTM already ships allowlisted; a new provider needs its own host added.
+4. **CSP** — allowlist the vendor's script/connect (and any pixel `img-src`) hosts in the `cspDirectives` in **`src/headers/headers.config.ts`** (the source of truth — **not** the generated `public/_headers`), then run `npm run build:headers` and commit the regenerated artifact. Without this the browser blocks the script in production. GTM already ships allowlisted; a new provider needs its own host added. (See the **PostHog CSP host** note in Step 2 for why hosts live as literals here rather than being read from env.)
 
 ## Step 4 — Add a tracked event (C)
 
