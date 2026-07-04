@@ -3,7 +3,7 @@ import { join } from "path";
 import { execSync } from "child_process";
 
 const BLOG_DIR = "src/content/blog";
-const SITE_URL = "https://example.com";
+const SITE_URL = "https://starter.zmoki.xyz";
 const OUTPUT_FILE = "blog-timeline.csv";
 
 // Parse frontmatter from MDX file

@@ -1,4 +1,4 @@
-# AGENTS.md — zmoki-website-starter technical spec
+# AGENTS.md — zmoki-astro-starter technical spec
 
 > Canonical AI instructions for this project. CLAUDE.md imports this. Cursor and other tools read it directly.
 
