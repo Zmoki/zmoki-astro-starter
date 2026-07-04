@@ -77,6 +77,20 @@ jobs:
             const bestPractices = Math.round(scores['best-practices'].score * 100);
             const seo = Math.round(scores.seo.score * 100);
 
+            // Public report links written by the temporary-public-storage upload target
+            let reportLinks = '';
+            const linksPath = path.join(resultsPath, 'links.json');
+            if (fs.existsSync(linksPath)) {
+              const links = JSON.parse(fs.readFileSync(linksPath, 'utf8'));
+              const items = Object.entries(links).map(([url, report]) => {
+                const route = new URL(url).pathname;
+                return `- [\`${route}\`](${report})`;
+              });
+              if (items.length) {
+                reportLinks = `\n\n**Full interactive reports** (hosted ~a few days):\n${items.join('\n')}`;
+              }
+            }
+
             // Create comment
             const comment = `## 🚀 Lighthouse CI Results
 
@@ -86,8 +100,9 @@ jobs:
             | Accessibility | ${accessibility}/100 |
             | Best Practices | ${bestPractices}/100 |
             | SEO | ${seo}/100 |
+            ${reportLinks}
 
-            📊 [View detailed reports](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            📊 [View CI run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
             `;
 
             github.rest.issues.createComment({

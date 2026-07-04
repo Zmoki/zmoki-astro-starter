@@ -67,7 +67,17 @@ All are optional — the site builds and runs without them.
 
 Set up hosting (the original uses Cloudflare Pages on the `main` branch — every push deploys). Update `public/_headers` and `public/_redirects` as needed. See the **Deploy & infrastructure** section in `AGENTS.md`.
 
-## 7. Verify
+## 7. Lighthouse report hosting
+
+The `lighthouse.yml` workflow runs Lighthouse CI on every push and PR to `main`, asserting each category scores ≥ 0.90 (config: `lighthouserc.cjs`). By default it publishes the full interactive reports so you can view them in the browser — the PR comment links to each one. Pick how those reports are hosted by setting `upload.target` in **`lighthouserc.cjs`**:
+
+- **`temporary-public-storage`** (default) — uploads each report to Google-hosted storage and prints a **public URL**. Zero infrastructure, one line of config. Trade-off: reports are **public** (anyone with the link) and **ephemeral** (deleted after ~a few days). Good default for a personal site.
+- **`filesystem`** — writes the HTML/JSON reports to `outputDir` (e.g. `./.lighthouseci`) only. Nothing is hosted; you download them from the run's `lighthouse-reports` artifact (the workflow's upload step sets `include-hidden-files: true` so the dot-directory is archived). Private, permanent-ish (30-day artifact retention), but not viewable on the web without downloading. To also publish these HTML files, add a deploy step that pushes them to **GitHub Pages** or a **Cloudflare Pages** project.
+- **LHCI server** (`target: "lhci"`) — a self-hosted [Lighthouse CI server](https://github.com/GoogleChrome/lighthouse-ci/blob/main/docs/server.md) gives a persistent dashboard with score trends over time and commit-to-commit diffs. Most capable, but you run a server + database.
+
+Whichever you choose, keep the `PR comment` step in `lighthouse.yml` in sync — it reads `.lighthouseci/links.json` (written by the `temporary-public-storage` and `lhci` targets) to link the hosted reports.
+
+## 8. Verify
 
 ```bash
 npm run format
