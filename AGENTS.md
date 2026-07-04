@@ -23,7 +23,7 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 | Fonts               | Noto Sans (headings + body), Noto Sans Mono (code)             | Google Fonts |
 | Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in       | posthog-js   |
 | Email/Forms         | Brevo                                                          | —            |
-| OG images           | Puppeteer (script)                                             | —            |
+| OG images           | Satori + resvg (build-time PNG endpoint)                       | —            |
 | RSS                 | @astrojs/rss                                                   | —            |
 | Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)      | —            |
 | Performance         | Lighthouse CI (@lhci/cli)                                      | —            |
@@ -40,6 +40,7 @@ Project skills live in `.claude/skills/`:
 - `/run` — launch the Astro dev server (`.claude/skills/run/SKILL.md`)
 - `/brand-typography` — swap the site's fonts end to end (`.claude/skills/brand-typography/SKILL.md`)
 - `/redirects` — add or edit URL redirects (`.claude/skills/redirects/SKILL.md`)
+- `/og-images` — customize the OG / social-share image cards (`.claude/skills/og-images/SKILL.md`)
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 - `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
 
@@ -49,9 +50,7 @@ Project skills live in `.claude/skills/`:
 
 ```
 npm run dev              # dev server
-npm run build            # production build
-npm run og:generate      # generate OG images via Puppeteer
-npm run build:full       # build + og:generate
+npm run build            # production build (also emits OG images to dist/og/)
 npm run timeline:blog    # generate blog-timeline.csv
 npm run build:redirects  # compile src/redirects/*.csv → host redirect artifact (runs automatically before build)
 npm run check:redirects  # CI guard: rebuild redirects and fail if the committed artifact drifted
@@ -209,7 +208,7 @@ access control — a public URL is reachable by anyone who has it.
 /thank-you/{slug}/       # post-form confirmation pages
 /rss.xml                 # RSS feed
 /sitemap.xml             # sitemap
-/og-images/              # generated OG images (public/)
+/og/{...path}.png        # generated OG images (build-time endpoint, dist/og/)
 /-/astro/health          # health check — returns "ok" + short commit hash
 /-/astro/brand/          # brand design system home (internal, noindex)
 /-/astro/brand/color/    # color palette reference (BrandLayout)
@@ -237,7 +236,7 @@ Props:
 
 Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
-Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. OG images are served from `/og-images{pathname}wide.jpg` (or `/og-images/wide.jpg` for non-articles).
+Sets `<html lang="en">`, loads Google Fonts (non-render-blocking — see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
 ### `PostLayout.astro`
 
@@ -442,6 +441,14 @@ Do not commit anything from `src/images/tmp/` — it's a staging folder.
 
 ## OG image generation
 
-`scripts/generate-og-images.mjs` uses Puppeteer to screenshot pages at 1200×675 and save to `public/og-images/`. Run after build: `npm run og:generate` or `npm run build:full`.
+OG images are **purpose-built cards rendered at build time** — no browser, no running server, nothing committed. The pipeline lives in **`src/og/`** and the endpoint **`src/pages/og/[...path].png.ts`**:
 
-OG images are wide JPEGs (1200×675). BaseLayout constructs the URL as `/og-images{pathname}wide.jpg`.
+- **`src/og/manifest.ts`** — the single source of truth. `getOgEntries()` enumerates every card (home, blog index, each post / resource page / legal page, plus a `default` fallback); each entry carries `{ key, template, title, description, eyebrow, alt }`. `getOgImage(pathname)` returns the `{ path, alt }` for a page. Consumed by both the endpoint (to render) and `BaseLayout` (for `og:image` + `og:image:alt`).
+- **`src/og/card.ts`** — two Satori templates: `article` (eyebrow · title · description · brand footer) and `site` (brand mark · name · tagline). Built as Satori vdom nodes directly (no JSX).
+- **`src/og/theme.ts`** — card colors pulled from `src/design-tokens.mjs`, so a re-skin (the `brand-colors` skill) recolors the cards automatically. Tokens are run through `culori`'s `formatHex` because Tailwind v4's default palettes are `oklch()` strings, which the resvg rasterizer doesn't render reliably.
+- **`src/og/fonts.ts`** — bundles the Noto Sans Latin subset (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's Google Fonts — if you swap the brand font (`brand-typography` skill), update these too.
+- **`src/pages/og/[...path].png.ts`** — `getStaticPaths()` from the manifest, `GET()` → Satori (vdom → SVG) → resvg (SVG → PNG). `astro build` emits `dist/og/**/*.png`; `astro dev` renders the same route on request. Cards are **1200×630** PNGs.
+
+Because the images are produced by `astro build`, production (Cloudflare Pages) and CI get them for free — there's no separate generate step and no binaries in git. `src/pages/rss.xml.ts` references each post's card at `/og/blog/{id}.png`.
+
+**The `/og-images` skill (`.claude/skills/og-images/SKILL.md`) is the source of truth** for customizing the cards (layout, colors, fonts, template variants, which pages get a card) — see it rather than duplicating the details here.

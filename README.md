@@ -7,7 +7,7 @@ An Astro starter for personal websites — posts, projects, and resources. Built
 - **Astro 5** + **Tailwind CSS** with a small, documented design-token system
 - **MDX** content with a custom pipeline: anchor links, external-link styling, copy buttons on code blocks, definition lists
 - Three content collections: `blog`, `resources`, `legal`
-- RSS feed, sitemap, and OG image generation (Puppeteer)
+- RSS feed, sitemap, and build-time OG images (Satori — brand-aware, no browser)
 - **PostHog** analytics and **Brevo** email forms, wired and ready
 - A living brand/design-system reference at `/-/astro/brand/` (internal, noindex)
 - One config file (`src/site.config.ts`) for everything site-specific
@@ -46,10 +46,8 @@ Then follow **[SETUP.md](./SETUP.md)**: edit `src/site.config.ts` (name, domain,
 ## Scripts
 
 - `npm run dev` — development server
-- `npm run build` — production build
+- `npm run build` — production build (also emits OG images to `dist/og/`)
 - `npm run preview` — preview the built site
-- `npm run build:full` — build + generate OG images
-- `npm run og:generate` — generate OG images (needs the preview server running)
 - `npm run timeline:blog` — generate `blog-timeline.csv`
 - `npm run check` — type check (`astro check`)
 - `npm run lint` — ESLint
