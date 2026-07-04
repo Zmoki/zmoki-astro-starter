@@ -45,6 +45,8 @@ Project skills live in `.claude/skills/`:
 - `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
 - `/structured-data` — add/edit schema.org JSON-LD for Google rich results, per Google's docs (`.claude/skills/structured-data/SKILL.md`)
 
+**These are AI-tool-agnostic task playbooks.** Each `SKILL.md` (and its `references/*.md`) is plain, vendor-neutral Markdown — the `/name` shortcut is Claude Code's way of loading it on demand, but any AI coding tool can use them by reading the file directly. Before doing one of the kinds of work above, **read the matching `.claude/skills/<name>/SKILL.md` first** and follow it. They're the source of truth for their topic; the sections below summarize, they don't replace.
+
 ---
 
 ## Scripts

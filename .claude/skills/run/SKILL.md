@@ -28,7 +28,7 @@ If running inside a git worktree (i.e. `$PWD` is not the primary repo), two extr
 
 ## Run
 
-**Before starting, use the `AskUserQuestion` tool to ask:**
+**Before starting, ask the user:**
 
 ```
 question: "Do you want analytics enabled for this session?"

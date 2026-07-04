@@ -11,7 +11,7 @@ Add and maintain schema.org **JSON-LD** so this site's pages are eligible for Go
 - **Policies & general guidelines** — <https://developers.google.com/search/docs/appearance/structured-data/sd-policies>
 - **Feature gallery** (every supported type + link to its per-type reference) — <https://developers.google.com/search/docs/appearance/structured-data/search-gallery>
 
-When you implement a specific type, **fetch that type's page from the gallery** (`WebFetch`) for two things — don't work from memory, both change over time and the Google doc is the authority:
+When you implement a specific type, **fetch that type's page from the gallery** for two things — don't work from memory, both change over time and the Google doc is the authority:
 
 1. **Eligibility conditions** — most features only produce a rich result under specific conditions. Read the "eligibility"/"guidelines" section and confirm this site + this page qualifies **before** writing any markup. Notable gotchas:
    - **FAQ (`FAQPage`)** and **Q&A (`QAPage`)** rich results are limited to **authoritative government and health websites** — a personal/B2B site like this one will **not** get the rich result, so don't add them expecting one (the markup is otherwise harmless but pointless here).

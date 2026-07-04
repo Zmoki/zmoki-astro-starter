@@ -34,7 +34,7 @@ its rendering block.
 ## Workflow
 
 1. **Settle the voice first.** If the user hasn't given you the pillars/tone, ask
-   (`AskUserQuestion`) for the 3–4 principles and the audience before rewriting —
+   the user for the 3–4 principles and the audience before rewriting —
    don't invent a brand voice silently.
 2. **Rewrite the data blocks** to match. Keep the `right`/`wrong` pairs genuinely
    contrastive — the `wrong` should be the generic marketing default, the `right`
