@@ -8,9 +8,9 @@ export interface Props {
 
 const { title, description } = Astro.props;
 
-// Same non-render-blocking, all-sans font load as BaseLayout (see note there).
+// Same all-sans font load as BaseLayout (see note there).
 const fontsHref =
-  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=optional";
+  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=swap";
 ---
 
 <!doctype html>
@@ -22,9 +22,7 @@ const fontsHref =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href={fontsHref} />
-    <link rel="stylesheet" href={fontsHref} media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href={fontsHref} /></noscript>
+    <link rel="stylesheet" href={fontsHref} />
 
     <title>{title}</title>
     {description && <meta name="description" content={description} />}

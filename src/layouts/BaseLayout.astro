@@ -50,13 +50,13 @@ const authorSiteLabel = new URL(site.author.url).host;
 
 // The site is all-sans: Noto Sans (headings + body) and Noto Sans Mono (code).
 // Only weights 400–700 are used, so we request just that range (smaller files).
-// Loaded non-render-blocking (preload + media=print/onload swap) so text paints
-// immediately in the fallback and never blocks First Contentful Paint.
-// display=optional + the metrics-matched "Noto Sans Fallback" (src/styles/
-// global.css) means the fallback renders at Noto Sans's dimensions and the web
-// font never swaps in mid-render, so there's zero font-driven layout shift (CLS).
+// Loaded with a plain stylesheet <link> (preconnect warms the connection).
+// display=swap paints text immediately in the fallback and swaps to the web
+// font once it loads; the metrics-matched "Noto Sans Fallback" (src/styles/
+// global.css) is sized to Noto Sans's dimensions, so that swap causes no
+// font-driven layout shift (CLS).
 const fontsHref =
-  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=optional";
+  "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400..700;1,400..700&family=Noto+Sans+Mono:wght@400..700&display=swap";
 ---
 
 <!doctype html>
@@ -67,9 +67,7 @@ const fontsHref =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="preload" as="style" href={fontsHref} />
-    <link rel="stylesheet" href={fontsHref} media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href={fontsHref} /></noscript>
+    <link rel="stylesheet" href={fontsHref} />
 
     <title>{title}</title>
     <meta name="description" content={description} />
