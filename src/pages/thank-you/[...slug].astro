@@ -58,12 +58,12 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
         asset && (
           <p class="not-prose">
             <Button
-              href={asset.file}
+              href={asset.url}
               size="lg"
               download
               id="resource-download"
               data-resource-name={name}
-              data-asset-file={asset.file}
+              data-asset-url={asset.url}
             >
               {asset.label ?? "Download now"}
             </Button>
@@ -96,7 +96,7 @@ const randomFeedPosts = allFeedPosts.sort(() => Math.random() - 0.5).slice(0, 3)
   document.getElementById("resource-download")?.addEventListener("click", function () {
     window.posthog?.capture("resource_downloaded", {
       resource_name: this.getAttribute("data-resource-name") || "",
-      asset_file: this.getAttribute("data-asset-file") || "",
+      asset_url: this.getAttribute("data-asset-url") || "",
     });
   });
 </script>

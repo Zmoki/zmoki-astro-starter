@@ -1,7 +1,0 @@
-This is a placeholder gated asset for the example resource.
-
-Replace it with your real lead magnet (PDF, template, checklist, etc.) and update the
-`asset.file` field in src/content/resources/example-resource.mdx to point at it.
-
-Files in public/downloads/ are served statically and are publicly reachable if the URL
-leaks — this is a lead-magnet gate, not access control.

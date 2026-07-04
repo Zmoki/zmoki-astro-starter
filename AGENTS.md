@@ -171,7 +171,7 @@ Files: `src/content/blog/{order}-{slug}.mdx` (most) or `.md`
     description: string
   }
   asset?: {                 // optional gated deliverable (lead magnet)
-    file: string            // path in public/downloads/ or an external URL
+    url: string             // public URL to the file (host it externally, not in-repo)
     label?: string          // download button text (default "Download now")
   }
 }
@@ -180,8 +180,9 @@ Files: `src/content/blog/{order}-{slug}.mdx` (most) or `.md`
 A resource with both a `form` and an `asset` is a **lead-magnet gate**: the `form`
 captures an email (Brevo emails the asset + redirects to `/thank-you/resources/{slug}/`),
 and the thank-you page also shows the `asset` as a **direct download** so delivery doesn't
-depend solely on the email. This is not access control — files under `public/` are publicly
-reachable if the URL leaks.
+depend solely on the email. Host the asset file externally (R2, S3, a CDN/bucket, Brevo's
+own hosting) and point `asset.url` at it — don't commit binaries to this repo. This is not
+access control — a public URL is reachable by anyone who has it.
 
 ### `legal` — privacy, terms
 
@@ -328,7 +329,7 @@ Also uses `remark-definition-list` for `<dl>`/`<dt>`/`<dd>` support in MDX.
 | `gate_viewed`                 | BrevoForm inline script  | `resource_slug`, `form_id`      |
 | `newsletter_form_submitted`   | BrevoForm inline script  | `form_id`, `resource_slug`      |
 | `resource_download_confirmed` | Thank-you inline script  | `resource_name`, `resource_url` |
-| `resource_downloaded`         | Thank-you inline script  | `resource_name`, `asset_file`   |
+| `resource_downloaded`         | Thank-you inline script  | `resource_name`, `asset_url`    |
 
 PostHog captures all listed events plus pageviews automatically.
 

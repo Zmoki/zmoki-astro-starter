@@ -7,7 +7,7 @@ publishDate: "2025-01-01"
 contentModifiedDate: "2026-07-04"
 order: 1
 asset:
-  file: "/downloads/example-resource.txt"
+  url: "https://example.com/downloads/your-lead-magnet.pdf"
   label: "Download the example"
 ---
 
@@ -25,9 +25,9 @@ resource behind an email exchange:
 
 - `form` renders a `BrevoForm` above the content. On submit, Brevo emails the asset and
   redirects to `/thank-you/resources/{slug}/`.
-- `asset.file` points at a file in `public/downloads/` (served statically) or an external
-  URL. The thank-you page shows it as a **direct download** so delivery doesn't depend
-  solely on the email landing.
+- `asset.url` is a **public URL** to the file — host it externally (R2, S3, a CDN/bucket,
+  Brevo's own hosting…) rather than committing binaries to this repo. The thank-you page
+  shows it as a **direct download** so delivery doesn't depend solely on the email landing.
 
-Note this is a _lead-magnet_ gate, not access control: files under `public/` are publicly
-reachable if someone has the URL. See `src/content.config.ts` for the full frontmatter shape.
+Note this is a _lead-magnet_ gate, not access control: a public URL is reachable by anyone
+who has it. See `src/content.config.ts` for the full frontmatter shape.
