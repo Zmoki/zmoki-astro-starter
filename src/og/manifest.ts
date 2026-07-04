@@ -8,6 +8,7 @@
 // (thank-you, brand, health, 404, …).
 import { getCollection, type CollectionEntry } from "astro:content";
 import { site } from "@/site.config";
+import { formatShortDate } from "@/lib/dates";
 import type { OgEntry } from "./types";
 
 /** Card text has no line-clamp, so cap lengths that would overflow the layout. */
@@ -16,9 +17,6 @@ const truncate = (s: string, n: number): string =>
 
 const TITLE_MAX = 90;
 const DESC_MAX = 140;
-
-const formatDate = (d: Date): string =>
-  new Intl.DateTimeFormat("en-US", { day: "numeric", month: "short", year: "numeric" }).format(d);
 
 /** An entry paired with the site route it belongs to (null for the fallback). */
 interface RoutedEntry {
@@ -37,7 +35,7 @@ const article = (
   template: "article",
   title: truncate(title, TITLE_MAX),
   description: truncate(description, DESC_MAX),
-  eyebrow: `${formatDate(date)} · ${by}`,
+  eyebrow: `${formatShortDate(date)} · ${by}`,
   alt: `${title} — ${site.ogSiteName}`,
 });
 
