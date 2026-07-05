@@ -62,3 +62,6 @@ jobs:
 
       - name: Structured data check
         run: npm run check:sd
+
+      - name: Internal link check
+        run: npm run check:links

@@ -62,6 +62,7 @@ npm run check:redirects  # CI guard: rebuild redirects and fail if the committed
 npm run build:headers    # compile src/headers/headers.config.ts → host header artifact (runs automatically before build)
 npm run check:headers    # CI guard: rebuild headers and fail if the committed artifact drifted
 npm run check:sd         # CI guard: validate schema.org JSON-LD in dist/ (run after build)
+npm run check:links      # CI guard: broken internal links + hard-coded self-origin links in dist/ (run after build)
 npm run lhci:mobile      # Lighthouse CI mobile
 npm run lhci:desktop     # Lighthouse CI desktop
 npm run format           # Prettier format all files
@@ -81,6 +82,7 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 5. **Headers drift check** — `npm run check:headers` (rebuilds the header artifact and fails if it differs from what's committed)
 6. **Build** — `npm run build`
 7. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
+8. **Internal link check** — `npm run check:links` (runs after build; two rules over `dist/`: (a) every relative internal `<a href>` must resolve to a built file — no 404s; redirect sources and off-site links are skipped; (b) no `<a href>` may hard-code our own origin — the production URL or a preview deploy for the configured host — those must be relative paths. Preview-host detection is shared with the OG image URLs via `src/lib/deploy.ts`.)
 
 Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`.
 
@@ -178,7 +180,7 @@ Props are defined in the file; the one with non-obvious behavior is **`wide`** (
 
 Classic landing-page chrome on every page: a sticky top nav (the **brand mark** — `public/brand-mark.svg` — linking home + `site.nav` links + a "Get started" button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav links, CTA, and footer read from `src/site.config.ts`; the logo is the brand mark (see Favicons & brand mark).
 
-Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (used for OG image URLs so cards resolve against the current deployment): the dev server under `astro dev`, the current preview deployment on a preview build (host-agnostic — detected from `site.deploy.platform`'s native build env: Cloudflare `CF_PAGES_URL`, Netlify `DEPLOY_PRIME_URL`, Vercel `VERCEL_URL`), else production. The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
+Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`siteUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `siteUrls` exposes two origins and two builders: **`siteOrigin`** (production, from astro.config `site`) with **`absoluteUrl(path)`** — used for canonical + RSS + SD; **`currentOrigin`** with **`currentAbsoluteUrl(path)`** — used for OG image URLs so cards resolve against the current deployment: the dev server under `astro dev`, the current preview deployment on a preview build (host-agnostic — detected from `site.deploy.platform`'s native build env: Cloudflare `CF_PAGES_URL`, Netlify `DEPLOY_PRIME_URL`, Vercel `VERCEL_URL`), else production. The canonical link itself is controlled by BaseLayout's `canonical` prop (default `true` = the page's own URL; `false` = omit, e.g. the 404 page; a URL string = point elsewhere, e.g. a cross-posted post whose `canonical` frontmatter names the source). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
 ### `PostLayout.astro`
 

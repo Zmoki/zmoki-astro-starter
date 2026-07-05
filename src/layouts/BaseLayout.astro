@@ -6,7 +6,7 @@ import Analytics from "@/components/Analytics.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
-import { pageUrls } from "@/lib/urls";
+import { siteUrls } from "@/lib/urls";
 
 export interface Props {
   title: string;
@@ -19,6 +19,13 @@ export interface Props {
    * Default false = a centered, readable container for articles and pages.
    */
   wide?: boolean;
+  /**
+   * Controls the <link rel="canonical"> tag. Default `true` emits the page's
+   * own absolute URL. Pass `false` to emit no canonical (e.g. the 404 page),
+   * or a URL string to point the canonical elsewhere — e.g. a post that
+   * republishes content whose canonical source lives on another site.
+   */
+  canonical?: boolean | string;
 }
 
 const {
@@ -27,6 +34,7 @@ const {
   publishDate,
   contentModifiedDate,
   wide = false,
+  canonical = true,
 } = Astro.props;
 
 const pagePathname = Astro.url.pathname;
@@ -34,13 +42,18 @@ const isPageArticle = publishDate && contentModifiedDate;
 
 // All absolute URLs (canonical, OG, structured data) come from one helper so
 // they can't drift apart — see src/lib/urls.ts.
-const urls = pageUrls(Astro);
-const canonicalURL = urls.canonical;
+const urls = siteUrls(Astro);
+// The page's own absolute URL — used for og:url and, unless overridden, the
+// canonical link. `canonical` resolves to: false → no canonical link;
+// a string → that URL; true (default) → the page's own URL.
+const selfURL = urls.absoluteUrl(pagePathname);
+const canonicalURL =
+  canonical === false ? null : typeof canonical === "string" ? canonical : selfURL;
 
 // OG image (+ alt) for this page, from the manifest. Generated on the fly by
 // /og/[...path].png.ts — see src/og/. Falls back to the site's default card.
 const ogImage = await getOgImage(pagePathname);
-const pageImageUrl = urls.assetUrl(ogImage.path);
+const pageImageUrl = urls.currentAbsoluteUrl(ogImage.path);
 
 const currentYear = new Date().getFullYear();
 const copyrightYears =
@@ -67,18 +80,18 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     <title>{title}</title>
     <meta name="description" content={description} />
     <meta name="robots" content="max-image-preview:large" />
-    <link rel="canonical" href={canonicalURL} />
+    {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     <link
       rel="alternate"
       type="application/rss+xml"
       title="RSS Feed"
-      href={urls.absolute("/rss.xml")}
+      href={urls.absoluteUrl("/rss.xml")}
     />
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:url" content={selfURL} />
     <meta property="og:type" content={isPageArticle ? "article" : "website"} />
     <meta property="og:site_name" content={site.ogSiteName} />
     <meta property="og:locale" content="en_US" />

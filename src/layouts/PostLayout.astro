@@ -8,7 +8,7 @@ import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
 import { resolveImageSrc } from "@/image.config";
-import { pageUrls } from "@/lib/urls";
+import { siteUrls } from "@/lib/urls";
 
 export interface Props {
   title: string;
@@ -18,6 +18,8 @@ export interface Props {
   author: CollectionEntry<"blog">["data"]["author"];
   cover?: string;
   coverAlt?: string;
+  /** Overrides the canonical URL — set for cross-posted content. See the blog schema. */
+  canonical?: string;
   prevPost?: CollectionEntry<"blog"> | null;
   nextPost?: CollectionEntry<"blog"> | null;
 }
@@ -30,6 +32,7 @@ const {
   author,
   cover,
   coverAlt,
+  canonical,
   prevPost,
   nextPost,
 } = Astro.props;
@@ -37,7 +40,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
 // BlogPosting structured data (schema.org Article) → Google rich result.
 // Article has no required properties; we include the recommended ones the page
-// actually backs up. All absolute URLs come from the shared pageUrls() helper
+// actually backs up. All absolute URLs come from the shared siteUrls() helper
 // (src/lib/urls.ts) — the same source BaseLayout uses for canonical + og:image —
 // so the structured data can't drift from the meta tags.
 //
@@ -48,9 +51,9 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 // is the same one used for the hero + the image sitemap (single source).
 // See the /structured-data skill and Google's Article reference:
 // https://developers.google.com/search/docs/appearance/structured-data/article
-const urls = pageUrls(Astro);
+const urls = siteUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
-const schemaImage = cover ? resolveImageSrc(cover) : urls.absolute(ogImage.path);
+const schemaImage = cover ? resolveImageSrc(cover) : urls.absoluteUrl(ogImage.path);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -69,7 +72,7 @@ const blogPostingLd = {
     url: site.organization.url,
   },
   image: schemaImage,
-  mainEntityOfPage: urls.canonical,
+  mainEntityOfPage: canonical ?? urls.absoluteUrl(Astro.url.pathname),
 };
 ---
 
@@ -78,6 +81,7 @@ const blogPostingLd = {
   description={description}
   publishDate={publishDate}
   contentModifiedDate={contentModifiedDate}
+  canonical={canonical}
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">

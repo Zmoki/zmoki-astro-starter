@@ -13,12 +13,17 @@ const blog = defineCollection({
     // card). Rendered as the post's hero (LCP) and used as the schema.org
     // BlogPosting.image + the image-sitemap entry, which is what Google Discover
     // reads to pick a page's primary image. For Discover, use a well-cropped
-    // landscape ≥1200px wide at 16:9. Value is an image-CDN key ("starter/x.jpg")
-    // or a full URL; served through the configured CDN (see src/image.config.ts).
-    // Posts without a cover fall back to the OG card for schema.image.
+    // landscape ≥1200px wide at 16:9. Value is a remote image key ("starter/x.jpg")
+    // or a full URL; optimized at build (see src/image.config.ts). Posts without a
+    // cover fall back to the OG card for schema.image.
     cover: z.string().optional(),
     /** Alt text for `cover`. Required-ish when a cover is set (accessibility + SEO). */
     coverAlt: z.string().optional(),
+    // Optional canonical URL. Set this when the post republishes content whose
+    // canonical source lives elsewhere (e.g. cross-posted from another site) so
+    // search engines credit the original. Drives <link rel="canonical"> and the
+    // schema.org BlogPosting `mainEntityOfPage`. Omit for original content.
+    canonical: z.url().optional(),
     // Per-post byline author. Drives the post header credit, the "Written by"
     // bio, the schema.org BlogPosting author, and the OG card credit.
     author: z.object({
