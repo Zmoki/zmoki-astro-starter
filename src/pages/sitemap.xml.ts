@@ -2,7 +2,7 @@ import type { APIRoute } from "astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { homePagePublishDate, homePageContentModifiedDate } from "@/data/home-page";
 import { isoDate } from "@/lib/dates";
-import { coverImageUrl } from "@/image.config";
+import { resolveImageSrc } from "@/image.config";
 
 // Minimal XML escaping for values placed in text nodes / URLs. Image-CDN URLs can
 // carry `&` (e.g. imgix query params), which must be `&amp;` in valid XML.
@@ -63,7 +63,7 @@ export const GET: APIRoute = async ({ site }) => {
       sitemapUrl(
         `blog/${post.id}/`,
         isoDate(post.data.contentModifiedDate),
-        post.data.cover ? coverImageUrl(post.data.cover) : undefined,
+        post.data.cover ? resolveImageSrc(post.data.cover) : undefined,
       ),
     )
     .join("")}

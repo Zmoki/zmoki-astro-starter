@@ -3,18 +3,17 @@
 // site (post & resource bodies, landing sections, any page), not just posts. A
 // <figure> carrying schema.org ImageObject microdata (license, creator, credit)
 // with a caption. The image itself is rendered by the vendor-neutral <Image>
-// component, so it works with both a repo-committed asset (imported ImageMetadata,
-// optimized at build) and a CDN-hosted key/URL (string) — see Image.astro.
+// component, so it works with both a repo-committed asset (imported ImageMetadata)
+// and a remote-hosted key/URL (string) — both optimized at build. See Image.astro.
 //
 // Reach for this for content images that carry meaning + a caption/credit. For a
 // purely decorative image use <Image> directly (or CSS). A plain Markdown image
-// (![alt](key)) is auto-rewritten to a responsive CDN <img> by the
-// rehypeCdnImages plugin instead (see astro.config.mjs).
+// (![alt](url)) is optimized by Astro's built-in pipeline instead.
 import Image from "@/components/Image.astro";
 import { site } from "@/site.config";
 
 interface Props {
-  /** An imported asset (local, optimized at build) or a CDN key/URL (string). */
+  /** An imported asset (local) or a remote key/URL (string) — both optimized at build. */
   src: ImageMetadata | string;
   alt: string;
 }

@@ -23,16 +23,13 @@ interface ImportMetaEnv {
   /** Global captcha kill switch: set to `"false"` to disable the form captcha. */
   readonly PUBLIC_CAPTCHA_ENABLED: string;
   /**
-   * Image-CDN provider for content images — DECOUPLED from the deploy host.
-   * One of: "r2-cloudflare" (R2 + Cloudflare Image Transformations, the default),
-   * "uploadcare", "cloudinary", "imgix". Unset ⇒ "local": no CDN, repo-committed
-   * images fall back to Astro's build-time optimization. See src/image.config.ts.
-   */
-  readonly PUBLIC_IMAGE_CDN: string;
-  /**
-   * Image-CDN base URL / domain, e.g. "https://i.zmoki.xyz". Set together with
-   * PUBLIC_IMAGE_CDN to activate the CDN. Also authorizes the domain for Astro's
-   * Markdown image optimization (astro.config.mjs `image.remotePatterns`).
+   * Base URL of the remote image origin for content images, e.g.
+   * "https://images.zmoki.xyz" (an R2 bucket on a custom domain). Content images
+   * are OPTIMIZED AT BUILD by Astro and served by the deploy host — the origin is
+   * pure storage, DECOUPLED from where the site deploys. Setting this authorizes
+   * the domain for build-time optimization (astro.config.mjs `image.remotePatterns`)
+   * and lets content reference images by bare key. Unset ⇒ commit images to
+   * src/images and import them. See src/image.config.ts.
    */
   readonly PUBLIC_IMAGE_CDN_BASE: string;
 }

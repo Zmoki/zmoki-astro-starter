@@ -7,7 +7,7 @@ import Image from "@/components/Image.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
-import { coverImageUrl } from "@/image.config";
+import { resolveImageSrc } from "@/image.config";
 import { pageUrls } from "@/lib/urls";
 
 export interface Props {
@@ -50,7 +50,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 // https://developers.google.com/search/docs/appearance/structured-data/article
 const urls = pageUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
-const schemaImage = cover ? coverImageUrl(cover) : urls.absolute(ogImage.path);
+const schemaImage = cover ? resolveImageSrc(cover) : urls.absolute(ogImage.path);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",

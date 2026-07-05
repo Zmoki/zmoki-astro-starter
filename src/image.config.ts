@@ -1,57 +1,34 @@
 /**
- * Image-CDN configuration, bound to the site's env vars. The single place the
- * runtime (the `<Image>` component) reads which provider is active and turns an
- * image key into responsive `<img>` attributes.
+ * Content-image configuration.
  *
- * Provider selection is by `PUBLIC_IMAGE_CDN` + `PUBLIC_IMAGE_CDN_BASE` and is
- * DECOUPLED from `site.deploy.platform` (deploy on one host, serve images from
- * another). Unset ⇒ `local`: no CDN, and repo-committed images fall back to
- * Astro's build-time optimization (astro:assets). See the /images skill.
+ * Images are hosted on a remote origin (e.g. an R2 bucket on a custom domain)
+ * and OPTIMIZED AT BUILD by Astro (`astro:assets`): downloaded, resized,
+ * re-encoded to webp/avif, content-hashed into `dist/_astro/`, and then served
+ * by the deploy host (whose edge is itself a CDN). The origin is pure storage —
+ * there is no runtime image-CDN transform. Astro caches processed images in
+ * `node_modules/.astro`, so unchanged images are never re-fetched or re-processed
+ * (persist that dir in CI — see the workflow).
  *
- * The pure URL logic lives in `src/lib/image-cdn.mjs` (framework/env-free) so the
- * Markdown rewrite in astro.config.mjs can share it via `loadEnv`.
+ * The origin is DECOUPLED from `site.deploy.platform` (originals can live
+ * anywhere) and is authorized for build-time optimization in `astro.config.mjs`
+ * via `image.remotePatterns`. See the /images skill.
  */
-import { cdnImageAttrs, cdnActive } from "./lib/image-cdn.mjs";
-
-/** Active provider id: "local" (default) | "r2-cloudflare" | "uploadcare" | "cloudinary" | "imgix". */
-export const imageProvider = (import.meta.env.PUBLIC_IMAGE_CDN || "local").trim();
-
-/** Image domain, e.g. "https://i.zmoki.xyz" (trailing slash trimmed). Empty when local. */
-export const imageCdnBase = (import.meta.env.PUBLIC_IMAGE_CDN_BASE || "")
-  .trim()
-  .replace(/\/+$/, "");
-
-/** True when a real CDN provider is configured (provider set + base URL present). */
-export const imageCdnActive = cdnActive(imageProvider, imageCdnBase);
 
 export type ImageLayout = "constrained" | "fullWidth" | "fixed";
 
-export interface CdnImageOpts {
-  /** Image key relative to the CDN base ("starter/photo.jpg") or a full URL. */
-  src: string;
-  width?: number;
-  height?: number;
-  /** "constrained" (default): scales down to `width`. "fullWidth": edge-to-edge. "fixed": exact. */
-  layout?: ImageLayout;
-  /** Eager-load + fetchpriority=high — set on the LCP/hero image only. */
-  priority?: boolean;
-  sizes?: string;
-  alt?: string;
-}
-
-/** Build responsive `<img>` attributes for a CDN-hosted image, using the active provider. */
-export function imageAttrs(opts: CdnImageOpts) {
-  return cdnImageAttrs(imageProvider, imageCdnBase, opts);
-}
+/** Base URL of the remote image origin, e.g. "https://images.zmoki.xyz". Empty ⇒ none set. */
+export const imageOriginBase = (import.meta.env.PUBLIC_IMAGE_CDN_BASE || "")
+  .trim()
+  .replace(/\/+$/, "");
 
 /**
- * Canonical absolute URL for a cover image at the Discover-friendly rendition
- * (≥1200px wide, 16:9). Single source for the post hero, the schema.org
- * BlogPosting.image, and the image-sitemap `<image:loc>` so they can't drift.
- * When no CDN is active, returns the raw value (expected to be a full URL or a
- * /public path).
+ * Resolve an author-facing image `src` to an absolute URL. A full URL passes
+ * through; a bare key ("starter/photo.jpg") is prefixed with the origin base, so
+ * content stays portable (change the domain in one env var). Used to resolve
+ * `<Image>` string sources and the cover URL for schema.org + the image sitemap.
  */
-export function coverImageUrl(src: string): string {
-  if (!imageCdnActive) return src;
-  return imageAttrs({ src, width: 1200, height: 675, layout: "constrained" }).src;
+export function resolveImageSrc(src: string): string {
+  if (/^https?:\/\//i.test(src)) return src;
+  if (!imageOriginBase) return src;
+  return `${imageOriginBase}/${src.replace(/^\/+/, "")}`;
 }

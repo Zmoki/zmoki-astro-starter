@@ -44,7 +44,7 @@ Project skills live in `.claude/skills/`:
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 - `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
 - `/structured-data` — add/edit schema.org JSON-LD for Google rich results, per Google's docs (`.claude/skills/structured-data/SKILL.md`)
-- `/images` — content-image CDN (R2/Uploadcare/Cloudinary/imgix, decoupled from the deploy host), responsive images, post cover/hero, and image SEO (Discover / image sitemaps) (`.claude/skills/images/SKILL.md`)
+- `/images` — content images: remote-hosted originals + build-time optimization, responsive images, post cover/hero, and image SEO (Discover / image sitemaps) (`.claude/skills/images/SKILL.md`)
 
 **These are AI-tool-agnostic task playbooks.** Each `SKILL.md` (and its `references/*.md`) is plain, vendor-neutral Markdown — the `/name` shortcut is Claude Code's way of loading it on demand, but any AI coding tool can use them by reading the file directly. Before doing one of the kinds of work above, **read the matching `.claude/skills/<name>/SKILL.md` first** and follow it. They're the source of truth for their topic; the sections below summarize, they don't replace.
 
@@ -355,20 +355,22 @@ When adding a new env var: declare it (with a doc comment) in `src/env.d.ts` fir
 
 ## Content images
 
-Content images (photos: png/jpg/webp) are **provider-agnostic and decoupled from the deploy host**, structured like analytics/forms/captcha. Two delivery paths behind one vendor-neutral surface:
+Content images (photos: png/jpg/webp) are **optimized at build by Astro** (`astro:assets` + Sharp): resized, re-encoded to `webp`/`avif`, content-hashed into `dist/_astro/`, and served by the deploy host (whose edge is a CDN). `astro.config.mjs` sets `image.layout: "constrained"`, so `<Image>` and Markdown `![]()` are responsive (srcset + zero CLS) by default. There is **no runtime image-CDN transform**.
 
-- **Zero-config baseline (`local`)** — no CDN configured. Repo-committed images (imported assets, in `src/images/`) are optimized at build by Astro (`astro:assets` + Sharp) and served by the deploy host. `astro.config.mjs` sets `image.layout: "constrained"` so every optimized image — `<Image>` and Markdown `![]()` — is responsive with zero CLS by default.
-- **Image CDN (opt-in)** — set `PUBLIC_IMAGE_CDN` + `PUBLIC_IMAGE_CDN_BASE` and content images are served + transformed by a CDN chosen **independently of `site.deploy.platform`**. Built on [Unpic](https://unpic.pics). Providers: **`r2-cloudflare`** (default — R2 storage + Cloudflare Image Transformations on the image domain's own zone), **`uploadcare`**, **`cloudinary`**, **`imgix`**. Unset ⇒ `local`.
+Originals come from either place:
 
-Engine + config: **`src/lib/image-cdn.mjs`** (framework/env-free provider registry + URL builder) and **`src/image.config.ts`** (binds it to env; exports `imageAttrs`, `imageCdnActive`, `coverImageUrl`). Components: **`src/components/Image.astro`** (the vendor-neutral responsive image) and **`src/components/ContentImage.astro`** (a captioned, meaningful image with schema.org `ImageObject` markup — site-wide, delegates to `<Image>`).
+- **Committed** — a file in `src/images/`, imported. Zero external dependency; builds never fetch.
+- **Remote origin** — host originals on a bucket/CDN (e.g. an **R2 bucket on a custom domain**), set `PUBLIC_IMAGE_CDN_BASE`, and Astro **downloads + optimizes them at build**. Keeps binaries out of git. The origin is pure storage, **decoupled from `site.deploy.platform`**, and is authorized for optimization via `image.remotePatterns` (from that env var).
 
-**Authoring** — three ways: `<Image>` (full control, CDN-delivered; used for the post cover), `<ContentImage>` (caption + licensing schema), and plain Markdown `![]()` (handled by **Astro's built-in optimization** — local images optimized at build; CDN-hosted URLs optimized at build because the domain is authorized in `image.remotePatterns`). No custom Markdown-image plugin.
+Config: **`src/image.config.ts`** (`imageOriginBase` + `resolveImageSrc()` — bare key → full URL; no provider/transform logic). Components: **`src/components/Image.astro`** (vendor-neutral responsive image wrapping `astro:assets`) and **`src/components/ContentImage.astro`** (a captioned, meaningful image with schema.org `ImageObject` — site-wide, delegates to `<Image>`).
 
-**Cover / hero & Google Discover** — a post's optional **`cover`** (blog frontmatter) is a real non-text photo (distinct from the branded OG card). Via `coverImageUrl()` (single source) it drives the post hero (LCP), the schema.org `BlogPosting.image` (the primary-image signal Discover reads), and the image-sitemap `<image:loc>` (`src/pages/sitemap.xml.ts`, image namespace `sitemap-image/1.1`). `og:image` stays the branded card. For Discover, a cover should be a well-cropped landscape ≥1200px wide at 16:9 (`max-image-preview:large` is already set).
+**Authoring** — three ways: `<Image>` (imported asset or remote key/URL; remote needs `width`+`height`; used for the post cover), `<ContentImage>` (caption + licensing schema), and plain Markdown `![]()` (Astro's built-in optimization — local images, and remote URLs whose domain is authorized in `image.remotePatterns`). No custom Markdown-image plugin. Reference remote images by **full URL** in content unless the origin env is always set (a bare key with no base fails the build).
 
-**Enabling a CDN** also needs its host added to the CSP: set `IMAGE_CDN_HOST` + `img-src` in `src/headers/headers.config.ts`, then `npm run build:headers`. Env vars are declared in `src/env.d.ts` and mirrored in `.env.example`. Host originals externally (R2/S3/bucket) — don't commit binaries.
+**Cover / hero & Google Discover** — a post's optional **`cover`** (+ `coverAlt`, blog frontmatter) is a real non-text photo (distinct from the branded OG card). Via `resolveImageSrc()` (single source) it drives the post hero (LCP, optimized at build), the schema.org `BlogPosting.image` (the primary-image signal Discover reads), and the image-sitemap `<image:loc>` (`src/pages/sitemap.xml.ts`, namespace `sitemap-image/1.1`). `og:image` stays the branded card. For Discover, a cover should be a well-cropped landscape ≥1200px wide at 16:9 (`max-image-preview:large` is already set).
 
-**The `/images` skill (`.claude/skills/images/SKILL.md`) is the source of truth** for enabling/swapping the CDN, R2 + Cloudflare Transformations setup, cover images, adding a provider, and image SEO — see it rather than duplicating the details here.
+**Reachability & caching:** a build with the origin authorized **must reach it** (Astro downloads at build); with the env unset (e.g. CI) remote images render unoptimized with **no fetch**, so builds never fail on a down origin. Astro caches optimized images + fonts in **`node_modules/.astro`** (keyed by content hash) — CI restores it via `actions/cache` (`.github/workflows/ci.yml`) so unchanged images aren't re-processed. Setting a remote origin also needs its host in the CSP `img-src` (`IMAGE_CDN_HOST` in `src/headers/headers.config.ts` → `npm run build:headers`). Env in `src/env.d.ts` + `.env.example`.
+
+**The `/images` skill (`.claude/skills/images/SKILL.md`) is the source of truth** for hosting originals, cover images, CI caching, and image SEO — see it rather than duplicating the details here.
 
 ---
 

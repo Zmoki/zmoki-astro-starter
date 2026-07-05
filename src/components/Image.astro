@@ -1,24 +1,23 @@
 ---
-// Vendor-neutral responsive image. One component, two rendering paths, chosen by
-// what you pass and whether an image CDN is configured (src/image.config.ts):
+// Vendor-neutral responsive image. Everything is optimized at build by Astro
+// (astro:assets): a repo-committed asset (imported ImageMetadata) or a
+// remote-hosted image (a string key/URL whose origin is authorized in
+// astro.config.mjs `image.remotePatterns`). Astro downloads + resizes +
+// re-encodes to webp/avif, content-hashes into dist/_astro, and the deploy host
+// serves it. No runtime image-CDN transform — see src/image.config.ts.
 //
-//   • src is an imported asset (ImageMetadata)  → Astro's astro:assets <Image>,
-//     optimized + content-hashed at build (the zero-config, host-agnostic path).
-//   • src is a string key/URL AND a CDN is active → an Unpic-built responsive
-//     <img> (srcset + sizes + zero-CLS aspect-ratio) served by the CDN.
-//   • src is a string but no CDN is active       → a plain <img> passthrough
-//     (a full remote URL, or a /public path) — unoptimized; configure a CDN.
-//
-// Call sites never name a vendor: the provider (R2+Cloudflare, Uploadcare,
-// Cloudinary, imgix…) is chosen by PUBLIC_IMAGE_CDN, decoupled from the deploy
-// host. See the /images skill.
+// A string `src` is resolved against the image origin (bare key → full URL) and
+// REQUIRES width + height (Astro can't infer a remote image's dimensions). An
+// image on an unauthorized origin renders as-is (unoptimized) rather than
+// failing the build.
 import { Image as AstroImage } from "astro:assets";
-import { imageAttrs, imageCdnActive, type ImageLayout } from "@/image.config";
+import { resolveImageSrc, type ImageLayout } from "@/image.config";
 
 interface Props {
-  /** An imported asset (local, optimized at build) or a string key/URL (CDN). */
+  /** An imported asset (local) or a remote key/URL (string). */
   src: ImageMetadata | string;
   alt: string;
+  /** Required for a string (remote) src. */
   width?: number;
   height?: number;
   layout?: ImageLayout;
@@ -41,57 +40,20 @@ const {
   ...rest
 } = Astro.props;
 
-const isString = typeof src === "string";
-const useCdn = isString && imageCdnActive;
-
-// CDN path: build responsive attributes via the active provider.
-const cdn = useCdn
-  ? imageAttrs({ src: src as string, width, height, layout, priority, sizes, alt })
-  : null;
+const resolvedSrc = typeof src === "string" ? resolveImageSrc(src) : src;
+// Astro spells full-width with a hyphen.
+const astroLayout = layout === "fullWidth" ? "full-width" : layout;
 ---
 
-{
-  cdn ? (
-    <img
-      src={cdn.src}
-      srcset={cdn.srcset}
-      sizes={cdn.sizes}
-      alt={alt}
-      width={cdn.width}
-      height={cdn.height}
-      style={cdn.style}
-      loading={cdn.loading as "lazy" | "eager" | undefined}
-      decoding={cdn.decoding as "async" | "sync" | "auto" | undefined}
-      fetchpriority={cdn.fetchpriority as "high" | "low" | "auto" | undefined}
-      class={className}
-      {...rest}
-    />
-  ) : isString ? (
-    // String src with no CDN configured — plain passthrough (remote URL / public path).
-    <img
-      src={src as string}
-      alt={alt}
-      width={width}
-      height={height}
-      loading={priority ? "eager" : "lazy"}
-      decoding="async"
-      fetchpriority={priority ? "high" : undefined}
-      class={className}
-      {...rest}
-    />
-  ) : (
-    // Imported asset — Astro optimizes at build. (Astro spells full-width with a
-    // hyphen; Unpic uses "fullWidth" — map it for the astro:assets layout prop.)
-    <AstroImage
-      src={src as ImageMetadata}
-      alt={alt}
-      width={width ?? (src as ImageMetadata).width}
-      height={height}
-      layout={layout === "fullWidth" ? "full-width" : layout}
-      loading={priority ? "eager" : "lazy"}
-      {...(priority ? { fetchpriority: "high" } : {})}
-      class={className}
-      {...rest}
-    />
-  )
-}
+<AstroImage
+  src={resolvedSrc}
+  alt={alt}
+  width={width ?? (typeof src === "object" ? src.width : undefined)}
+  height={height}
+  layout={astroLayout}
+  loading={priority ? "eager" : "lazy"}
+  {...priority ? { fetchpriority: "high" } : {}}
+  {...sizes ? { sizes } : {}}
+  class={className}
+  {...rest}
+/>
