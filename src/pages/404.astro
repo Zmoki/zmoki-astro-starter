@@ -3,7 +3,11 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import { site } from "@/site.config";
 ---
 
-<BaseLayout title={`Page not found on ${site.name}`} description="Sorry, that page is not found.">
+<BaseLayout
+  title={`Page not found on ${site.name}`}
+  description="Sorry, that page is not found."
+  canonical={false}
+>
   <section
     class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
   >

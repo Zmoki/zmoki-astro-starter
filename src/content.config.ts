@@ -9,6 +9,11 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
+    // Optional canonical URL. Set this when the post republishes content whose
+    // canonical source lives elsewhere (e.g. cross-posted from another site) so
+    // search engines credit the original. Drives <link rel="canonical"> and the
+    // schema.org BlogPosting `mainEntityOfPage`. Omit for original content.
+    canonical: z.url().optional(),
     // Per-post byline author. Drives the post header credit, the "Written by"
     // bio, the schema.org BlogPosting author, and the OG card credit.
     author: z.object({
