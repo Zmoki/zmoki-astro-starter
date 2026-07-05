@@ -1,6 +1,7 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
 import { colors, fonts } from "@/design-tokens.mjs";
+import { site } from "@/site.config";
 
 // Pull real tokens so the link-treatment swatches can never drift from
 // what Tailwind actually generates (mirrors the Color page approach).
@@ -16,7 +17,7 @@ const typeScale = [
   {
     label: "Hero",
     classes: "text-4xl font-semibold xl:text-6xl",
-    sample: "Zmoki Astro Starter",
+    sample: site.name,
     usage: "Post titles (PostLayout h1)",
   },
   {
@@ -125,14 +126,12 @@ const linkTreatments = [
 
 <BrandLayout
   title="Brand — Typography"
-  description="Zmoki Astro Starter typography scale and prose styles"
+  description={`${site.name} typography scale and prose styles`}
 >
   <header
     class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
   >
-    <a href="/-/astro/brand/" class="text-xs text-white/70 hover:text-white"
-      >← Zmoki Astro Starter brand</a
-    >
+    <a href="/-/astro/brand/" class="text-xs text-white/70 hover:text-white">← {site.name} brand</a>
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Typography</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
       Headings and body share one typeface: {fonts.sans.name}. Code uses {fonts.mono.name} — plus a tuned

@@ -9,6 +9,15 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
+    // Per-post byline author. Drives the post header credit, the "Written by"
+    // bio, the schema.org BlogPosting author, and the OG card credit.
+    author: z.object({
+      name: z.string(),
+      /** The author's site — linked from the byline. */
+      url: z.string(),
+      /** Short first-person blurb shown in the post's author bio. */
+      bio: z.string(),
+    }),
   }),
 });
 

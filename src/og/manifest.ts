@@ -76,7 +76,7 @@ async function computeEntries(): Promise<RoutedEntry[]> {
         p.data.title,
         p.data.description,
         p.data.publishDate,
-        site.author.name,
+        p.data.author.name,
       ),
     })),
     ...resources.map((r) => ({

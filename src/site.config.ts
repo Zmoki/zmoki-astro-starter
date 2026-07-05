@@ -30,36 +30,17 @@ export const site = {
     { label: "SEO Checklist", href: "/resources/new-website-seo-checklist/" },
   ],
 
-  /** Primary call to action — reused by the nav button and the hero button. */
-  cta: {
-    label: "Get started",
-    href: "https://github.com/Zmoki/zmoki-astro-starter",
-  },
-
-  /** Home-page hero — the headline and subhead at the top of the landing page. */
-  hero: {
-    heading: "A website starter your AI can make its own.",
-    subhead:
-      "An Astro starter for personal and project sites — landing page, blog, RSS, analytics, and email forms already wired. It ships with AGENTS.md, so Claude Code, Codex, Cursor, or any AI coding agent understands the codebase and rebrands it for you.",
-  },
-
-  /** Closing CTA band at the bottom of the home page. */
-  finalCta: {
-    heading: "Ready to get started?",
-    text: "Grab the template, tell your AI agent what you want, and deploy.",
-    button: {
-      label: "Use this template",
-      href: "https://github.com/Zmoki/zmoki-astro-starter",
-    },
-  },
-
-  author: {
-    /** Shown in the post author bio and the footer copyright. */
+  /**
+   * The site owner / publishing entity. Site-wide identity (per-page), as
+   * opposed to a post's byline author, which lives per-post in the blog
+   * collection (see src/content.config.ts). Shown in the footer copyright and
+   * used as the image-credit creator on post images.
+   */
+  organization: {
+    /** Shown in the footer copyright and as the content-image credit. */
     name: "Zarema Khalilova",
-    /** Personal website — linked from the footer copyright. */
+    /** Personal/company site. */
     url: "https://zmoki.xyz",
-    /** Feed slug the author name links to (an "about me" post). */
-    aboutSlug: "1-set-up-your-site",
   },
 
   contact: {
@@ -69,7 +50,7 @@ export const site = {
 
   social: {
     /** "GitHub" link in the footer. */
-    sourceRepo: "https://github.com/Zmoki/zmoki-astro-starter",
+    github: "https://github.com/Zmoki/zmoki-astro-starter",
   },
 
   /** First year shown in the footer copyright range. */

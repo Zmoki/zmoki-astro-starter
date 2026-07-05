@@ -1,5 +1,6 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
+import { site } from "@/site.config";
 
 // Shared input class strings so the live examples and the usage code stay in
 // sync with what BrevoForm.astro actually renders.
@@ -14,7 +15,7 @@ const buttonClass =
 
 <BrandLayout
   title="Brand — Forms"
-  description="Zmoki Astro Starter form components, states, and patterns"
+  description={`${site.name} form components, states, and patterns`}
 >
   <header
     class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-900 mb-8 rounded-2xl border px-6 py-10 shadow-sm md:px-10"
@@ -22,7 +23,7 @@ const buttonClass =
     <a
       href="/-/astro/brand/"
       class="text-zmoki-indigo-600 hover:text-zmoki-indigo-700 text-xs underline underline-offset-2"
-      >← Zmoki Astro Starter brand</a
+      >← {site.name} brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Forms</h1>
     <p class="text-zmoki-stone-700 mt-4 max-w-2xl text-xl md:text-2xl">

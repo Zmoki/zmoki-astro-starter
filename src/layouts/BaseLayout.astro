@@ -48,7 +48,7 @@ const copyrightYears =
     ? `${site.copyrightStartYear}–${currentYear}`
     : `${site.copyrightStartYear}`;
 // Bare host (no protocol) for the footer copyright link, e.g. "zmoki.xyz".
-const authorSiteLabel = new URL(site.author.url).host;
+const ownerSiteLabel = new URL(site.organization.url).host;
 ---
 
 <!doctype html>
@@ -125,7 +125,7 @@ const authorSiteLabel = new URL(site.author.url).host;
               ))
             }
           </ul>
-          <Button href={site.cta.href}>{site.cta.label}</Button>
+          <Button href={site.social.github}>Get started</Button>
         </div>
       </nav>
     </header>
@@ -149,14 +149,14 @@ const authorSiteLabel = new URL(site.author.url).host;
         class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8"
       >
         <p>
-          &copy; {copyrightYears} · {site.author.name} ·{" "}
-          <a href={site.author.url}>{authorSiteLabel}</a>
+          &copy; {copyrightYears} · {site.organization.name} ·{" "}
+          <a href={site.organization.url}>{ownerSiteLabel}</a>
         </p>
         <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">
           <a href="/legal/privacy/">Privacy</a>
           <a href="/legal/terms/">Terms</a>
           <a href={`mailto:${site.contact.email}`}>Contact</a>
-          <a href={site.social.sourceRepo}>GitHub</a>
+          <a href={site.social.github}>GitHub</a>
         </nav>
       </div>
     </footer>
