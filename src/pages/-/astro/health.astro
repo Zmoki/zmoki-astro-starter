@@ -1,7 +1,5 @@
 ---
-import { execSync } from "child_process";
-
-const commit = execSync("git rev-parse --short HEAD").toString().trim();
+import { commitHash } from "@/lib/version";
 ---
 
 <!doctype html>
@@ -12,6 +10,6 @@ const commit = execSync("git rev-parse --short HEAD").toString().trim();
   </head>
   <body>
     <p>ok</p>
-    <p>{commit}</p>
+    <p>{commitHash}</p>
   </body>
 </html>
