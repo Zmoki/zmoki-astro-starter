@@ -47,6 +47,7 @@ const cspDirectives: Record<string, string[]> = {
   ],
   "media-src": ["'self'"],
   "font-src": ["'self'"],
+  "manifest-src": ["'self'"],
   "connect-src": [
     "'self'",
     "https://cloudflareinsights.com",

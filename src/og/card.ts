@@ -3,6 +3,9 @@
 // (no JSX config needed). Every container with multiple children sets an explicit
 // `display: flex`, as Satori requires. Colors come from ./theme (the design tokens),
 // so cards re-skin with the site.
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { Resvg } from "@resvg/resvg-js";
 import { site } from "@/site.config";
 import { theme, OG_WIDTH, OG_HEIGHT } from "./theme";
 import type { OgEntry } from "./types";
@@ -16,24 +19,26 @@ const el = (type: string, style: Record<string, unknown>, children?: unknown): N
 
 const domain = site.domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
-/** The brand mark: an accent square with the site's initial. */
-const brandMark = (size = 56): Node =>
-  el(
-    "div",
-    {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: size,
-      height: size,
-      borderRadius: Math.round(size * 0.26),
-      backgroundColor: theme.accent,
-      color: "#ffffff",
-      fontSize: Math.round(size * 0.55),
-      fontWeight: 700,
-    },
-    (site.name.trim()[0] ?? "•").toUpperCase(),
-  );
+// The brand mark is the site's own public/brand-mark.svg (the same source the
+// favicons render from), so the social cards always match the icon. Rasterize it
+// once to a PNG data URI here — Satori embeds it as an <img>. (cwd is the project
+// root in both `astro dev` and `astro build`, matching src/og/fonts.ts.)
+const brandMarkSvg = readFileSync(join(process.cwd(), "public/brand-mark.svg"));
+const brandMarkPng = new Resvg(brandMarkSvg, { fitTo: { mode: "width", value: 200 } })
+  .render()
+  .asPng();
+const brandMarkUri = `data:image/png;base64,${Buffer.from(brandMarkPng).toString("base64")}`;
+
+/** The brand mark, rendered from public/brand-mark.svg with softly rounded corners. */
+const brandMark = (size = 56): Node => ({
+  type: "img",
+  props: {
+    src: brandMarkUri,
+    width: size,
+    height: size,
+    style: { borderRadius: Math.round(size * 0.26) },
+  },
+});
 
 const root = (children: Node[]): Node =>
   el(

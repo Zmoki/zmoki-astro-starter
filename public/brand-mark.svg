@@ -1,0 +1,19 @@
+<!--
+  The site's brand mark — the single source for the favicon set AND the mark on
+  the OG social cards. Replace this with your own mark, then run `npm run favicons`.
+
+  Keep it a SQUARE, FULL-BLEED SVG (the art fills its own background, corner to
+  corner). The icons are rasterized from it as-is: Apple-touch / Android icons
+  can't be transparent, so a full-bleed square avoids black or empty corners.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="Brand mark">
+  <rect width="32" height="32" fill="#4f39f6" />
+  <path
+    d="M9 9 H23 L9 23 H23"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="3.5"
+    stroke-linecap="square"
+    stroke-linejoin="round"
+  />
+</svg>
