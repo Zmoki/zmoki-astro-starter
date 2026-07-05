@@ -113,8 +113,8 @@ The events this starter fires today. All go through `window.track(...)` and reac
 | `post_navigation_clicked`     | `PostLayout.astro`          | `direction`, `destination_slug` |
 | `code_block_copied`           | `Prose.astro`               | `snippet_length`                |
 | `resource_link_clicked`       | `ResourceLink.astro`        | `resource_slug`, `is_external`  |
-| `resource_gate_viewed`        | `BrevoForm.astro`           | `resource_slug`, `form_id`      |
-| `resource_gate_submitted`     | `BrevoForm.astro`           | `form_id`, `resource_slug`      |
+| `resource_gate_viewed`        | `forms/brevo.astro`         | `resource_slug`, `form_id`      |
+| `resource_gate_submitted`     | `forms/brevo.astro`         | `form_id`, `resource_slug`      |
 | `resource_download_confirmed` | `thank-you/[...slug].astro` | `resource_name`, `resource_url` |
 | `resource_downloaded`         | `thank-you/[...slug].astro` | `resource_name`, `asset_url`    |
 

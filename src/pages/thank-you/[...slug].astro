@@ -4,11 +4,12 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
 import Prose from "@/components/Prose.astro";
 import { site } from "@/site.config";
+import { isResourcePage } from "@/lib/page-collections";
 
 export async function getStaticPaths() {
   const allResources: CollectionEntry<"resources">[] = await getCollection(
     "resources",
-    ({ data }: { data: CollectionEntry<"resources">["data"] }) => data.type === "page",
+    isResourcePage,
   );
 
   return allResources.map((resource) => ({

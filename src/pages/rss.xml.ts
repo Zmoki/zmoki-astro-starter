@@ -1,8 +1,10 @@
 import rss from "@astrojs/rss";
-import { getCollection, type CollectionEntry } from "astro:content";
+import { type CollectionEntry } from "astro:content";
 import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
 import { site } from "@/site.config";
+import { getPostsNewestFirst } from "@/lib/page-collections";
+import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 
 // Configure markdown-it to allow HTML (needed for our converted components)
 const parser = new MarkdownIt({
@@ -101,13 +103,8 @@ export async function GET(context: { site: string | undefined }) {
   // Ensure siteUrl is always a string
   const siteUrl = String(context.site || site.domain);
 
-  // Get all posts from the feed collection
-  const allPosts: CollectionEntry<"blog">[] = await getCollection("blog");
-
-  // Sort posts by publishDate (newest first, matching the site's ordering)
-  const sortedPosts = allPosts.sort(
-    (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime(),
-  );
+  // Newest first, same ordering rule as the blog index and prev/next nav.
+  const sortedPosts = await getPostsNewestFirst();
 
   // Render and sanitize each post's content
   const items = await Promise.all(
@@ -179,8 +176,8 @@ export async function GET(context: { site: string | undefined }) {
 
   return rss({
     title: site.name,
-    // Feed-channel description — lives here (the RSS feed owns it), not in site.config.
-    description: "Posts and guides about building your site with the Zmoki Astro Starter.",
+    // Feed-channel description — the feed is the blog, so reuse its description.
+    description: blogIndexMeta.description,
     site: siteUrl,
     // Add media and atom namespaces for better RSS compatibility
     xmlns: {

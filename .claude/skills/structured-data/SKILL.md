@@ -47,23 +47,22 @@ From the gallery, the types that map onto this starter's content model (`blog`, 
 
 Before using any of these, open its gallery page and confirm **both** eligibility and the current required/recommended fields. Don't add a type the page's visible content can't back up.
 
-**Source the values from `src/site.config.ts`**, never hard-code — it's the site's single source of truth. `site.name`, `site.domain`, `site.author.name`, `site.contact.email`, `site.social.sourceRepo` feed `Organization`/`Person`/`BlogPosting` cleanly and keep the markup in sync with the rest of the chrome.
+**Source the values from `src/site.config.ts`**, never hard-code — it's the site's single source of truth. `site.name`, `site.domain`, `site.organization.*`, `site.contact.email`, `site.social.github` feed `Organization`/`Person` cleanly and keep the markup in sync with the rest of the chrome. The `BlogPosting` author is **per-post**: each post's frontmatter carries its own `author` (`{ name, url, bio }`) — there is no site-level author.
 
 ## How to add it in this codebase
 
 Use the **`JsonLd.astro` component** (`src/components/JsonLd.astro`). It renders a `<script type="application/ld+json">`, accepts one schema object **or an array** of them, and escapes `<` so a stray `</script>` in a string can't break out. JSON-LD is valid anywhere in the document, so drop the component straight into the relevant layout or page — no need to touch `BaseLayout`'s `<head>`. The CSP in `public/_headers` already allows inline scripts (`script-src … 'unsafe-inline'`), so no header change is needed.
 
-Build the schema object in the layout/page frontmatter, sourcing text from `src/site.config.ts` and **all absolute URLs from `pageUrls(Astro)`** (`src/lib/urls.ts`) — the same helper `BaseLayout` uses for the canonical link and og:image, so the structured data can never drift from the meta tags. For a page's OG card image, reuse `getOgImage(pathname)` (`src/og/manifest.ts`) rather than hand-building a path. Then render `<JsonLd schema={…} />`. Example — a blog post in `PostLayout.astro` (fill fields from the gallery's Article reference after checking its eligibility):
+Build the schema object in the layout/page frontmatter, sourcing text from `src/site.config.ts` and **all absolute URLs from `siteUrls(Astro)`** (`src/lib/urls.ts`) — the same helper `BaseLayout` uses for the canonical link and og:image, so the structured data can never drift from the meta tags. Use `absoluteUrl(path)` (the production origin) for every structured-data URL. For a page's OG card image, reuse `getOgImage(pathname)` (`src/og/manifest.ts`) rather than hand-building a path. Then render `<JsonLd schema={…} />`. Example — a blog post in `PostLayout.astro` (fill fields from the gallery's Article reference after checking its eligibility; `author` is the post's own frontmatter author prop):
 
 ```astro
 ---
 import JsonLd from "@/components/JsonLd.astro";
-import { site } from "@/site.config";
-import { pageUrls } from "@/lib/urls";
+import { siteUrls } from "@/lib/urls";
 import { getOgImage } from "@/og/manifest";
 // …existing frontmatter…
 
-const urls = pageUrls(Astro);
+const { absoluteUrl } = siteUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
 const blogPostingLd = {
   "@context": "https://schema.org",
@@ -72,9 +71,9 @@ const blogPostingLd = {
   description,
   datePublished: publishDate.toISOString(),
   dateModified: contentModifiedDate.toISOString(),
-  author: { "@type": "Person", name: site.author.name },
-  image: urls.absolute(ogImage.path),
-  mainEntityOfPage: urls.canonical,
+  author: { "@type": "Person", name: author.name, url: author.url },
+  image: absoluteUrl(ogImage.path),
+  mainEntityOfPage: absoluteUrl(Astro.url.pathname),
 };
 ---
 
@@ -86,7 +85,7 @@ const blogPostingLd = {
 
 For a page needing two graphs (e.g. `BlogPosting` + `BreadcrumbList`), pass an **array**: `<JsonLd schema={[blogPostingLd, breadcrumbLd]} />`.
 
-Always build absolute URLs with `pageUrls(Astro)` — `urls.canonical` for the current page, `urls.absolute(path)` for any other site path — and keep dates ISO 8601. Both are what the Google references expect, and routing every URL through the one helper keeps canonical/og/meta/SD in lockstep.
+Always build absolute URLs with `siteUrls(Astro)`'s `absoluteUrl(path)` — `absoluteUrl(Astro.url.pathname)` for the current page — and keep dates ISO 8601. Both are what the Google references expect, and routing every URL through the one helper keeps canonical/og/meta/SD in lockstep.
 
 ## Verify (required before done)
 
