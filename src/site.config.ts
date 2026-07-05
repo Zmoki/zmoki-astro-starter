@@ -16,12 +16,6 @@ export const site = {
   description:
     "An AI-native Astro starter for personal and project sites — blog, RSS, analytics, structured data, and OG images, ready to adapt with any AI coding agent.",
 
-  /** og:site_name and the RSS feed title. */
-  ogSiteName: "Zmoki Astro Starter",
-
-  /** RSS feed description. */
-  feedDescription: "Posts and guides about building your site with the Zmoki Astro Starter.",
-
   /** Top-nav links (between the logo and the CTA button). Anchors or routes. */
   nav: [
     { label: "Features", href: "/#features" },

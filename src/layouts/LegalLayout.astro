@@ -3,7 +3,7 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Time from "@/components/Time.astro";
 import Prose from "@/components/Prose.astro";
 
-const { title, description, publishDate, contentModifiedDate } = Astro.props;
+const { title, description, publishDate, contentModifiedDate, robots } = Astro.props;
 ---
 
 <BaseLayout
@@ -11,6 +11,7 @@ const { title, description, publishDate, contentModifiedDate } = Astro.props;
   description={description}
   publishDate={publishDate}
   contentModifiedDate={contentModifiedDate}
+  robots={robots}
 >
   <section class="space-y-4">
     <header

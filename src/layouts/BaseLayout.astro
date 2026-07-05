@@ -7,12 +7,21 @@ import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
+import { robotsContent } from "@/lib/robots";
 
 export interface Props {
   title: string;
   description?: string;
   publishDate?: Date;
   contentModifiedDate?: Date;
+  /**
+   * Per-page robots directives merged into <meta name="robots"> alongside the
+   * site default — e.g. ["noindex"], ["noindex", "nofollow"], ["noarchive"].
+   * Content pages pass this from an entry's `robots` frontmatter
+   * (src/content.config.ts); directives implying noindex also exclude the page
+   * from the sitemap.
+   */
+  robots?: string[];
   /**
    * When true, <main> spans the full viewport width so the page can render
    * full-bleed landing sections that manage their own inner containers.
@@ -33,6 +42,7 @@ const {
   description = site.description,
   publishDate,
   contentModifiedDate,
+  robots,
   wide = false,
   canonical = true,
 } = Astro.props;
@@ -74,7 +84,7 @@ const ownerSiteLabel = new URL(site.organization.url).host;
 
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content="max-image-preview:large" />
+    <meta name="robots" content={robotsContent(robots)} />
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     <link
       rel="alternate"
@@ -88,7 +98,7 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={selfURL} />
     <meta property="og:type" content={isPageArticle ? "article" : "website"} />
-    <meta property="og:site_name" content={site.ogSiteName} />
+    <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={pageImageUrl} />
     <meta property="og:image:type" content="image/png" />

@@ -1,6 +1,11 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
+// Per-entry robots directives → <meta name="robots"> (e.g. ["noindex"],
+// ["noindex", "nofollow"]). A noindex value also drops the page from the sitemap.
+// Path-level rules live in src/headers/headers.config.ts. Omit to index normally.
+const robots = z.array(z.string()).optional();
+
 const blog = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/blog" }),
   schema: z.object({
@@ -33,6 +38,7 @@ const blog = defineCollection({
       /** Short first-person blurb shown in the post's author bio. */
       bio: z.string(),
     }),
+    robots,
   }),
 });
 
@@ -75,6 +81,7 @@ const resources = defineCollection({
         label: z.string().optional(),
       })
       .optional(),
+    robots,
   }),
 });
 
@@ -85,6 +92,7 @@ const legal = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
+    robots,
   }),
 });
 

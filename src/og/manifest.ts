@@ -1,14 +1,13 @@
-// The OG image manifest: one entry per generated card. It is the single source
-// of truth shared by two consumers:
-//   • src/pages/og/[...path].png.ts — getStaticPaths() + rendering
-//   • src/layouts/BaseLayout.astro  — the og:image URL + og:image:alt per page
-//
-// Enumerates the same routes as the sitemap (home, blog index, posts, resource
-// pages, legal) plus a `default` fallback used for any page without its own card
-// (thank-you, brand, health, 404, …).
-import { getCollection, type CollectionEntry } from "astro:content";
+// The OG image manifest: one entry per generated card, shared by the endpoint
+// (src/pages/og/[...path].png.ts) and BaseLayout (og:image + alt). Collection
+// cards come from the page-collections registry (self-registering per section);
+// standalone cards (home, blog index) read each page's exported `meta`; a
+// `default` fallback covers pages without their own card.
 import { site } from "@/site.config";
 import { formatShortDate } from "@/lib/dates";
+import { getPageRecords } from "@/lib/page-collections";
+import { meta as homeMeta } from "@/pages/index.astro";
+import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 import type { OgEntry } from "./types";
 
 /** Card text has no line-clamp, so cap lengths that would overflow the layout. */
@@ -36,7 +35,7 @@ const article = (
   title: truncate(title, TITLE_MAX),
   description: truncate(description, DESC_MAX),
   eyebrow: `${formatShortDate(date)} · ${by}`,
-  alt: `${title} — ${site.ogSiteName}`,
+  alt: `${title} — ${site.name}`,
 });
 
 const siteEntry = (key: string, title: string, description: string): OgEntry => ({
@@ -49,9 +48,7 @@ const siteEntry = (key: string, title: string, description: string): OgEntry => 
 
 const DEFAULT_ENTRY: OgEntry = siteEntry("default", site.name, site.description);
 
-// Memoized so the three getCollection() calls and the array build run once per
-// process, not on every getOgImage() call — BaseLayout resolves an OG image for
-// every page (and PostLayout again for each post), so this is hit N+ times.
+// Memoized — BaseLayout resolves an OG image for every page, so this runs once.
 let entriesPromise: Promise<RoutedEntry[]> | null = null;
 
 function buildEntries(): Promise<RoutedEntry[]> {
@@ -59,44 +56,41 @@ function buildEntries(): Promise<RoutedEntry[]> {
 }
 
 async function computeEntries(): Promise<RoutedEntry[]> {
-  const posts: CollectionEntry<"blog">[] = await getCollection("blog");
-  const resources: CollectionEntry<"resources">[] = await getCollection(
-    "resources",
-    ({ data }) => data.type === "page",
-  );
-  const legal: CollectionEntry<"legal">[] = await getCollection("legal");
+  const records = await getPageRecords();
+
+  // Read page metas at runtime (not at module top level — import cycle). This is
+  // also the build-time "incomplete metadata" check: title/description together.
+  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
+  for (const page of standalonePages) {
+    if ((page.title === undefined) !== (page.description === undefined)) {
+      throw new Error(
+        `Standalone page "${page.path || "/"}" has incomplete metadata — set title and description together, or neither (src/pages/${page.ogKey === "index" ? "index" : "blog/index"}.astro).`,
+      );
+    }
+  }
 
   return [
-    { route: "/", entry: siteEntry("index", site.name, site.description) },
-    { route: "/blog/", entry: siteEntry("blog", site.name, "Blog") },
-    ...posts.map((p) => ({
-      route: `/blog/${p.id}/`,
+    // Standalone cards (home, blog index) from each page's `meta`; a page that
+    // sets no title/description falls back to the default card.
+    ...standalonePages.flatMap((page) =>
+      page.title !== undefined && page.description !== undefined
+        ? [
+            {
+              route: page.path === "" ? "/" : `/${page.path}`,
+              entry: siteEntry(page.ogKey, page.title, page.description),
+            },
+          ]
+        : [],
+    ),
+    // One article card per collection page; card key drops the trailing slash.
+    ...records.map((record) => ({
+      route: `/${record.path}`,
       entry: article(
-        `blog/${p.id}`,
-        p.data.title,
-        p.data.description,
-        p.data.publishDate,
-        p.data.author.name,
-      ),
-    })),
-    ...resources.map((r) => ({
-      route: `/resources/${r.id}/`,
-      entry: article(
-        `resources/${r.id}`,
-        r.data.title,
-        r.data.description,
-        r.data.publishDate,
-        site.name,
-      ),
-    })),
-    ...legal.map((l) => ({
-      route: `/legal/${l.id}/`,
-      entry: article(
-        `legal/${l.id}`,
-        l.data.title,
-        l.data.description,
-        l.data.publishDate,
-        site.name,
+        record.path.replace(/\/$/, ""),
+        record.title,
+        record.description,
+        record.publishDate,
+        record.byline,
       ),
     })),
     { route: null, entry: DEFAULT_ENTRY },

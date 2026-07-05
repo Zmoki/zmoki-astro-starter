@@ -1,12 +1,10 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import ResourceLayout from "@/layouts/ResourceLayout.astro";
+import { isResourcePage } from "@/lib/page-collections";
 
 export async function getStaticPaths() {
-  const items: CollectionEntry<"resources">[] = await getCollection(
-    "resources",
-    ({ data }: { data: CollectionEntry<"resources">["data"] }) => data.type === "page",
-  );
+  const items: CollectionEntry<"resources">[] = await getCollection("resources", isResourcePage);
 
   return items.map((item) => ({
     params: { slug: item.id },

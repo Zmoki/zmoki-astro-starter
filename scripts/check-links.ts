@@ -1,7 +1,8 @@
-import { existsSync, readdirSync, readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { site } from "../src/site.config.ts";
 import { PREVIEW_HOST_SUFFIX, previewOrigin } from "../src/lib/deploy.ts";
+import { DIST_DIR, htmlFiles, routeForFile } from "./lib/dist-files.ts";
 
 // CI guard for internal links. Two checks over the built site in dist/:
 //
@@ -30,29 +31,7 @@ import { PREVIEW_HOST_SUFFIX, previewOrigin } from "../src/lib/deploy.ts";
 //
 // Run after `npm run build` (needs dist/). Wired into CI and `npm run check:links`.
 
-const DIST_DIR = "dist";
 const A_HREF_RE = /<a\s[^>]*?href=["']([^"']*)["'][^>]*>/gi;
-
-/** Recursively collect every .html file under a directory. */
-function htmlFiles(dir: string): string[] {
-  const files: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...htmlFiles(path));
-    } else if (entry.isFile() && entry.name.endsWith(".html")) {
-      files.push(path);
-    }
-  }
-  return files;
-}
-
-/** Map a dist/ .html file path to the route it serves (directory format). */
-function routeForFile(file: string): string {
-  const rel = file.slice(DIST_DIR.length).replace(/\\/g, "/"); // strip "dist", normalize
-  if (rel.endsWith("/index.html")) return rel.slice(0, -"index.html".length); // "/blog/index.html" → "/blog/"
-  return rel; // e.g. "/404.html"
-}
 
 /** Host of a URL string, or null if it doesn't parse. */
 function safeHost(url: string): string | null {

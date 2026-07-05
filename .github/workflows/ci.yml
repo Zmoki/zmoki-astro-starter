@@ -65,3 +65,6 @@ jobs:
 
       - name: Internal link check
         run: npm run check:links
+
+      - name: Sitemap check
+        run: npm run check:sitemap

@@ -21,9 +21,11 @@ export interface Props {
     url: string;
     label?: string;
   };
+  robots?: string[];
 }
 
-const { title, description, publishDate, contentModifiedDate, slug, form, asset } = Astro.props;
+const { title, description, publishDate, contentModifiedDate, slug, form, asset, robots } =
+  Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 ---
 
@@ -32,6 +34,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   description={description}
   publishDate={publishDate}
   contentModifiedDate={contentModifiedDate}
+  robots={robots}
 >
   <article class="space-y-4">
     <!-- Post Header -->

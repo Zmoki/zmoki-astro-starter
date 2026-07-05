@@ -35,6 +35,7 @@ const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
   canonical={post.data.canonical}
   prevPost={prevPost}
   nextPost={nextPost}
+  robots={post.data.robots}
 >
   <Content />
 </PostLayout>

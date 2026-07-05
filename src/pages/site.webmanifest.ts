@@ -8,7 +8,7 @@ import { theme } from "@/og/theme";
 // `npm run favicons` (scripts/generate-favicons.ts) and live in public/.
 export function GET() {
   const manifest = {
-    name: site.ogSiteName,
+    name: site.name,
     short_name: site.name,
     description: site.description,
     start_url: "/",
