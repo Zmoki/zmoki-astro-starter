@@ -20,7 +20,7 @@ Originals come from one of two places:
 ### Key files
 
 - **`src/image.config.ts`** — `imageCdnHost` (from `PUBLIC_IMAGE_CDN_HOST`) + `resolveImageSrc()` (bare key → full URL). No provider/transform logic.
-- **`src/components/Image.astro`** — the one content-image component; wraps `astro:assets`. Imported asset **or** remote key/URL. Pass a caption (default slot) and it becomes a `<figure>` + schema.org `ImageObject` JSON-LD (license/credit); no caption ⇒ a plain `<img>`.
+- **`src/components/Image.astro`** — the one content-image component; wraps `astro:assets`. Imported asset **or** remote key/URL. Emits a schema.org `ImageObject` license JSON-LD for **every** image. A caption (default slot) adds a `<figure>` + `<figcaption>`. Images `astro:assets` can't optimize (an unauthorized/unknown remote) render as a plain `<img>` (no bogus repeated-URL srcset, no build-time fetch).
 - **`astro.config.mjs`** — `image.layout: "constrained"` + `image.remotePatterns` authorizing the origin domain (from `PUBLIC_IMAGE_CDN_HOST`).
 
 ## Enable a remote origin
@@ -42,7 +42,8 @@ Unset ⇒ commit images to `src/images` and import them; a full remote URL in co
      ```astro
      <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675} priority />
      ```
-   - **With a caption** (default slot) → a `<figure>` + `<figcaption>` **plus a schema.org `ImageObject` JSON-LD** block (Google image-license metadata — license/acquireLicensePage/creditText/copyrightNotice/creator, sourced from `site.copyright.images.license` + `site.organization`). Use for meaningful images that warrant a caption + licensing:
+   Every image emits a schema.org `ImageObject` license JSON-LD (Google image-license metadata — license/acquireLicensePage/creditText/copyrightNotice/creator, from `site.copyright.images.license` + `site.organization`), caption or not.
+   - **With a caption** (default slot) → additionally wraps the image in a `<figure>` + `<figcaption>`:
      ```astro
      <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675}>
        A caption.
