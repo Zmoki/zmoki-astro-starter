@@ -6,12 +6,14 @@
 // The collection-driven cards (posts, resource pages, legal) come from the same
 // page-collections registry the sitemap uses (src/lib/page-collections.ts), so a
 // new page section self-registers here too. Standalone cards (home, blog index)
-// and a `default` fallback — used for any page without its own card (thank-you,
-// brand, health, 404, …) — are listed explicitly.
+// read each page's own exported `meta`, and a `default` fallback — used for any
+// page without its own card (thank-you, brand, health, 404, …) — is explicit.
 import { site } from "@/site.config";
 import { formatShortDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
-import { standalonePages } from "@/data/standalone-pages";
+import type { StandalonePageMeta } from "@/lib/standalone-page";
+import { meta as homeMeta } from "@/pages/index.astro";
+import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 import type { OgEntry } from "./types";
 
 /** Card text has no line-clamp, so cap lengths that would overflow the layout. */
@@ -39,7 +41,7 @@ const article = (
   title: truncate(title, TITLE_MAX),
   description: truncate(description, DESC_MAX),
   eyebrow: `${formatShortDate(date)} · ${by}`,
-  alt: `${title} — ${site.ogSiteName}`,
+  alt: `${title} — ${site.name}`,
 });
 
 const siteEntry = (key: string, title: string, description: string): OgEntry => ({
@@ -64,11 +66,24 @@ function buildEntries(): Promise<RoutedEntry[]> {
 async function computeEntries(): Promise<RoutedEntry[]> {
   const records = await getPageRecords();
 
+  // Standalone pages own their metadata (read at runtime — not at module top
+  // level, which would race the page↔manifest import cycle). title/description
+  // must be set together — this is the build-time "incomplete page metadata"
+  // check the CI relies on (a plain-node script can't import an .astro page).
+  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
+  for (const page of standalonePages) {
+    if ((page.title === undefined) !== (page.description === undefined)) {
+      throw new Error(
+        `Standalone page "${page.path || "/"}" has incomplete metadata — set title and description together, or neither (src/pages/${page.ogKey === "index" ? "index" : "blog/index"}.astro).`,
+      );
+    }
+  }
+
   return [
-    // Standalone cards (home, blog index) — the same set the sitemap lists, from
-    // the shared data module. Each gets its own `site`-template card from its
-    // real title/description; a page that sets neither falls back to the default
-    // card (getOgImage returns DEFAULT_ENTRY for any route without an entry).
+    // Standalone cards (home, blog index) — the same set the sitemap lists. Each
+    // gets its own `site`-template card from its real title/description; a page
+    // that sets neither falls back to the default card (getOgImage returns
+    // DEFAULT_ENTRY for any route without an entry).
     ...standalonePages.flatMap((page) =>
       page.title !== undefined && page.description !== undefined
         ? [

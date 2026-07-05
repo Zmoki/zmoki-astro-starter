@@ -2,17 +2,24 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import PostCard from "@/components/PostCard.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
-import { site } from "@/site.config";
-import { blogIndexPage } from "@/data/standalone-pages";
+
+// This page's own metadata — read by BaseLayout below, its OG card
+// (src/og/manifest.ts), and the sitemap (src/pages/sitemap.xml.ts).
+export const meta = {
+  path: "blog/",
+  ogKey: "blog",
+  title: "Blog",
+  description: "Posts and guides about building your site with the Zmoki Astro Starter.",
+};
 
 const allPosts: CollectionEntry<"blog">[] = await getCollection("blog");
 const sortedPosts = allPosts.sort((a, b) => b.data.order - a.data.order);
 ---
 
-<BaseLayout title={blogIndexPage.title ?? site.name} description={blogIndexPage.description}>
+<BaseLayout title={meta.title} description={meta.description}>
   <header class="mb-10">
     <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">Blog</h1>
-    <p class="text-zmoki-stone-600 mt-3 text-lg">{site.feedDescription}</p>
+    <p class="text-zmoki-stone-600 mt-3 text-lg">{meta.description}</p>
   </header>
 
   {

@@ -1,7 +1,9 @@
 import type { APIRoute } from "astro";
 import { isoDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
-import { standalonePages } from "@/data/standalone-pages";
+import type { StandalonePageMeta } from "@/lib/standalone-page";
+import { meta as homeMeta } from "@/pages/index.astro";
+import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 import { isNoindex } from "@/lib/robots";
 import { isNoindexPath } from "@/lib/noindex";
 
@@ -9,6 +11,10 @@ import { isNoindexPath } from "@/lib/noindex";
 type SitemapEntry = { path: string; lastmod: Date };
 
 export const GET: APIRoute = async ({ site }) => {
+  // The standalone pages own their metadata — read it here at runtime (not at
+  // module top level, which would race the page↔manifest import cycle).
+  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
+
   // One load of every collection-driven page; both the URL list and the index
   // <lastmod> are derived from it (no second content-store read).
   const records = await getPageRecords();
@@ -20,11 +26,11 @@ export const GET: APIRoute = async ({ site }) => {
     .filter((record) => !isNoindex(record.robots))
     .map((record) => ({ path: record.path, lastmod: record.contentModifiedDate }));
 
-  // The standalone pages' shared <lastmod>: the newest of any date set on a
-  // standalone page (src/data/standalone-pages.ts) and the most recently
-  // modified post (all posts, incl. any noindex — matches the pages' freshness,
-  // since home + blog index surface recent content). Spread into Math.max so an
-  // empty blog falls back to the page dates cleanly.
+  // The standalone pages' shared <lastmod>: the newest of any date a standalone
+  // page exports in its `meta` and the most recently modified post (all posts,
+  // incl. any noindex — matches the pages' freshness, since home + blog index
+  // surface recent content). Spread into Math.max so an empty blog falls back to
+  // the page dates cleanly.
   const standaloneLatestDate = new Date(
     Math.max(
       ...standalonePages

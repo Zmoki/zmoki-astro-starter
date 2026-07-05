@@ -8,7 +8,7 @@ Edit **`src/site.config.ts`** — this is the main one. Set:
 
 - `domain` — your production URL, no trailing slash
 - `name` — the logo/wordmark in the nav and footer
-- `description`, `ogSiteName`, `feedDescription` — metadata and RSS titles
+- `description` — default meta/OG description (the nav wordmark + RSS/OG titles use `name`)
 - `nav` — the top-nav links (label + href; anchors like `/#features` or routes like `/blog/`)
 - `organization.name` and `organization.url` — the site owner shown in the footer copyright (also the content-image credit)
 - `contact.email` — the footer Contact link and mailto target

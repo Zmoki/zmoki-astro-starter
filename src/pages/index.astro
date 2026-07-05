@@ -3,10 +3,17 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { fonts } from "@/design-tokens.mjs";
-import { homePage } from "@/data/standalone-pages";
-
-// Title / description / dates live in src/data/standalone-pages.ts (homePage) so
-// the page, its OG card, and the sitemap all read one source.
+// This page's own metadata — read by BaseLayout below, by its OG card
+// (src/og/manifest.ts), and by the sitemap (src/pages/sitemap.xml.ts), so the
+// page is the single source. Bump contentModifiedDate when the page changes.
+export const meta = {
+  path: "",
+  ogKey: "index",
+  title: `${site.name} — a website your AI can make its own`,
+  description: site.description,
+  publishDate: new Date("2026-07-04"),
+  contentModifiedDate: new Date("2026-07-04"),
+};
 
 // Real features of the starter — edit, extend, or remove.
 const features = [
@@ -81,7 +88,7 @@ const securityReport =
 const securityGrade = "A";
 ---
 
-<BaseLayout title={homePage.title ?? site.name} description={homePage.description} wide>
+<BaseLayout title={meta.title} description={meta.description} wide>
   <!-- Hero -->
   <section class="px-4 py-16 text-center lg:py-28">
     <div class="mx-auto max-w-3xl">

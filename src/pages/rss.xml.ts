@@ -178,8 +178,9 @@ export async function GET(context: { site: string | undefined }) {
   );
 
   return rss({
-    title: site.ogSiteName,
-    description: site.feedDescription,
+    title: site.name,
+    // Feed-channel description — lives here (the RSS feed owns it), not in site.config.
+    description: "Posts and guides about building your site with the Zmoki Astro Starter.",
     site: siteUrl,
     // Add media and atom namespaces for better RSS compatibility
     xmlns: {
