@@ -1,19 +1,21 @@
 ---
 // Cloudflare Turnstile captcha provider. Gated by Captcha.astro (the
-// dispatcher), which renders this only when PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY
-// is set — so an unconfigured Turnstile never loads its script.
+// dispatcher), which renders this only when TURNSTILE_SITE_KEY is set — so an
+// unconfigured Turnstile never loads its script.
 //
 // After api.js loads, Turnstile auto-renders any `.cf-turnstile` element and
 // injects a hidden `cf-turnstile-response` token that the form backend (Brevo)
 // validates server-side. The extra `g-recaptcha` class matches Brevo's own
 // generated embed (its captcha-field detection) — keep it so the token is
 // picked up on submit.
-const siteKey = import.meta.env.PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY;
+
+// Committed, not an env var.
+export const TURNSTILE_SITE_KEY = "0x4AAAAAAB2gqKaM5dY-L2kN";
 ---
 
 <div
   class="cf-turnstile g-recaptcha"
-  data-sitekey={siteKey}
+  data-sitekey={TURNSTILE_SITE_KEY}
   data-size="flexible"
   data-language="en"
 >

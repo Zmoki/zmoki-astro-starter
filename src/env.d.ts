@@ -1,30 +1,15 @@
 /// <reference path="../.astro/types.d.ts" />
 
-// Source of truth for the site's PUBLIC_* env vars: declare each here (with a
-// doc comment) first, then mirror the key into .env.example. All are optional —
-// an unconfigured provider simply stays off.
+// Provider config (PostHog, GTM, Turnstile, Brevo, image origin) is committed
+// constants in the relevant components, not env vars — see AGENTS.md →
+// Analytics/Captcha/Forms. Analytics/captcha default to on only for the deploy
+// host's real production build of `main` (src/lib/deploy.ts); the two env vars
+// below are optional overrides of that default.
 interface ImportMetaEnv {
-  /** PostHog project token. Set together with PUBLIC_POSTHOG_HOST to load PostHog. */
-  readonly PUBLIC_POSTHOG_PROJECT_TOKEN: string;
-  /** PostHog host URL. Set together with PUBLIC_POSTHOG_PROJECT_TOKEN to load PostHog. */
-  readonly PUBLIC_POSTHOG_HOST: string;
-  /** Google Tag Manager container ID (e.g. `GTM-XXXXXXX`). Loads GTM when set. */
-  readonly PUBLIC_GTM_CONTAINER_ID: string;
-  /** Global analytics kill switch: set to `"false"` to disable every provider. */
+  /** Overrides the automatic production-only default: `"true"` forces analytics on, `"false"` forces it off. */
   readonly PUBLIC_ANALYTICS_ENABLED: string;
-  /** Brevo account ID, for the email signup forms. */
-  readonly PUBLIC_BREVO_ACCOUNT_ID: string;
-  /**
-   * Cloudflare Turnstile site key — the built-in captcha provider for forms.
-   * Captcha is provider-agnostic (see src/components/Captcha.astro); set this to
-   * enable Turnstile, or add another provider's key to swap it.
-   */
-  readonly PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: string;
-  /** Global captcha kill switch: set to `"false"` to disable the form captcha. */
+  /** Overrides the automatic production-only default: `"true"` forces the form captcha on, `"false"` forces it off. */
   readonly PUBLIC_CAPTCHA_ENABLED: string;
-  // Note: the content-image origin is NOT an env var — it's committed as
-  // `site.platform.imagesCDNHost` in src/site.config.ts (non-secret, and must be
-  // present in every build environment: CI, host previews, production).
 }
 
 interface ImportMeta {

@@ -58,3 +58,24 @@ export function previewOrigin(platform: DeployPlatform): string | null {
       return null;
   }
 }
+
+/**
+ * True only on the host's own production build of `main` — false on previews,
+ * local `astro dev`, and CI (GitHub Actions sets none of these vars). Unlike
+ * `previewOrigin`, which defaults to "production" when it can't tell, this
+ * requires positive evidence — used to gate side effects (analytics, captcha)
+ * that must never fire outside a real deploy.
+ */
+export function isProductionDeploy(platform: DeployPlatform): boolean {
+  const env = process.env;
+  switch (platform) {
+    case "cloudflare":
+      return env.CF_PAGES_BRANCH === PRODUCTION_BRANCH;
+    case "netlify":
+      return env.CONTEXT === "production";
+    case "vercel":
+      return env.VERCEL_ENV === "production";
+    case "amplify":
+      return env.AWS_BRANCH === PRODUCTION_BRANCH;
+  }
+}

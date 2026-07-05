@@ -14,6 +14,9 @@ export interface Props {
 import Button from "@/components/Button.astro";
 import Captcha from "@/components/Captcha.astro";
 
+// Brevo account ID for the email signup forms.
+const BREVO_ACCOUNT_ID = "75687697";
+
 const defaultButtonText = "Subscribe";
 const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.props;
 ---
@@ -22,7 +25,7 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
 <form
   id="brevo-form"
   method="POST"
-  action={`https://${import.meta.env.PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/${formId}`}
+  action={`https://${BREVO_ACCOUNT_ID}.sibforms.com/serve/${formId}`}
   class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
 >
   <section class="prose prose-headings:font-semibold !leading-tight md:w-1/2">

@@ -1,31 +1,29 @@
 ---
-// Analytics dispatcher.
+// Analytics dispatcher. Renders each built-in provider only when its own
+// committed config constant is set — an unconfigured provider emits nothing
+// (no 404ing script, no Lighthouse hit). Providers stack, chaining onto the
+// same `window.track`/`window.identify` facade so one call fans out to all.
 //
-// Renders every built-in analytics provider, each gated on its own env vars so
-// an unconfigured provider emits nothing (no 404ing script, no dent to the
-// Lighthouse Best-Practices score). Multiple providers can run at once — they
-// all chain onto the same vendor-neutral facade, so a single tracked event fans
-// out to all of them.
-//
-// Call sites (BaseLayout, PostLayout) fire events through `window.track(event,
-// props)` and never name a vendor. Each provider component defines/extends
-// `window.track` to forward into its own API:
-//   PostHog → posthog.capture(event, props)
-//   GTM     → dataLayer.push({ event, ...props })
-// To add a provider: create a component in src/components/analytics/ that
-// renders its loader snippet and chains onto window.track, add its enable check
-// here, then render it below.
-//
-// PUBLIC_ANALYTICS_ENABLED="false" is a global kill switch (e.g. for dev) that
-// disables all providers regardless of their individual config.
-import PostHog from "@/components/analytics/posthog.astro";
-import Gtm from "@/components/analytics/gtm.astro";
+// Off by default everywhere (local dev, CI, previews) and on only for the
+// host's real production build of `main` (see isProductionDeploy) — so
+// tracking never fires from a build that isn't the live site.
+// PUBLIC_ANALYTICS_ENABLED overrides that default when explicitly "true" or
+// "false" (e.g. to QA a provider on a preview, or kill it in prod without a
+// redeploy); leave it unset to just use the automatic default.
+// To add a provider: create a component that exports its config constant and
+// chains onto window.track, then import + render it below.
+import { site } from "@/site.config";
+import { isProductionDeploy } from "@/lib/deploy";
+import PostHog, { POSTHOG_PROJECT_TOKEN, POSTHOG_HOST } from "@/components/analytics/posthog.astro";
+import Gtm, { GTM_CONTAINER_ID } from "@/components/analytics/gtm.astro";
 
-const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED !== "false";
+const analyticsOverride = import.meta.env.PUBLIC_ANALYTICS_ENABLED;
+const analyticsEnabled = analyticsOverride
+  ? analyticsOverride !== "false"
+  : isProductionDeploy(site.platform.deploy);
 
-const posthogEnabled =
-  !!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN && !!import.meta.env.PUBLIC_POSTHOG_HOST;
-const gtmEnabled = !!import.meta.env.PUBLIC_GTM_CONTAINER_ID;
+const posthogEnabled = !!POSTHOG_PROJECT_TOKEN && !!POSTHOG_HOST;
+const gtmEnabled = !!GTM_CONTAINER_ID;
 ---
 
 {analyticsEnabled && posthogEnabled && <PostHog />}

@@ -84,9 +84,9 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 7. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
 8. **Internal link check** — `npm run check:links` (runs after build; two rules over `dist/`: (a) every relative internal `<a href>` must resolve to a built file — no 404s; redirect sources and off-site links are skipped; (b) no `<a href>` may hard-code our own origin — the production URL or a preview deploy for the configured host — those must be relative paths. Preview-host detection is shared with the OG image URLs via `src/lib/deploy.ts`.)
 
-Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`. (The content-image origin is **not** an env var — it's committed as `site.platform.imagesCDNHost` in `src/site.config.ts`, so CI/preview/production all optimize with no per-environment config.)
+No GitHub secrets are required for the build step: provider config (PostHog, GTM, Turnstile, Brevo, the image origin) is all committed, not env vars — see **Analytics**/**Captcha**/**Forms** below. Analytics/captcha stay off in this build (and everywhere else in CI) automatically, since `isProductionDeploy` (`src/lib/deploy.ts`) only returns true on the deploy host's own production build of `main` — GitHub Actions runners never set those host-native env vars.
 
-A separate `lighthouse.yml` workflow runs Lighthouse CI after every push to `main`.
+A separate `lighthouse.yml` workflow runs Lighthouse CI on every push and PR to `main`, for the same reason free of real analytics/Turnstile traffic.
 
 ---
 
@@ -269,14 +269,14 @@ Analytics is **provider-agnostic** and supports **multiple providers at once**. 
 
 Alongside `track`, providers chain a second facade `window.identify(id, props)` — call it (optionally: `window.identify?.(...)`) to associate the current visitor with an id. Every call site (page or component) uses these two facades and **never** touches a vendor SDK (`window.posthog`, `dataLayer`, …) directly, so a new provider needs no changes at the call sites.
 
-Built-in providers ship as self-gating components in `src/components/analytics/`:
+Built-in providers ship as components in `src/components/analytics/`, each exporting its own committed config constant (not an env var — no per-environment config needed):
 
-- **`posthog.astro`** — PostHog. Active when `PUBLIC_POSTHOG_PROJECT_TOKEN` **and** `PUBLIC_POSTHOG_HOST` are set. `track` → `posthog.capture(event, props)`; `identify` → `posthog.identify(id, props)`.
-- **`gtm.astro`** — Google Tag Manager. Active when `PUBLIC_GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`) is set. `track` → `dataLayer.push({ event, ...props })`; `identify` → `dataLayer.push({ event: "identify", user_id: id, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
+- **`posthog.astro`** — PostHog. Exports `POSTHOG_PROJECT_TOKEN` + `POSTHOG_HOST`; active when both are non-empty. `track` → `posthog.capture(event, props)`; `identify` → `posthog.identify(id, props)`.
+- **`gtm.astro`** — Google Tag Manager. Exports `GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`); active when non-empty (empty by default — unused on this site). `track` → `dataLayer.push({ event, ...props })`; `identify` → `dataLayer.push({ event: "identify", user_id: id, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
 
-`Analytics.astro` is the dispatcher: it renders every provider (each emits nothing when its own env vars are absent) under one global kill switch, `PUBLIC_ANALYTICS_ENABLED !== "false"`.
+`Analytics.astro` is the dispatcher: it imports each provider's constant(s) and renders the provider only when they're set, under one global switch that's on only for the deploy host's real production build of `main` (`isProductionDeploy`, `src/lib/deploy.ts`) — off in dev/CI/previews with no config needed. `PUBLIC_ANALYTICS_ENABLED` (`"true"`/`"false"`) overrides that default when set.
 
-**To add a provider:** drop a component in `src/components/analytics/` that renders its loader snippet and chains onto `window.track` (wrap the previous `track` so events still reach earlier providers), then render it from `Analytics.astro`. Add its host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`) and its env var to `src/env.d.ts` + `.env.example`.
+**To add a provider:** drop a component in `src/components/analytics/` that exports its own config constant, renders its loader snippet, and chains onto `window.track` (wrap the previous `track` so events still reach earlier providers), then import its constant and render it from `Analytics.astro`. Add its host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`).
 
 ### Tracked events
 
@@ -286,7 +286,7 @@ All events fire via `window.track(...)` and reach every active provider; pagevie
 
 ## Forms
 
-The email-capture form behind the resource lead-magnet gate is **provider-agnostic**, structured like analytics/captcha: **`Form.astro`** is the dispatcher and each backend is a component in **`src/components/forms/`**. `ResourceLayout` renders `<Form formId=… />` (the id comes from the resource's `form.formId` frontmatter) and never names a vendor. **Built-in provider: Brevo** (`forms/brevo.astro`) — a native HTML POST to `{PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/{formId}`.
+The email-capture form behind the resource lead-magnet gate is **provider-agnostic**, structured like analytics/captcha: **`Form.astro`** is the dispatcher and each backend is a component in **`src/components/forms/`**. `ResourceLayout` renders `<Form formId=… />` (the id comes from the resource's `form.formId` frontmatter) and never names a vendor. **Built-in provider: Brevo** (`forms/brevo.astro`) — a native HTML POST to `{BREVO_ACCOUNT_ID}.sibforms.com/serve/{formId}`, where `BREVO_ACCOUNT_ID` is a committed constant in that file (not an env var).
 
 **Single-select** (a gate posts to one backend). Unlike analytics/captcha — selected by env vars — the form backend is chosen site-wide in `Form.astro`'s `providers` registry.
 
@@ -298,9 +298,9 @@ The email-capture form behind the resource lead-magnet gate is **provider-agnost
 
 ## Captcha
 
-Form bot-protection is **provider-agnostic**, structured like analytics: **`Captcha.astro`** is the dispatcher and each provider is a self-gating component in **`src/components/captcha/`** that emits nothing unless its own site-key env var is set. The resource-gate form (`forms/brevo.astro`) renders `<Captcha />` and never names a vendor. **Built-in provider: Cloudflare Turnstile** (`captcha/turnstile.astro`, active on `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`).
+Form bot-protection is **provider-agnostic**, structured like analytics: **`Captcha.astro`** is the dispatcher and each provider is a component in **`src/components/captcha/`** that exports its own committed site-key constant (not an env var — see Analytics above) and emits nothing when that constant is empty. The resource-gate form (`forms/brevo.astro`) renders `<Captcha />` and never names a vendor. **Built-in provider: Cloudflare Turnstile** (`captcha/turnstile.astro`, exports `TURNSTILE_SITE_KEY`).
 
-**Difference from analytics — single-select.** Analytics providers stack (every event fans out to all of them); a form needs exactly **one** captcha (two widgets would inject competing hidden tokens), so the dispatcher renders only the **first** configured provider in its priority list. `PUBLIC_CAPTCHA_ENABLED="false"` is a global kill switch (e.g. for dev, where Turnstile's domain check is a nuisance).
+**Difference from analytics — single-select.** Analytics providers stack (every event fans out to all of them); a form needs exactly **one** captcha (two widgets would inject competing hidden tokens), so the dispatcher renders only the **first** configured provider in its priority list. Like analytics, it's on only for the deploy host's real production build of `main` (`isProductionDeploy`) — off elsewhere, which conveniently also keeps Turnstile's domain check from tripping in dev. `PUBLIC_CAPTCHA_ENABLED` (`"true"`/`"false"`) overrides that default when set.
 
 **Backend coupling (important):** the widget produces a hidden token that **Brevo validates server-side against the captcha configured on that form**. So the provider you enable here must match the one enabled on the Brevo form — the frontend swap alone isn't enough. (This is why the Turnstile widget also carries the `g-recaptcha` class: it matches Brevo's own generated embed / field detection.)
 
@@ -323,7 +323,7 @@ Reusable button composed from Tailwind utilities. Renders a `<button>`, or an `<
 
 ### `Analytics.astro`
 
-Dispatcher for the analytics providers in `src/components/analytics/` (see **Analytics** above). Renders each provider under one global kill switch (`PUBLIC_ANALYTICS_ENABLED !== "false"`); each provider then self-gates on its own env vars and emits **nothing** when unconfigured. This matters beyond tidiness: an unconfigured PostHog would request `<host>/static/array.js` from the current origin, 404, and log a console error — which is what happened in the Lighthouse/CI build (those secrets are empty there), capping the Best-Practices score. Emitting no snippet when a provider can't work keeps that score clean.
+Dispatcher for the analytics providers in `src/components/analytics/` (see **Analytics** above). Renders each provider only when its constant is set, and only on the deploy host's real production build of `main` (`isProductionDeploy`) — this matters beyond tidiness: an unconfigured or non-production PostHog would otherwise request `<host>/static/array.js`, 404, and log a console error, capping the Lighthouse Best-Practices score. Emitting no snippet outside production keeps that score clean.
 
 ### Fonts
 
@@ -349,9 +349,7 @@ Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guid
 
 ## Environment variables
 
-**`src/env.d.ts` is the source of truth** — every `PUBLIC_*` var is declared and documented there (one JSDoc line each: purpose + when it applies), and **`.env.example`** mirrors the same keys as a copy-me template (`cp .env.example .env`). Read those two files rather than a table here; all vars are optional (an unset provider just stays off). Which of them CI's build needs as secrets is listed under **CI** above.
-
-When adding a new env var: declare it (with a doc comment) in `src/env.d.ts` first, then add it to `.env.example` with an empty value and a comment. If the provider exposes a browser global, add it to the `Window` interface in `src/env.d.ts` too.
+Provider config (PostHog, GTM, Turnstile, Brevo, the image origin) is committed constants in the relevant components (see **Analytics**/**Captcha**/**Forms** below), not env vars. The only two env vars this site declares are `PUBLIC_ANALYTICS_ENABLED` / `PUBLIC_CAPTCHA_ENABLED` — optional overrides of the automatic default (on only for the deploy host's real production build of `main`, via `src/lib/deploy.ts` → `isProductionDeploy`; see **Analytics**/**Captcha**). No `.env` file is required. `src/env.d.ts` is the source of truth for both, and also declares the `Window` interface for provider globals (`posthog`, `dataLayer`) — add to it if a new provider exposes one.
 
 ---
 
