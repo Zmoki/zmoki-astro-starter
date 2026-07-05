@@ -1,5 +1,4 @@
 import rss from "@astrojs/rss";
-import { type CollectionEntry } from "astro:content";
 import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
 import { site } from "@/site.config";
@@ -83,7 +82,7 @@ export async function GET(context: { site: string | undefined }) {
 
   // Render and sanitize each post's content
   const items = await Promise.all(
-    sortedPosts.map(async (post: CollectionEntry<"blog">) => {
+    sortedPosts.map(async (post) => {
       // First, strip import statements (Content Layer types `body` as optional)
       let processedContent = stripImports(post.body ?? "");
 
@@ -108,11 +107,20 @@ export async function GET(context: { site: string | undefined }) {
       // Also remove empty figure tags
       contentHtml = contentHtml.replace(/<figure[^>]*>\s*<\/figure>/gi, "");
 
-      // Sanitize the HTML to ensure safe RSS output
+      // Sanitize the HTML to ensure safe RSS output. `video`/`source` stay
+      // allowlisted for raw <video> embeds in MDX, which pass straight through.
       const sanitizedContent = sanitizeHtml(contentHtml, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "figure", "figcaption"]),
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+          "img",
+          "video",
+          "source",
+          "figure",
+          "figcaption",
+        ]),
         allowedAttributes: {
           ...sanitizeHtml.defaults.allowedAttributes,
+          video: ["src", "width", "height"],
+          source: ["src", "type"],
           img: ["src", "alt", "width", "height", "loading", "class"],
         },
       });

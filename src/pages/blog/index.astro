@@ -1,7 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import PostCard from "@/components/PostCard.astro";
-import { type CollectionEntry } from "astro:content";
 import { getPostsNewestFirst } from "@/lib/page-collections";
 
 // This page's metadata — also read by its OG card, the sitemap, and the RSS
@@ -27,7 +26,7 @@ const sortedPosts = await getPostsNewestFirst();
       <p>No posts yet. Check back soon!</p>
     ) : (
       <div class="grid grid-flow-dense grid-cols-1 gap-6">
-        {sortedPosts.map((post: CollectionEntry<"blog">) => (
+        {sortedPosts.map((post) => (
           <PostCard {...post} />
         ))}
       </div>
