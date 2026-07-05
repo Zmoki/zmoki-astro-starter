@@ -18,7 +18,7 @@ export const site = {
 
   /** Top-nav links (between the logo and the CTA button). Anchors or routes. */
   nav: [
-    { label: "Features", href: "/#features" },
+    { label: "SEO", href: "/#seo" },
     { label: "Brand", href: "/#brand" },
     { label: "Blog", href: "/blog/" },
     { label: "SEO Checklist", href: "/resources/new-website-seo-checklist/" },
