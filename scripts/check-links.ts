@@ -101,13 +101,13 @@ function main(): void {
 
   const origin = new URL(site.domain).origin;
   const prodHost = new URL(site.domain).host;
-  const previewSuffix = PREVIEW_HOST_SUFFIX[site.deploy.platform];
+  const previewSuffix = PREVIEW_HOST_SUFFIX[site.platform.deploy];
   const redirects = redirectSources();
 
   // The exact origin of *this* build's preview deploy, if we're running inside
   // one — resolved by the same env-var logic that points OG images at the
   // current preview (src/lib/deploy.ts, shared with src/lib/urls.ts).
-  const currentPreview = previewOrigin(site.deploy.platform);
+  const currentPreview = previewOrigin(site.platform.deploy);
   const previewHost = currentPreview ? safeHost(currentPreview) : null;
 
   // A host is "ours" if it's production, this build's preview, or any host that

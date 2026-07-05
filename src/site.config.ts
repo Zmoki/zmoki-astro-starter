@@ -53,18 +53,6 @@ export const site = {
     github: "https://github.com/Zmoki/zmoki-astro-starter",
   },
 
-  /**
-   * Remote origin for content-image originals — e.g. an R2 bucket on a custom
-   * domain — DECOUPLED from where the site deploys. Content images referenced by
-   * a URL on this origin are OPTIMIZED AT BUILD by Astro (authorized via
-   * `image.remotePatterns`) and served by the deploy host; there is no runtime
-   * transform. It's committed here (not an env var) precisely because it's not a
-   * secret — so every build (CI, host previews, production) optimizes with no
-   * per-environment config. A full URL, or `""` to disable a remote origin and
-   * commit images to `src/images` instead. See the /images skill.
-   */
-  imageOrigin: "https://images.zmoki.xyz",
-
   /** Copyright / content-licensing settings. */
   copyright: {
     /** First year shown in the footer copyright range. */
@@ -80,16 +68,19 @@ export const site = {
     },
   },
 
-  /** Deploy-time settings (hosting). See SETUP.md §6. */
-  deploy: {
+  /** Hosting config — both decoupled and committed (see SETUP.md §6, /images skill). */
+  platform: {
     /**
-     * Hosting target. The starter is platform-agnostic; this one field selects
-     * which host the redirects (`npm run build:redirects`) and response-header
-     * (`npm run build:headers`) artifacts compile to. Default is "cloudflare".
+     * Deploy host — selects the redirect/header artifact format:
      *   "cloudflare" | "netlify" → public/_redirects + public/_headers
-     *   "vercel"                 → vercel.json (redirects[] + headers[] merged in)
-     *   "amplify"                → redirects.json + customHeaders.json
+     *   "vercel"                 → vercel.json · "amplify" → redirects.json + customHeaders.json
      */
-    platform: "cloudflare",
+    deploy: "cloudflare",
+    /**
+     * Remote origin for content-image originals (e.g. an R2 bucket on a custom
+     * domain). Images on it are optimized at build and served by the deploy host;
+     * also the CSP img-src source. A full URL, or "" to keep images in src/images.
+     */
+    imagesCDNHost: "https://images.zmoki.xyz",
   },
 } as const;

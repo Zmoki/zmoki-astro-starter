@@ -13,7 +13,7 @@ thank-you paths; on `/*` the standard security set — `X-Content-Type-Options`,
 To add or change a header: edit `headers.config.ts`, run `npm run build:headers`,
 and commit both the config and the regenerated artifact.
 
-The compiled artifact depends on `site.deploy.platform` (`public/_headers` for
+The compiled artifact depends on `site.platform.deploy` (`public/_headers` for
 Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for
 Amplify) — **never edit it by hand.** It's committed, and CI's
 `npm run check:headers` fails on drift.

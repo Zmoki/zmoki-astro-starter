@@ -1,82 +1,70 @@
 ---
-description: Set up or work on content images (png/jpg/webp) — remote-hosted originals, build-time optimization, responsive images, post cover/hero, and image SEO (Google Discover / image sitemaps). Use when the user wants to add content images, host originals on a bucket/CDN (R2, S3…), add a post cover, cache optimized images in CI, or change how the <Image> component / Markdown images work.
+description: Set up or work on content images (png/jpg/webp) — remote-hosted originals, build-time optimization, responsive images, a post hero image, and image SEO (Google Discover / image sitemaps). Use when the user wants to add content images, host originals on a bucket/CDN (R2, S3…), add a post hero, cache optimized images in CI, or change how the <Image> component / Markdown images work.
 ---
 
 # Content images
 
-How the starter serves **content images** (photos: png/jpg/webp) — optimized, responsive, and SEO-ready. The canonical summary lives in `AGENTS.md` → **Content images**.
+How the starter serves **content images** (photos: png/jpg/webp). The canonical summary is in `AGENTS.md` → **Content images**.
 
 ## The model — build-time optimization
 
-Every content image is **optimized at build by Astro** (`astro:assets`, Sharp): resized, re-encoded to `webp`/`avif`, content-hashed into `dist/_astro/`, and served by the deploy host (whose edge is itself a CDN). `astro.config.mjs` sets `image.layout: "constrained"`, so images are responsive (srcset + zero-CLS sizing) by default.
+Every content image is **optimized at build by Astro** (`astro:assets`): resized, re-encoded to `webp`/`avif`, content-hashed into `dist/_astro/`, and served by the deploy host. `image.layout: "constrained"` (astro.config.mjs) makes them responsive by default. There is **no runtime CDN transform**.
 
-Originals come from one of two places:
+Originals come from either:
 
-- **Committed** — drop the file in `src/images/`, import it, done. Zero external dependency; builds never fetch.
-- **Remote origin (recommended for anything non-trivial)** — host originals on a bucket/CDN (e.g. an **R2 bucket on a custom domain**), set **`site.imageOrigin`** in `src/site.config.ts`, and Astro **downloads + optimizes them at build**. Keeps binaries out of git. The origin is pure storage — there is **no runtime image-CDN transform** — and is **decoupled from `site.deploy.platform`** (deploy anywhere, host images anywhere). It's committed config (not an env var) precisely because it's non-secret and must be present in every build environment — including host previews, which often don't expose env vars.
-
-> Why build-time (not runtime CDN transforms)? Simpler, no per-transform billing, no extra runtime service, host-agnostic, and the deploy host already CDN-serves `/_astro/`. Trade-off: a build with the origin authorized **must reach it** (it downloads at build); and variants are baked, not on-the-fly. See "Reachability & CI" below.
+- **Committed** — a file in `src/images/`, imported. No external dependency; builds never fetch.
+- **Remote origin** — host originals on a bucket/CDN (e.g. an **R2 bucket on a custom domain**), set **`site.platform.imagesCDNHost`** (a full URL) in `src/site.config.ts`, and Astro downloads + optimizes them at build. Keeps binaries out of git. Decoupled from `site.platform.deploy`. It's committed config (not an env var) because it's non-secret and must reach every build environment — including host previews, which often don't expose env vars.
 
 ### Key files
 
-- **`src/site.config.ts`** — **`site.imageOrigin`**, the single source of truth for the origin (also feeds the CSP `img-src`, so they can't drift).
-- **`src/image.config.ts`** — `imageCdnHost` (from `site.imageOrigin`) + `resolveImageSrc()` (bare key → full URL). No provider/transform logic.
-- **`src/components/Image.astro`** — the one content-image component; wraps `astro:assets`. Imported asset **or** remote key/URL. Emits a schema.org `ImageObject` license JSON-LD for **every** image. A caption (default slot) adds a `<figure>` + `<figcaption>`. Images `astro:assets` can't optimize (an unauthorized/unknown remote) render as a plain `<img>` (no bogus repeated-URL srcset, no build-time fetch).
-- **`astro.config.mjs`** — `image.layout: "constrained"` + `image.remotePatterns` authorizing the origin domain (from `site.imageOrigin`).
+- **`src/site.config.ts`** — `site.platform.imagesCDNHost`, the single source of truth for the origin (also feeds the CSP `img-src`, so they can't drift).
+- **`src/components/Image.astro`** — the one component; wraps `astro:assets`. Reads `site.config` directly (there is no separate image config module). Emits a schema.org `ImageObject` license JSON-LD for **every** image; a caption (default slot) adds a `<figure>` + `<figcaption>`. An image it can't optimize (an off-origin remote) renders a plain `<img>` — no repeated-URL srcset, no build-time fetch.
+- **`astro.config.mjs`** — `image.layout` + `image.remotePatterns` authorizing the origin (from `site.platform.imagesCDNHost`).
 
 ## Enable a remote origin
 
-1. **Set `site.imageOrigin`** in `src/site.config.ts`, e.g. `imageOrigin: "https://images.zmoki.xyz"`. That single value authorizes the domain for build-time optimization, lets content reference images by bare key, and drives the CSP `img-src`. (Because it's committed, every build — CI, host previews, production — optimizes with no env-var setup.)
-2. **Rebuild the CSP artifact** — `npm run build:headers` and commit `public/_headers` (it now includes the origin, sourced from `site.imageOrigin`).
-3. Host originals there (e.g. `wrangler r2 object put <bucket>/<key> --file=… --remote`) and reference them.
+1. Set `imagesCDNHost` in `src/site.config.ts` (`platform.imagesCDNHost: "https://images.example.com"`). That one value authorizes build-time optimization and drives the CSP.
+2. `npm run build:headers` and commit `public/_headers` (now includes the origin).
+3. Host originals there (e.g. `wrangler r2 object put <bucket>/<key> --file=… --remote`) and reference them by **full URL**.
 
-`imageOrigin: ""` ⇒ commit images to `src/images` and import them; a full remote URL in content still renders (just unoptimized) if its domain isn't authorized.
+`imagesCDNHost: ""` ⇒ commit images to `src/images` and import them instead.
 
 ## Authoring — two ways
 
-1. **`<Image>`** — the one component. `src` is an imported asset **or** a string URL; a string (remote) src **requires `width` + `height`** (Astro can't infer a remote image's size). Use a **full URL** (a bare key only resolves when `site.imageOrigin` is set — see the robustness note). `priority` = eager + `fetchpriority=high` (LCP/hero only).
-   - **No caption** → a plain responsive `<img>` (hero/cover, decorative, inline):
+1. **`<Image>`** — `src` is an imported asset **or** a full remote URL (a remote src needs `width` + `height` — Astro can't infer them). Every image emits a schema.org `ImageObject` license JSON-LD (license/acquireLicensePage/creditText/copyrightNotice/creator, from `site.copyright.images.license` + `site.organization`). `priority` = eager + `fetchpriority=high` (LCP/hero only).
+   - **No caption** → a plain responsive `<img>`:
      ```astro
      <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675} priority />
      ```
-   Every image emits a schema.org `ImageObject` license JSON-LD (Google image-license metadata — license/acquireLicensePage/creditText/copyrightNotice/creator, from `site.copyright.images.license` + `site.organization`), caption or not.
-   - **With a caption** (default slot) → additionally wraps the image in a `<figure>` + `<figcaption>`:
+   - **With a caption** (default slot) → also wraps it in a `<figure>` + `<figcaption>`:
      ```astro
      <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675}>
        A caption.
      </Image>
      ```
-2. **Plain Markdown `![alt](…)`** — handled by **Astro's built-in optimization**: local (`./photo.jpg`) images, and remote URLs whose domain is authorized in `image.remotePatterns`, are optimized + made responsive at build.
+2. **Plain Markdown `![alt](…)`** — Astro's built-in optimization: local (`./photo.jpg`) images, and full remote URLs whose domain is authorized in `image.remotePatterns`.
 
-> **Content robustness:** reference remote images by **full URL** in Markdown/frontmatter (not a bare key) unless `site.imageOrigin` is set — a bare key with no origin is treated as a (missing) local path and fails the build. Full URLs render either way.
+## Post hero & Google Discover
 
-## Cover / hero images & Google Discover
+A post's optional **`hero`** (`{ image, alt }`, blog frontmatter) is a real **non-text photograph** (distinct from the branded OG card). It drives the post **hero** (LCP), the schema.org **`BlogPosting.image`**, and the **image-sitemap** `<image:loc>` (`src/pages/sitemap.xml.ts`, namespace `sitemap-image/1.1`) — the primary image Google Discover reads. **`og:image` stays the OG card** (social); the two serve different surfaces.
 
-A post's optional **`cover`** (+ **`coverAlt`**) — blog frontmatter, `src/content.config.ts` — is a real **non-text photograph** (distinct from the branded OG card). Via `resolveImageSrc()` (single source) it drives:
-
-- the post **hero** (`<Image priority>` — the LCP image, optimized at build),
-- the schema.org **`BlogPosting.image`** (`PostLayout.astro`) — the primary-image signal Google Discover reads,
-- the **image-sitemap** `<image:loc>` (`src/pages/sitemap.xml.ts`, namespace `sitemap-image/1.1`).
-
-**`og:image` stays the branded OG card** (better for social) — the two images serve different surfaces. This fixes the prior state where both pointed at the text-heavy OG card, which [Discover](https://developers.google.com/search/docs/appearance/google-discover) tells you not to use.
-
-**For Discover, a cover must be** a well-cropped **landscape**, **≥1200px wide**, **16:9**, high-resolution, **not text-heavy**, not a logo. `max-image-preview:large` is already set site-wide (`BaseLayout.astro`). Use a **full URL** so it stays valid even when the origin env is unset:
+Both `hero.image` and `hero.alt` are required when `hero` is set (the schema enforces it, so the primary image is never decorative). **For Discover**, use a well-cropped landscape **≥1200px wide, 16:9, not text-heavy** ([docs](https://developers.google.com/search/docs/appearance/google-discover)); `max-image-preview:large` is already set. Use a **full URL** on the origin so it's optimized:
 
 ```yaml
-cover: "https://images.zmoki.xyz/starter/photo.jpg"
-coverAlt: "Describe the photo"
+hero:
+  image: "https://images.example.com/photo.jpg"
+  alt: "Describe the photo"
 ```
 
-Posts without a cover fall back to the OG card for `schema.image` and emit no image-sitemap entry.
+No `hero` ⇒ `schema.image` falls back to the OG card and no image-sitemap entry is emitted.
 
 ## Reachability & CI caching
 
-- **On the configured origin** (`site.imageOrigin` set): Astro downloads + optimizes at build in **every** environment (CI, host previews, production — the value is committed, so there's no per-environment gap). The origin **must be reachable** during the build; the cache below softens re-fetching.
-- **Off the origin, or `imageOrigin: ""`**: a remote image renders **as-is, unoptimized** (a plain `<img>`, no `srcset`), with **no build-time fetch** — so those never fail a build on a down origin.
-- **Caching:** Astro caches optimized images (and downloaded fonts) in **`node_modules/.astro`** — keyed by source content hash, so an unchanged image is never re-downloaded or re-processed. `npm ci` wipes `node_modules`, so CI restores this dir via `actions/cache` (see `.github/workflows/ci.yml`). Deploy hosts (Cloudflare Pages / Netlify / Vercel) reuse it through their own build cache.
+- **On the configured origin**: optimized at build in **every** environment (the value is committed) — the origin **must be reachable** during the build (the cache below softens re-fetching).
+- **Off the origin, or `imagesCDNHost: ""`**: the image renders as a plain unoptimized `<img>` (no `srcset`), with **no build-time fetch** — never fails a build on a down origin.
+- **Caching:** Astro caches optimized images + fonts in **`node_modules/.astro`** (keyed by content hash). `npm ci` wipes `node_modules`, so CI restores it via `actions/cache` (`.github/workflows/ci.yml`); deploy hosts reuse it via their own build cache.
 
 ## Verify
 
-- `npm run build` with the origin authorized: post `<img>` points at `/_astro/*.webp` (responsive srcset), JSON-LD `image` = the cover, `/sitemap.xml` has an `<image:image>` for it, and `node_modules/.astro/assets/` fills with cached webp.
-- Set `imageOrigin: ""` (or reference an off-origin URL): that image renders as a plain unoptimized `<img>` (no srcset), no fetch, build passes.
-- `npm run check:sd` (after build) validates the JSON-LD.
+- `npm run build`: the hero `<img>` points at `/_astro/*.webp` (distinct srcset), JSON-LD `image` = the hero URL, `/sitemap.xml` has an `<image:image>`, `node_modules/.astro/assets/` fills with webp.
+- `npm run check:sd` validates the JSON-LD.

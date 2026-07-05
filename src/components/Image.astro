@@ -1,37 +1,30 @@
 ---
-// The one content-image component.
+// The one content-image component. Wraps astro:assets: a committed asset
+// (imported ImageMetadata) is optimized at build; a full remote URL on the
+// configured origin (site.platform.imagesCDNHost) is downloaded + optimized at
+// build. Any other remote URL renders a plain <img> — no bogus srcset repeating
+// the original at every width, no build-time fetch. See the /images skill.
 //
-// Optimization: a committed asset (imported ImageMetadata) is always optimized
-// by astro:assets; a remote-hosted image (string URL) is optimized only when its
-// origin is the configured, authorized image host (PUBLIC_IMAGE_CDN_HOST →
-// image.remotePatterns). Astro downloads + resizes + re-encodes to webp/avif,
-// content-hashes into dist/_astro, and the deploy host serves it. There is no
-// runtime transform (see src/image.config.ts). An UNoptimizable remote image
-// renders as a plain <img> — no bogus srcset repeating the original at every
-// width, and no build-time fetch.
+// Every image emits a schema.org ImageObject license JSON-LD (from
+// site.copyright.images.license + site.organization). A caption (the default
+// slot) additionally wraps it in a <figure> + <figcaption>.
 //
-// Every image also emits a schema.org ImageObject JSON-LD block (Google
-// image-license metadata: license, credit, creator) sourced from
-// src/site.config.ts (copyright.images.license, organization).
-//
-// Pass a caption (the default slot) to wrap the image in a <figure> +
-// <figcaption>; without one it's a bare image.
-//
-// A string `src` REQUIRES width + height (Astro can't infer a remote image's
-// dimensions) and should be a full URL (a bare key needs PUBLIC_IMAGE_CDN_HOST).
+// A string `src` must be a full URL and needs width + height (Astro can't infer
+// a remote image's dimensions).
 import { Image as AstroImage } from "astro:assets";
 import JsonLd from "@/components/JsonLd.astro";
-import { resolveImageSrc, imageCdnHost, type ImageLayout } from "@/image.config";
 import { site } from "@/site.config";
 
+type ImageLayout = "constrained" | "fullWidth" | "fixed";
+
 interface Props {
-  /** An imported asset (local) or a remote URL (string, needs width+height). */
+  /** An imported asset, or a full remote URL (needs width + height). */
   src: ImageMetadata | string;
   alt: string;
   width?: number;
   height?: number;
   layout?: ImageLayout;
-  /** Eager-load + fetchpriority=high — set on the LCP/hero image only. */
+  /** Eager + fetchpriority=high — set on the LCP/hero image only. */
   priority?: boolean;
   sizes?: string;
   class?: string;
@@ -51,44 +44,26 @@ const {
 } = Astro.props;
 
 const isString = typeof src === "string";
-const resolvedSrc = isString ? resolveImageSrc(src as string) : src;
-// Astro spells full-width with a hyphen. Keep literal types (a plain object would
-// widen these to `string`, which astro:assets' <Image> props reject).
+const imagesCDNHost = (site.platform.imagesCDNHost || "").replace(/\/+$/, "");
+const willOptimize = !isString || (!!imagesCDNHost && (src as string).startsWith(imagesCDNHost));
 const astroLayout: "constrained" | "fixed" | "full-width" =
   layout === "fullWidth" ? "full-width" : layout;
-const resolvedWidth = width ?? (typeof src === "object" ? src.width : undefined);
 
-// Only images astro:assets can actually optimize get the responsive <Image>: a
-// committed asset, or a remote URL on the configured origin. Everything else
-// (an unauthorized/unknown remote) renders as a plain <img>.
-const willOptimize =
-  !isString || (!!imageCdnHost && (resolvedSrc as string).startsWith(imageCdnHost));
-
+// astro:assets' <Image> props are an overloaded union (string XOR ImageMetadata);
+// cast src to string to pick the remote overload (Astro checks typeof at runtime,
+// so a committed asset still optimizes) and assert the required width/height.
 const shared = {
-  // astro:assets' <Image> props are an overloaded union (string XOR
-  // ImageMetadata), so a union `src` matches no branch. Cast to `string` to select
-  // the remote overload; Astro checks `typeof src` at runtime, so a committed asset
-  // still optimizes. That overload types width/height as required numbers — our
-  // Props contract guarantees them for a string src (a committed asset supplies
-  // width from its metadata), so assert them.
-  src: resolvedSrc as string,
+  src: src as string,
   alt,
-  width: resolvedWidth as number,
+  width: (width ?? (typeof src === "object" ? src.width : undefined)) as number,
   height: height as number,
   loading: (priority ? "eager" : "lazy") as "eager" | "lazy",
   ...(priority ? ({ fetchpriority: "high" } as const) : {}),
 };
 
 const hasCaption = Astro.slots.has("default");
-
-// schema.org ImageObject — emitted for EVERY image. Required is contentUrl + at
-// least one of {creator, creditText, copyrightNotice, license}; we fill the full
-// recommended set. contentUrl is the resolved origin URL for a remote src (the
-// full-res source you license — Google supports it alongside a displayed
-// derivative), or the built/served image for a committed asset (its src/ original
-// has no public URL). See the /structured-data skill.
 const contentUrl = isString
-  ? resolveImageSrc(src as string)
+  ? (src as string)
   : new URL((src as ImageMetadata).src, Astro.site ?? Astro.url).href;
 const imageLd = {
   "@context": "https://schema.org",
@@ -98,11 +73,7 @@ const imageLd = {
   acquireLicensePage: site.copyright.images.license,
   creditText: site.organization.name,
   copyrightNotice: `© ${site.copyright.year} ${site.organization.name}`,
-  creator: {
-    "@type": "Person",
-    name: site.organization.name,
-    url: site.organization.url,
-  },
+  creator: { "@type": "Person", name: site.organization.name, url: site.organization.url },
 };
 
 const captionImgClasses =

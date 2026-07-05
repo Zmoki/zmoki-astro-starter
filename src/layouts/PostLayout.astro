@@ -7,7 +7,6 @@ import Image from "@/components/Image.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
-import { resolveImageSrc } from "@/image.config";
 import { siteUrls } from "@/lib/urls";
 
 export interface Props {
@@ -16,8 +15,7 @@ export interface Props {
   publishDate: Date;
   contentModifiedDate: Date;
   author: CollectionEntry<"blog">["data"]["author"];
-  cover?: string;
-  coverAlt?: string;
+  hero?: CollectionEntry<"blog">["data"]["hero"];
   /** Overrides the canonical URL — set for cross-posted content. See the blog schema. */
   canonical?: string;
   prevPost?: CollectionEntry<"blog"> | null;
@@ -30,30 +28,21 @@ const {
   publishDate,
   contentModifiedDate,
   author,
-  cover,
-  coverAlt,
+  hero,
   canonical,
   prevPost,
   nextPost,
 } = Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
-// BlogPosting structured data (schema.org Article) → Google rich result.
-// Article has no required properties; we include the recommended ones the page
-// actually backs up. All absolute URLs come from the shared siteUrls() helper
-// (src/lib/urls.ts) — the same source BaseLayout uses for canonical + og:image —
-// so the structured data can't drift from the meta tags.
-//
-// image: prefer the post's real cover photo (≥1200px, 16:9) when set — that's
-// the primary-image signal Google Discover reads. Fall back to the OG card only
-// when a post has no cover. (og:image stays the branded card, which is better
-// for social sharing — the two images serve different surfaces.) The cover URL
-// is the same one used for the hero + the image sitemap (single source).
-// See the /structured-data skill and Google's Article reference:
-// https://developers.google.com/search/docs/appearance/structured-data/article
+// BlogPosting structured data → Google rich result. Absolute URLs come from the
+// shared siteUrls() helper, so the SD can't drift from the meta tags. `image`
+// prefers the post's real hero photo — the primary-image signal Google Discover
+// reads — falling back to the OG card (which stays og:image for social). See the
+// /structured-data skill.
 const urls = siteUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
-const schemaImage = cover ? resolveImageSrc(cover) : urls.absoluteUrl(ogImage.path);
+const schemaImage = hero?.image ?? urls.absoluteUrl(ogImage.path);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -85,15 +74,14 @@ const blogPostingLd = {
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">
-    <!-- Cover / hero image (the post's primary image for Discover). Priority = LCP. -->
+    <!-- Hero image — the post's LCP + Discover primary image. -->
     {
-      cover && (
+      hero && (
         <Image
-          src={cover}
-          alt={coverAlt ?? ""}
+          src={hero.image}
+          alt={hero.alt}
           width={1200}
           height={675}
-          layout="constrained"
           priority
           sizes="(min-width: 768px) 768px, 100vw"
           class="border-zmoki-stone-200 w-full rounded-2xl border shadow-sm"

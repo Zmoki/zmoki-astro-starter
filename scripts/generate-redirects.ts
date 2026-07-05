@@ -3,7 +3,7 @@ import { join } from "path";
 import { site } from "../src/site.config.ts";
 
 // Compiles the CSV files in src/redirects/ into the redirect artifact for the
-// configured hosting platform (site.deploy.platform). The CSVs are the
+// configured hosting platform (site.platform.deploy). The CSVs are the
 // platform-neutral source of truth; each emitter below renders their format.
 //
 // Each CSV has the columns: source,destination,code — one redirect per row.
@@ -211,7 +211,7 @@ function warnStaleArtifacts(platform: Platform, warnings: string[]): void {
 }
 
 function main(): void {
-  const platform = site.deploy.platform as Platform;
+  const platform = site.platform.deploy as Platform;
   const emitters: Record<Platform, true> = {
     cloudflare: true,
     netlify: true,

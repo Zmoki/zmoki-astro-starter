@@ -3,7 +3,7 @@
  *
  * Compiled by `scripts/generate-headers.ts` (`npm run build:headers`, also run
  * automatically before `npm run build`) into the artifact for the host set by
- * `site.deploy.platform` in `src/site.config.ts`:
+ * `site.platform.deploy` in `src/site.config.ts`:
  *   "cloudflare" | "netlify" → public/_headers
  *   "vercel"                 → vercel.json (headers[] merged in)
  *   "amplify"                → customHeaders.json (paste into the Amplify console / IaC)
@@ -37,13 +37,10 @@ const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 // reCAPTCHA, https://hcaptcha.com for hCaptcha).
 const CAPTCHA_HOST = "https://challenges.cloudflare.com";
 
-// Remote image origin — where content-image originals are hosted (the demo uses
-// an R2 bucket on a custom domain). Optimized images are served same-origin from
-// /_astro, so 'self' covers the common case; the origin is listed so an image
-// that renders unoptimized (the original remote URL) isn't CSP-blocked. Sourced
-// from `site.imageOrigin` (src/site.config.ts) — the SINGLE source of truth, so
-// the CSP can't drift from the build. Empty ⇒ not added.
-const IMAGE_CDN_HOST = (site.imageOrigin || "").trim().replace(/\/+$/, "");
+// Remote image origin (fallback for images that render unoptimized — optimized
+// ones are served same-origin from /_astro). Sourced from `site.platform.imagesCDNHost`,
+// the same value the build uses, so the CSP can't drift. Empty ⇒ not added.
+const IMAGE_CDN_HOST = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
 
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],

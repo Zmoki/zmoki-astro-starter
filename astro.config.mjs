@@ -8,25 +8,16 @@ import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
 
-// Image origin (decoupled from the deploy host), committed in src/site.config.ts
-// (`imageOrigin`). Authorizes the origin domain for Astro's BUILD-TIME image
-// optimization (`image.remotePatterns` below) so remote content images — the post
-// cover, `<Image>`, and full-URL Markdown images on that host — are downloaded +
-// optimized at build. There is no runtime CDN transform (see src/image.config.ts).
-// Empty ⇒ no remote domain is authorized.
-const rawImageHost = (site.imageOrigin || "").trim().replace(/\/+$/, "");
-// Tolerate a scheme-less value by assuming https; fail with a clear message on a
-// genuinely invalid one rather than a cryptic URL parse error at config load.
-const imageCdnBase =
-  rawImageHost && !/^https?:\/\//i.test(rawImageHost) ? `https://${rawImageHost}` : rawImageHost;
-let imageCdnHost = "";
-if (imageCdnBase) {
+// Authorize the content-image origin (site.platform.imagesCDNHost) for build-time
+// optimization (image.remotePatterns below). Empty ⇒ no remote optimization.
+const imagesCDNHost = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
+let imageHostname = "";
+if (imagesCDNHost) {
   try {
-    imageCdnHost = new URL(imageCdnBase).hostname;
+    imageHostname = new URL(imagesCDNHost).hostname;
   } catch {
     throw new Error(
-      `site.imageOrigin is not a valid host or URL: "${site.imageOrigin}". ` +
-        `Use e.g. "https://images.example.com", or "" to disable a remote origin.`,
+      `site.platform.imagesCDNHost must be a full URL (e.g. "https://images.example.com") or "": got "${imagesCDNHost}"`,
     );
   }
 }
@@ -176,16 +167,12 @@ function rehypeCodeBlockCopy() {
 export default defineConfig({
   integrations: [mdx()],
   site: "https://starter.zmoki.xyz",
-  // Image optimization. `layout: "constrained"` makes every optimized image
-  // (astro:assets <Image> and Markdown `![]()`) responsive with a srcset and
-  // zero-CLS sizing by default. `remotePatterns` authorizes the configured image
-  // origin so remote content images hosted there — the post cover, <Image>, and
-  // full-URL Markdown images — are downloaded + optimized at build (there is no
-  // runtime transform; see src/image.config.ts). No origin set ⇒ no remote
-  // domain authorized (remote images then render unoptimized rather than failing).
+  // `layout: "constrained"` makes optimized images (<Image> and Markdown `![]()`)
+  // responsive by default; `remotePatterns` authorizes the image origin for
+  // build-time optimization. Unset origin ⇒ remote images render unoptimized.
   image: {
     layout: "constrained",
-    ...(imageCdnHost ? { remotePatterns: [{ protocol: "https", hostname: imageCdnHost }] } : {}),
+    ...(imageHostname ? { remotePatterns: [{ protocol: "https", hostname: imageHostname }] } : {}),
   },
   // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
   // served same-origin from /_astro/fonts, with automatic optimized fallback

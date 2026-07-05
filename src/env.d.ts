@@ -22,9 +22,9 @@ interface ImportMetaEnv {
   readonly PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: string;
   /** Global captcha kill switch: set to `"false"` to disable the form captcha. */
   readonly PUBLIC_CAPTCHA_ENABLED: string;
-  // Note: the content-image origin is NOT an env var — it's committed in
-  // src/site.config.ts (`imageOrigin`), since it's non-secret and must be present
-  // in every build environment (CI, host previews, production). See the /images skill.
+  // Note: the content-image origin is NOT an env var — it's committed as
+  // `site.platform.imagesCDNHost` in src/site.config.ts (non-secret, and must be
+  // present in every build environment: CI, host previews, production).
 }
 
 interface ImportMeta {
