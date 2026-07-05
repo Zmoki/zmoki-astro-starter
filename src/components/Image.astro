@@ -12,8 +12,10 @@
 //     JSON-LD block (Google image-license metadata: license, credit, creator).
 //     Use for meaningful images that warrant a caption + licensing metadata.
 //     License URL + credit come from src/site.config.ts (copyright.images.license,
-//     organization). contentUrl is the resolved ORIGINAL image (the full-res
-//     source you license), which Google supports alongside a displayed derivative.
+//     organization). contentUrl is the resolved origin URL for a remote src (the
+//     full-res source you license — Google supports it alongside a displayed
+//     derivative); for a committed asset it's the built/served image (the original
+//     in src/ has no public URL), which is content-hashed and stable per content.
 //
 // A string `src` is resolved against the image origin (bare key → full URL) and
 // REQUIRES width + height (Astro can't infer a remote image's dimensions). An

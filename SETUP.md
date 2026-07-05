@@ -13,7 +13,8 @@ Edit **`src/site.config.ts`** — this is the main one. Set:
 - `organization.name` and `organization.url` — the site owner shown in the footer copyright (also the content-image credit)
 - `contact.email` — the footer Contact link and mailto target
 - `social.github` — the footer "Source" link
-- `copyrightStartYear`
+- `copyright.year` — first year shown in the footer copyright range
+- `copyright.images.license` — license URL for content images (schema.org ImageObject); point it at your terms page
 
 The home page (`src/pages/index.astro`) is a landing page, edited directly in that file. The blog list lives at `src/pages/blog/index.astro` (`/blog/`).
 

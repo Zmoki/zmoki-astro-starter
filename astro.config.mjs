@@ -8,15 +8,30 @@ import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
 
-// Image-CDN base host (decoupled from the deploy host), read via Vite's loadEnv.
-// Used to authorize the CDN domain for Astro's built-in image optimization so
-// that plain Markdown images (`![alt](https://<cdn-base>/key.jpg)`) get
-// downloaded + optimized + made responsive at build. Deliberate images (the post
-// cover, <Image>/<ContentImage>) instead go through the CDN's own transform URLs
-// at runtime — see src/image.config.ts. Unset ⇒ no remote domain is authorized.
+// Image origin host (decoupled from the deploy host), read via Vite's loadEnv.
+// Authorizes the origin domain for Astro's BUILD-TIME image optimization
+// (`image.remotePatterns` below) so remote content images — the post cover,
+// `<Image>`, and full-URL Markdown images on that host — are downloaded +
+// optimized at build. There is no runtime CDN transform (see src/image.config.ts).
+// Unset ⇒ no remote domain is authorized.
 const env = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "PUBLIC_");
-const imageCdnBase = (env.PUBLIC_IMAGE_CDN_HOST || "").replace(/\/+$/, "");
-const imageCdnHost = imageCdnBase ? new URL(imageCdnBase).hostname : "";
+const rawImageHost = (env.PUBLIC_IMAGE_CDN_HOST || "").trim().replace(/\/+$/, "");
+// Tolerate a scheme-less value (the var is named ..._HOST, so `images.example.com`
+// is a natural input) by assuming https, and fail with a clear message on a
+// genuinely invalid one — not a cryptic URL parse error at config load.
+const imageCdnBase =
+  rawImageHost && !/^https?:\/\//i.test(rawImageHost) ? `https://${rawImageHost}` : rawImageHost;
+let imageCdnHost = "";
+if (imageCdnBase) {
+  try {
+    imageCdnHost = new URL(imageCdnBase).hostname;
+  } catch {
+    throw new Error(
+      `PUBLIC_IMAGE_CDN_HOST is not a valid host or URL: "${env.PUBLIC_IMAGE_CDN_HOST}". ` +
+        `Use e.g. "https://images.example.com" or "images.example.com".`,
+    );
+  }
+}
 
 // Rehype plugin to add IDs to definition list terms
 function rehypeDefinitionListIds() {
@@ -166,10 +181,10 @@ export default defineConfig({
   // Image optimization. `layout: "constrained"` makes every optimized image
   // (astro:assets <Image> and Markdown `![]()`) responsive with a srcset and
   // zero-CLS sizing by default. `remotePatterns` authorizes the configured image
-  // CDN's own domain so plain Markdown images hosted there are downloaded +
-  // optimized + made responsive at build (deliberate images — the cover,
-  // <Image>/<ContentImage> — instead use the CDN's runtime transform URLs; see
-  // src/image.config.ts). No CDN configured ⇒ no remote domain authorized.
+  // origin so remote content images hosted there — the post cover, <Image>, and
+  // full-URL Markdown images — are downloaded + optimized at build (there is no
+  // runtime transform; see src/image.config.ts). No origin set ⇒ no remote
+  // domain authorized (remote images then render unoptimized rather than failing).
   image: {
     layout: "constrained",
     ...(imageCdnHost ? { remotePatterns: [{ protocol: "https", hostname: imageCdnHost }] } : {}),

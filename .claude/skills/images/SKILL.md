@@ -37,14 +37,16 @@ Unset ⇒ commit images to `src/images` and import them; a full remote URL in co
 
 ## Authoring — two ways
 
-1. **`<Image>`** — the one component. `src` is an imported asset **or** a string (bare key / full URL); a string (remote) src **requires `width` + `height`** (Astro can't infer a remote image's size). `priority` = eager + `fetchpriority=high` (LCP/hero only).
+1. **`<Image>`** — the one component. `src` is an imported asset **or** a string URL; a string (remote) src **requires `width` + `height`** (Astro can't infer a remote image's size). Use a **full URL** (a bare key only works when `PUBLIC_IMAGE_CDN_HOST` is set — see the robustness note). `priority` = eager + `fetchpriority=high` (LCP/hero only).
    - **No caption** → a plain responsive `<img>` (hero/cover, decorative, inline):
      ```astro
-     <Image src="starter/photo.jpg" alt="…" width={1200} height={675} priority />
+     <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675} priority />
      ```
    - **With a caption** (default slot) → a `<figure>` + `<figcaption>` **plus a schema.org `ImageObject` JSON-LD** block (Google image-license metadata — license/acquireLicensePage/creditText/copyrightNotice/creator, sourced from `site.copyright.images.license` + `site.organization`). Use for meaningful images that warrant a caption + licensing:
      ```astro
-     <Image src="starter/photo.jpg" alt="…" width={1200} height={675}>A caption.</Image>
+     <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675}>
+       A caption.
+     </Image>
      ```
 2. **Plain Markdown `![alt](…)`** — handled by **Astro's built-in optimization**: local (`./photo.jpg`) images, and remote URLs whose domain is authorized in `image.remotePatterns`, are optimized + made responsive at build.
 
