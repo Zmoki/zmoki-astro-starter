@@ -10,8 +10,8 @@ first, and let it lead the work. This skill orients you across them and helps yo
 improve or adapt a guideline, then bring the implementation into line so the two
 never drift.
 
-The pages are an internal, `noindex` living style guide. They use the placeholder
-name **`My Project X`** and are **not** wired to `src/site.config.ts` — you edit
+The pages are an internal, `noindex` living style guide. They hardcode the name
+**`Zmoki Astro Starter`** and are **not** wired to `src/site.config.ts` — you edit
 them directly.
 
 ## The guideline pages (source of truth)

@@ -16,7 +16,7 @@ A guide is just another page under `src/pages/-/astro/brand/`, built on
    example+recipe blocks) as the starting shape. Keep the house conventions:
    - Wrap in `BrandLayout` with a `title` (`Brand — <Name>`) and `description`.
    - Open with the standard header: a back-link
-     `← My Project X brand` → `/-/astro/brand/`, an `<h1>`, and a one-line intro.
+     `← Zmoki Astro Starter brand` → `/-/astro/brand/`, an `<h1>`, and a one-line intro.
    - Put editable content in **frontmatter data** (arrays/objects) and map over it
      in the markup — that's the pattern every page uses; it keeps future edits to
      the data, not the layout.

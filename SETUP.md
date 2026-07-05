@@ -15,7 +15,7 @@ Edit **`src/site.config.ts`** — this is the main one. Set:
 - `social.github` — the footer "Source" link
 - `copyrightStartYear`
 
-The home page (`src/pages/index.astro`) is a landing page (hero → features → final CTA); the hero copy, the closing CTA band, the nav/hero button, and the feature cards are edited **directly in that file** (they aren't in `site.config.ts`). The blog list lives at `src/pages/blog/index.astro` (`/blog/`).
+The home page (`src/pages/index.astro`) is a landing page, edited directly in that file. The blog list lives at `src/pages/blog/index.astro` (`/blog/`).
 
 Then set the domain in two more places:
 
@@ -48,7 +48,7 @@ Add content images to `src/images/`. Whenever you edit a content file, bump its 
 
 ## 4. Brand / design-system pages
 
-The pages under `/-/astro/brand/` are a living style guide (internal, noindex). They use the placeholder name `My Project X` and aren't wired to `site.config`. Edit them directly — especially **`voice.astro`**, which still carries an example "house style" you'll want to rewrite for your own project.
+The pages under `/-/astro/brand/` are a living style guide (internal, noindex). They hardcode the name `Zmoki Astro Starter` and aren't wired to `site.config`. Edit them directly — especially **`voice.astro`**, which still carries an example "house style" you'll want to rewrite for your own project.
 
 ## 5. Analytics and forms (optional but wired)
 
