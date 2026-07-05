@@ -158,13 +158,22 @@ const copyrightYears =
       soft top border above the footer (<code
         class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
         >border-b / border-t border-zmoki-stone-200</code
-      >), a clean sans wordmark, medium-weight links, and a rounded indigo CTA pill.
+      >), the brand mark (<code
+        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
+        >public/brand-mark.svg</code
+      >) linking home, medium-weight links, and a rounded indigo CTA pill.
     </p>
     <div class="border-zmoki-stone-200 overflow-hidden rounded-xl border shadow-sm">
       <div
         class="border-zmoki-stone-200 flex items-center justify-between gap-4 border-b bg-white px-4 py-3"
       >
-        <span class="text-zmoki-stone-900 text-lg font-bold">{site.name}</span>
+        <img
+          src="/brand-mark.svg"
+          alt={site.name}
+          width="32"
+          height="32"
+          class="size-8 rounded-lg"
+        />
         <div class="flex items-center gap-4">
           <span class="text-zmoki-stone-500 hidden text-sm font-medium sm:inline">Features</span>
           <span class="text-zmoki-stone-500 hidden text-sm font-medium sm:inline">Blog</span>
