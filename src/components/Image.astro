@@ -51,18 +51,26 @@ const {
 } = Astro.props;
 
 const resolvedSrc = typeof src === "string" ? resolveImageSrc(src) : src;
-// Astro spells full-width with a hyphen.
-const astroLayout = layout === "fullWidth" ? "full-width" : layout;
+// Astro spells full-width with a hyphen. Keep literal types (a plain object
+// would widen these to `string`, which astro:assets' <Image> props reject).
+const astroLayout: "constrained" | "fixed" | "full-width" =
+  layout === "fullWidth" ? "full-width" : layout;
 const resolvedWidth = width ?? (typeof src === "object" ? src.width : undefined);
 
 const shared = {
-  src: resolvedSrc,
+  // astro:assets' <Image> props are an overloaded union (string XOR
+  // ImageMetadata), so passing a union `src` matches no branch. Cast to `string`
+  // to select the remote overload; Astro checks `typeof src` at runtime, so a
+  // local imported asset still optimizes correctly. That overload types
+  // width/height as required numbers — our Props contract guarantees them for a
+  // string src (a local asset supplies width from its metadata), so assert them.
+  src: resolvedSrc as string,
   alt,
-  width: resolvedWidth,
-  height,
+  width: resolvedWidth as number,
+  height: height as number,
   layout: astroLayout,
-  loading: priority ? "eager" : "lazy",
-  ...(priority ? { fetchpriority: "high" } : {}),
+  loading: (priority ? "eager" : "lazy") as "eager" | "lazy",
+  ...(priority ? ({ fetchpriority: "high" } as const) : {}),
   ...(sizes ? { sizes } : {}),
 };
 
