@@ -1,61 +1,55 @@
 import type { APIRoute } from "astro";
-import { getCollection, type CollectionEntry } from "astro:content";
 import { homePagePublishDate, homePageContentModifiedDate } from "@/data/home-page";
 import { isoDate } from "@/lib/dates";
+import { getPageRecords, type SitemapEntry } from "@/lib/page-collections";
+import { isNoindex } from "@/lib/robots";
+import { isNoindexPath } from "@/lib/noindex";
 
 export const GET: APIRoute = async ({ site }) => {
-  // Get all posts from the feed collection
-  const allFeedIems: CollectionEntry<"blog">[] = await getCollection("blog");
+  // One load of every collection-driven page; both the URL list and the index
+  // <lastmod> are derived from it (no second content-store read).
+  const records = await getPageRecords();
 
-  // Get all resources from the resources collection
-  const allResources: CollectionEntry<"resources">[] = await getCollection(
-    "resources",
-    ({ data }: { data: CollectionEntry<"resources">["data"] }) => data.type === "page",
+  // Collection page URLs, dropping entries whose `robots` frontmatter implies
+  // noindex (content-level). Path-level noindex (headers) is applied to the full
+  // list below, so both noindex controls live together in this endpoint.
+  const collectionEntries: SitemapEntry[] = records
+    .filter((record) => !isNoindex(record.robots))
+    .map((record) => ({ path: record.path, lastmod: record.contentModifiedDate }));
+
+  // The index page's <lastmod> is the newest of its own dates and the most
+  // recently modified post (all posts, incl. any noindex — matches the page's
+  // own freshness). Spread into Math.max so an empty blog falls back cleanly.
+  const indexPageLatestDate = new Date(
+    Math.max(
+      homePagePublishDate.getTime(),
+      homePageContentModifiedDate.getTime(),
+      ...records
+        .filter((record) => record.path.startsWith("blog/"))
+        .map((record) => record.contentModifiedDate.getTime()),
+    ),
   );
 
-  // Get all legal items from the legal collection
-  const allLegalItems: CollectionEntry<"legal">[] = await getCollection("legal");
-
-  // The index page's <lastmod> is the newest of: its own dates, and the most
-  // recently modified post. Spread the post timestamps into Math.max so an empty
-  // blog collection simply falls back to the home-page dates (no [0] on []).
-  const indexPageLatestDateTimestamp = Math.max(
-    homePagePublishDate.getTime(),
-    homePageContentModifiedDate.getTime(),
-    ...allFeedIems.map((post) => post.data.contentModifiedDate.getTime()),
-  );
-  const indexPageLatestDate = isoDate(new Date(indexPageLatestDateTimestamp));
-
-  const sitemapUrl = (path: string, lastmod: string) => `
+  const sitemapUrl = ({ path, lastmod }: SitemapEntry) => `
   <url>
     <loc>${site}${path}</loc>
-    <lastmod>${lastmod}</lastmod>
+    <lastmod>${isoDate(lastmod)}</lastmod>
   </url>
   `;
 
-  // Generate sitemap XML
+  // Standalone (non-collection) pages listed explicitly: the home page (with its
+  // computed <lastmod>) and the blog index (which shares it). Everything is then
+  // run through isNoindexPath so any URL the headers config marks noindex
+  // (X-Robots-Tag) is excluded.
+  const urls: SitemapEntry[] = [
+    { path: "", lastmod: indexPageLatestDate },
+    { path: "blog/", lastmod: indexPageLatestDate },
+    ...collectionEntries,
+  ].filter((url) => !isNoindexPath(`/${url.path}`));
+
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>${site}</loc>
-    <lastmod>${indexPageLatestDate}</lastmod>
-  </url>
-  ${sitemapUrl("blog/", indexPageLatestDate)}
-  ${allFeedIems
-    .map((post: CollectionEntry<"blog">) =>
-      sitemapUrl(`blog/${post.id}/`, isoDate(post.data.contentModifiedDate)),
-    )
-    .join("")}
-  ${allResources
-    .map((resource: CollectionEntry<"resources">) =>
-      sitemapUrl(`resources/${resource.id}/`, isoDate(resource.data.contentModifiedDate)),
-    )
-    .join("")}
-    ${allLegalItems
-      .map((legalItem: CollectionEntry<"legal">) =>
-        sitemapUrl(`legal/${legalItem.id}/`, isoDate(legalItem.data.contentModifiedDate)),
-      )
-      .join("")}
+  ${urls.map(sitemapUrl).join("")}
 </urlset>`;
 
   return new Response(sitemap, {

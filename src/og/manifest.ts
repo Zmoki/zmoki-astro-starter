@@ -3,12 +3,14 @@
 //   • src/pages/og/[...path].png.ts — getStaticPaths() + rendering
 //   • src/layouts/BaseLayout.astro  — the og:image URL + og:image:alt per page
 //
-// Enumerates the same routes as the sitemap (home, blog index, posts, resource
-// pages, legal) plus a `default` fallback used for any page without its own card
-// (thank-you, brand, health, 404, …).
-import { getCollection, type CollectionEntry } from "astro:content";
+// The collection-driven cards (posts, resource pages, legal) come from the same
+// page-collections registry the sitemap uses (src/lib/page-collections.ts), so a
+// new page section self-registers here too. Standalone cards (home, blog index)
+// and a `default` fallback — used for any page without its own card (thank-you,
+// brand, health, 404, …) — are listed explicitly.
 import { site } from "@/site.config";
 import { formatShortDate } from "@/lib/dates";
+import { getPageRecords } from "@/lib/page-collections";
 import type { OgEntry } from "./types";
 
 /** Card text has no line-clamp, so cap lengths that would overflow the layout. */
@@ -49,9 +51,9 @@ const siteEntry = (key: string, title: string, description: string): OgEntry => 
 
 const DEFAULT_ENTRY: OgEntry = siteEntry("default", site.name, site.description);
 
-// Memoized so the three getCollection() calls and the array build run once per
-// process, not on every getOgImage() call — BaseLayout resolves an OG image for
-// every page (and PostLayout again for each post), so this is hit N+ times.
+// Memoized so the record load and the array build run once per process, not on
+// every getOgImage() call — BaseLayout resolves an OG image for every page (and
+// PostLayout again for each post), so this is hit N+ times.
 let entriesPromise: Promise<RoutedEntry[]> | null = null;
 
 function buildEntries(): Promise<RoutedEntry[]> {
@@ -59,44 +61,21 @@ function buildEntries(): Promise<RoutedEntry[]> {
 }
 
 async function computeEntries(): Promise<RoutedEntry[]> {
-  const posts: CollectionEntry<"blog">[] = await getCollection("blog");
-  const resources: CollectionEntry<"resources">[] = await getCollection(
-    "resources",
-    ({ data }) => data.type === "page",
-  );
-  const legal: CollectionEntry<"legal">[] = await getCollection("legal");
+  const records = await getPageRecords();
 
   return [
     { route: "/", entry: siteEntry("index", site.name, site.description) },
     { route: "/blog/", entry: siteEntry("blog", site.name, "Blog") },
-    ...posts.map((p) => ({
-      route: `/blog/${p.id}/`,
+    // One article card per collection-driven page. `path` is "blog/foo/"; the
+    // route keeps the trailing slash, the card key drops it → /og/blog/foo.png.
+    ...records.map((record) => ({
+      route: `/${record.path}`,
       entry: article(
-        `blog/${p.id}`,
-        p.data.title,
-        p.data.description,
-        p.data.publishDate,
-        p.data.author.name,
-      ),
-    })),
-    ...resources.map((r) => ({
-      route: `/resources/${r.id}/`,
-      entry: article(
-        `resources/${r.id}`,
-        r.data.title,
-        r.data.description,
-        r.data.publishDate,
-        site.name,
-      ),
-    })),
-    ...legal.map((l) => ({
-      route: `/legal/${l.id}/`,
-      entry: article(
-        `legal/${l.id}`,
-        l.data.title,
-        l.data.description,
-        l.data.publishDate,
-        site.name,
+        record.path.replace(/\/$/, ""),
+        record.title,
+        record.description,
+        record.publishDate,
+        record.byline,
       ),
     })),
     { route: null, entry: DEFAULT_ENTRY },

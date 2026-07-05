@@ -18,6 +18,7 @@ export interface Props {
   canonical?: string;
   prevPost?: CollectionEntry<"blog"> | null;
   nextPost?: CollectionEntry<"blog"> | null;
+  robots?: string[];
 }
 
 const {
@@ -29,6 +30,7 @@ const {
   canonical,
   prevPost,
   nextPost,
+  robots,
 } = Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
@@ -69,6 +71,7 @@ const blogPostingLd = {
   publishDate={publishDate}
   contentModifiedDate={contentModifiedDate}
   canonical={canonical}
+  robots={robots}
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">
