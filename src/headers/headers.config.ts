@@ -22,20 +22,14 @@ import { site } from "../site.config.ts";
 // Third-party hosts in use: Cloudflare (Web Analytics + Turnstile), Google Tag
 // Manager / Analytics (GTM provider — drop if unused), Google Fonts.
 
-// PostHog host — the origin the PostHog snippet loads its script from (script-src)
-// and sends events to (connect-src); a dedicated reverse-proxy subdomain here.
-// Keep this in sync with `PUBLIC_POSTHOG_HOST` (src/env.d.ts): the env var drives
-// the runtime snippet, this literal drives the committed CSP artifact — the
-// drift-checked `public/_headers` can't read env, so it's duplicated.
-const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
+// PostHog host (https://a.starter.zmoki.xyz), a reverse-proxy subdomain: keep
+// in sync with the POSTHOG_HOST constant in src/components/analytics/posthog.astro.
+// Duplicated as a literal because this file compiles into the committed,
+// drift-checked public/_headers artifact, which can't import an .astro export.
 
-// Captcha host — the origin the built-in captcha (Cloudflare Turnstile) loads its
-// widget script (script-src) and iframe (frame-src) from, and which the form
-// iframe is granted feature permissions for (Permissions-Policy below). Captcha
-// is provider-agnostic (see src/components/Captcha.astro) — if you swap the
-// provider, change this one constant to its host (e.g. https://www.google.com for
-// reCAPTCHA, https://hcaptcha.com for hCaptcha).
-const CAPTCHA_HOST = "https://challenges.cloudflare.com";
+// Captcha host (https://challenges.cloudflare.com): swap to your provider's
+// host if you change captcha (src/components/Captcha.astro), e.g.
+// https://www.google.com for reCAPTCHA, https://hcaptcha.com for hCaptcha.
 
 // Remote image origin (fallback for images that render unoptimized — optimized
 // ones are served same-origin from /_astro). Sourced from `site.platform.imagesCDNHost`,
@@ -48,11 +42,11 @@ const cspDirectives: Record<string, string[]> = {
     "'self'",
     "'unsafe-inline'",
     "https://static.cloudflareinsights.com",
-    CAPTCHA_HOST, // built-in captcha (Turnstile) widget script
-    POSTHOG_HOST,
+    "https://challenges.cloudflare.com", // built-in captcha (Turnstile) widget script
+    "https://a.starter.zmoki.xyz", // PostHog
     "https://www.googletagmanager.com",
   ],
-  "frame-src": [CAPTCHA_HOST], // captcha widget iframe
+  "frame-src": ["https://challenges.cloudflare.com"], // captcha widget iframe
   "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
     "'self'",
@@ -68,7 +62,7 @@ const cspDirectives: Record<string, string[]> = {
   "connect-src": [
     "'self'",
     "https://cloudflareinsights.com",
-    POSTHOG_HOST,
+    "https://a.starter.zmoki.xyz", // PostHog
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
   ],
@@ -94,15 +88,15 @@ const permissionsPolicy = [
   "microphone=()",
   "midi=()",
   "payment=()",
-  `picture-in-picture=(self "${CAPTCHA_HOST}")`,
+  'picture-in-picture=(self "https://challenges.cloudflare.com")',
   "publickey-credentials-get=()",
   "screen-wake-lock=()",
   "sync-xhr=()",
   "usb=()",
   "xr-spatial-tracking=()",
-  `autoplay=(self "${CAPTCHA_HOST}")`,
-  `cross-origin-isolated=(self "${CAPTCHA_HOST}")`,
-  `fullscreen=(self "${CAPTCHA_HOST}")`,
+  'autoplay=(self "https://challenges.cloudflare.com")',
+  'cross-origin-isolated=(self "https://challenges.cloudflare.com")',
+  'fullscreen=(self "https://challenges.cloudflare.com")',
 ].join(", ");
 
 export interface HeaderRule {

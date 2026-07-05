@@ -42,8 +42,7 @@ cd my-new-site && rm -rf .git && git init
 ```bash
 cd my-new-site
 npm install
-cp .env.example .env   # optional: PostHog / Brevo keys
-npm run dev            # http://localhost:4321
+npm run dev   # http://localhost:4321
 ```
 
 Then follow **[SETUP.md](./SETUP.md)**: edit `src/site.config.ts` (name, domain, nav, hero, CTA), set the domain in `astro.config.mjs`, drop your content into `src/content/blog/`, and re-skin the palette in `src/design-tokens.mjs`.

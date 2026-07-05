@@ -1,31 +1,19 @@
 ---
-// Analytics dispatcher.
+// Analytics dispatcher. Renders each built-in provider only when its own
+// committed config constant is set, chaining onto the shared window.track/
+// window.identify facade so one call fans out to every active provider.
 //
-// Renders every built-in analytics provider, each gated on its own env vars so
-// an unconfigured provider emits nothing (no 404ing script, no dent to the
-// Lighthouse Best-Practices score). Multiple providers can run at once — they
-// all chain onto the same vendor-neutral facade, so a single tracked event fans
-// out to all of them.
-//
-// Call sites (BaseLayout, PostLayout) fire events through `window.track(event,
-// props)` and never name a vendor. Each provider component defines/extends
-// `window.track` to forward into its own API:
-//   PostHog → posthog.capture(event, props)
-//   GTM     → dataLayer.push({ event, ...props })
-// To add a provider: create a component in src/components/analytics/ that
-// renders its loader snippet and chains onto window.track, add its enable check
-// here, then render it below.
-//
-// PUBLIC_ANALYTICS_ENABLED="false" is a global kill switch (e.g. for dev) that
-// disables all providers regardless of their individual config.
-import PostHog from "@/components/analytics/posthog.astro";
-import Gtm from "@/components/analytics/gtm.astro";
+// Off by default; PUBLIC_ANALYTICS_ENABLED="true" turns it on (host's
+// production env, CI on main, or locally to test — see AGENTS.md → Analytics).
+// To add a provider: export a config constant, chain onto window.track, then
+// import + render it below.
+import PostHog, { POSTHOG_PROJECT_TOKEN, POSTHOG_HOST } from "@/components/analytics/posthog.astro";
+import Gtm, { GTM_CONTAINER_ID } from "@/components/analytics/gtm.astro";
 
-const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED !== "false";
+const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED === "true";
 
-const posthogEnabled =
-  !!import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN && !!import.meta.env.PUBLIC_POSTHOG_HOST;
-const gtmEnabled = !!import.meta.env.PUBLIC_GTM_CONTAINER_ID;
+const posthogEnabled = !!POSTHOG_PROJECT_TOKEN && !!POSTHOG_HOST;
+const gtmEnabled = !!GTM_CONTAINER_ID;
 ---
 
 {analyticsEnabled && posthogEnabled && <PostHog />}

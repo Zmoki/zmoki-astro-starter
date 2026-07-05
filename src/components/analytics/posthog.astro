@@ -1,19 +1,24 @@
 ---
 // PostHog analytics provider. Gated by Analytics.astro (the dispatcher), which
-// renders this only when PUBLIC_POSTHOG_PROJECT_TOKEN and PUBLIC_POSTHOG_HOST
-// are both set — so an unconfigured PostHog never requests a 404ing script.
+// renders this only when POSTHOG_PROJECT_TOKEN and POSTHOG_HOST are both
+// set — so an unconfigured PostHog never requests a 404ing script.
 //
 // Beyond loading the library, this registers the vendor-neutral
 // `window.track(event, props)` facade (see Analytics.astro) by *chaining* onto
 // any previously-defined `track` — so multiple providers can coexist and every
 // event fans out to all of them.
+
+// Committed, not an env var. Keep POSTHOG_HOST in sync with the literal in
+// src/headers/headers.config.ts.
+export const POSTHOG_PROJECT_TOKEN = "phc_B5Nb3sdRsE7uugTkBUCYjfppXvKDMi8k6YtCPGyHvHeo";
+export const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 ---
 
 <script
   is:inline
   define:vars={{
-    apiKey: import.meta.env.PUBLIC_POSTHOG_PROJECT_TOKEN,
-    apiHost: import.meta.env.PUBLIC_POSTHOG_HOST,
+    apiKey: POSTHOG_PROJECT_TOKEN,
+    apiHost: POSTHOG_HOST,
   }}
 >
   /* eslint-disable */

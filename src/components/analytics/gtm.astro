@@ -1,6 +1,6 @@
 ---
 // Google Tag Manager provider. Gated by Analytics.astro (the dispatcher), which
-// renders this only when PUBLIC_GTM_CONTAINER_ID (GTM-XXXXXXX) is set.
+// renders this only when GTM_CONTAINER_ID (GTM-XXXXXXX) is set.
 //
 // GTM is a tag hub: it loads its container and exposes `window.dataLayer`, into
 // which we push events. Whatever tags you wire up inside the GTM UI (GA4, Ads,
@@ -12,7 +12,10 @@
 // any previously-defined `track`, so events fan out to every active provider.
 // A tracked event becomes a `dataLayer.push({ event, ...props })` — the `event`
 // key is what you match on with a "Custom Event" trigger in GTM.
-const containerId = import.meta.env.PUBLIC_GTM_CONTAINER_ID;
+
+// Committed, not an env var. Empty by default (GTM is unused on this site).
+export const GTM_CONTAINER_ID = "";
+const containerId = GTM_CONTAINER_ID;
 ---
 
 <script is:inline define:vars={{ containerId }}>

@@ -8,39 +8,32 @@ Astro dev server. No build step needed for local verification.
 
 ## Prerequisites
 
-`.env` file must exist at the project root. See `src/env.d.ts` for all variables; `.env.example` has the full list with empty values.
+No `.env` file is required — see `src/env.d.ts`.
 
 ### Worktree setup
 
-If running inside a git worktree (i.e. `$PWD` is not the primary repo), two extra steps are needed before starting:
+If running inside a git worktree (i.e. `$PWD` is not the primary repo), install dependencies first — `node_modules` is not shared across worktrees:
 
-1. **Copy `.env` from the primary repo** — worktrees don't share the root `.env`:
-
-   ```bash
-   PRIMARY=$(git rev-parse --path-format=absolute --git-common-dir | sed 's|/.git||')
-   cp "$PRIMARY/.env" .env
-   ```
-
-2. **Install dependencies** — `node_modules` is not shared across worktrees:
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 ## Run
 
-**Before starting, ask the user:**
+Analytics and captcha default off. **Before starting, ask the user:**
 
 ```
-question: "Do you want analytics enabled for this session?"
-header: "Analytics"
+question: "Enable analytics and/or captcha for this session?"
+header: "Analytics/Captcha"
+multiSelect: true
 options:
-  - label: "Disabled"
-    description: "Set PUBLIC_ANALYTICS_ENABLED=false — keeps dev traffic out of PostHog"
-  - label: "Enabled"
-    description: "Real events will be sent to PostHog"
+  - label: "Analytics"
+    description: "Sets PUBLIC_ANALYTICS_ENABLED=true — real events will be sent to PostHog"
+  - label: "Captcha"
+    description: "Sets PUBLIC_CAPTCHA_ENABLED=true — note Turnstile's domain check may reject localhost"
 ```
 
-Use the answer to pick the correct start command below.
+Use the answer to set the corresponding env var(s) on the start command below (default: neither set).
 
 Derive a stable port from the working directory so multiple worktrees can run simultaneously without conflict:
 
@@ -51,12 +44,12 @@ PORT=$(( 4300 + $(echo "$PWD" | cksum | cut -d' ' -f1) % 100 ))
 Start the dev server in the background:
 
 ```bash
-# analytics enabled (default):
+# neither enabled (default):
 npm run dev -- --port $PORT &> /tmp/astro-dev.log &
 ZMOKI_PID=$!
 
-# analytics disabled:
-PUBLIC_ANALYTICS_ENABLED=false npm run dev -- --port $PORT &> /tmp/astro-dev.log &
+# analytics and/or captcha enabled, per the answer above:
+PUBLIC_ANALYTICS_ENABLED=true PUBLIC_CAPTCHA_ENABLED=true npm run dev -- --port $PORT &> /tmp/astro-dev.log &
 ZMOKI_PID=$!
 ```
 

@@ -1,38 +1,21 @@
 ---
-// Captcha dispatcher.
+// Captcha dispatcher, mirroring Analytics.astro but single-select: at most ONE
+// provider renders (two widgets inject competing hidden tokens), the first in
+// `providers` whose site-key constant is set. Its token is validated by the
+// form backend (Brevo) against the captcha configured on that Brevo form —
+// keep the two in sync.
 //
-// Provider-agnostic bot protection on forms, mirroring Analytics.astro. Renders
-// at most ONE captcha provider from src/components/captcha/, each self-gating on
-// its own site-key env var so an unconfigured provider emits nothing (no widget,
-// no script, no CSP violation, no dent to the Lighthouse score).
-//
-// Unlike analytics — where providers stack and every event fans out to all of
-// them — a form needs exactly ONE captcha (two widgets would inject competing
-// hidden tokens). So this is single-select: the first configured provider in the
-// priority list below wins and the rest are skipped.
-//
-// The active provider's token is validated by the form's backend (Brevo) against
-// the captcha configured on that form — so the provider you enable here must
-// match the one enabled on the Brevo form.
-//
-// To add a provider (e.g. Google reCAPTCHA, hCaptcha):
-//   1. Create a component in src/components/captcha/ that renders its widget +
-//      loader script, gated on its own PUBLIC_* site-key env var.
-//   2. Declare that env var in src/env.d.ts and .env.example.
-//   3. Import it and add a { enabled, Component } entry to `providers` below.
-//   4. Add its script/frame host to the CSP in src/headers/headers.config.ts
-//      (then `npm run build:headers`).
-//
-// PUBLIC_CAPTCHA_ENABLED="false" is a global kill switch (e.g. for local dev,
-// where Turnstile's domain check is a nuisance).
-import Turnstile from "@/components/captcha/turnstile.astro";
+// Off by default; PUBLIC_CAPTCHA_ENABLED="true" turns it on (host's production
+// env, CI on main, or locally to test) — also keeps Turnstile's domain check
+// from tripping in local dev.
+// To add a provider: export a site-key constant, add a { enabled, Component }
+// entry below, and allowlist its host in src/headers/headers.config.ts.
+import Turnstile, { TURNSTILE_SITE_KEY } from "@/components/captcha/turnstile.astro";
 
-const captchaEnabled = import.meta.env.PUBLIC_CAPTCHA_ENABLED !== "false";
+const captchaEnabled = import.meta.env.PUBLIC_CAPTCHA_ENABLED === "true";
 
 // Priority order: the first provider with its site key set wins.
-const providers = [
-  { enabled: !!import.meta.env.PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY, Component: Turnstile },
-];
+const providers = [{ enabled: !!TURNSTILE_SITE_KEY, Component: Turnstile }];
 
 const Active = captchaEnabled ? providers.find((p) => p.enabled)?.Component : undefined;
 ---
