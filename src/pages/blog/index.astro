@@ -1,9 +1,10 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import PostCard from "@/components/PostCard.astro";
-import { getCollection, type CollectionEntry } from "astro:content";
+import { getPostsNewestFirst } from "@/lib/page-collections";
 
-// This page's metadata — also read by its OG card and the sitemap.
+// This page's metadata — also read by its OG card, the sitemap, and the RSS
+// channel description.
 export const meta = {
   path: "blog/",
   ogKey: "blog",
@@ -11,8 +12,7 @@ export const meta = {
   description: "Posts and guides about building your site with the Zmoki Astro Starter.",
 } satisfies StandalonePageMeta;
 
-const allPosts: CollectionEntry<"blog">[] = await getCollection("blog");
-const sortedPosts = allPosts.sort((a, b) => b.data.order - a.data.order);
+const sortedPosts = await getPostsNewestFirst();
 ---
 
 <BaseLayout title={meta.title} description={meta.description}>
@@ -26,7 +26,7 @@ const sortedPosts = allPosts.sort((a, b) => b.data.order - a.data.order);
       <p>No posts yet. Check back soon!</p>
     ) : (
       <div class="grid grid-flow-dense grid-cols-1 gap-6">
-        {sortedPosts.map((post: CollectionEntry<"blog">) => (
+        {sortedPosts.map((post) => (
           <PostCard {...post} />
         ))}
       </div>

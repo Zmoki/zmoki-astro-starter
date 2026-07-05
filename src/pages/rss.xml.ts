@@ -1,8 +1,9 @@
 import rss from "@astrojs/rss";
-import { getCollection, type CollectionEntry } from "astro:content";
 import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
 import { site } from "@/site.config";
+import { getPostsNewestFirst } from "@/lib/page-collections";
+import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 
 // Configure markdown-it to allow HTML (needed for our converted components)
 const parser = new MarkdownIt({
@@ -37,7 +38,7 @@ function convertRelativeUrlsToAbsolute(html: string, siteUrl: string): string {
 
 /**
  * Converts MDX components to HTML for RSS feed
- * Handles <Image> and <Video> components using regex parsing.
+ * Handles <Image> components using regex parsing.
  *
  * Note: this parses MDX/HTML with regexes, which is inherently brittle (attribute
  * ordering, nested figures, etc.). It's kept intentionally narrow — only the
@@ -69,31 +70,6 @@ function convertMdxComponentsToHtml(content: string): string {
     return `<p><em>[Image: ${alt}]</em></p>`;
   });
 
-  // Convert <Video> components to <video> tags
-  // Note: RSS validators prefer simpler video tags without controls/poster
-  // Matches: <Video src="..." poster="..." width="..." height="..." />
-  processed = processed.replace(/<Video\s+([^>]+)\s*\/?>/g, (match, attrs) => {
-    // Extract attributes
-    const srcMatch = attrs.match(/src=["']([^"']+)["']/);
-    const widthMatch = attrs.match(/width=["']?(\d+)["']?/);
-    const heightMatch = attrs.match(/height=["']?(\d+)["']?/);
-
-    const src = srcMatch ? srcMatch[1] : "";
-    const width = widthMatch ? widthMatch[1] : "";
-    const height = heightMatch ? heightMatch[1] : "";
-
-    if (!src) return "";
-
-    // Build video tag - simplified for RSS compatibility
-    // Remove controls and poster attributes as validators prefer simpler tags
-    let videoTag = `<video`;
-    if (width) videoTag += ` width="${width}"`;
-    if (height) videoTag += ` height="${height}"`;
-    videoTag += `><source src="${src}" type="video/mp4" />Your browser does not support the video tag.</video>`;
-
-    return videoTag;
-  });
-
   return processed;
 }
 
@@ -101,17 +77,12 @@ export async function GET(context: { site: string | undefined }) {
   // Ensure siteUrl is always a string
   const siteUrl = String(context.site || site.domain);
 
-  // Get all posts from the feed collection
-  const allPosts: CollectionEntry<"blog">[] = await getCollection("blog");
-
-  // Sort posts by publishDate (newest first, matching the site's ordering)
-  const sortedPosts = allPosts.sort(
-    (a, b) => b.data.publishDate.getTime() - a.data.publishDate.getTime(),
-  );
+  // Newest first, same ordering rule as the blog index and prev/next nav.
+  const sortedPosts = await getPostsNewestFirst();
 
   // Render and sanitize each post's content
   const items = await Promise.all(
-    sortedPosts.map(async (post: CollectionEntry<"blog">) => {
+    sortedPosts.map(async (post) => {
       // First, strip import statements (Content Layer types `body` as optional)
       let processedContent = stripImports(post.body ?? "");
 
@@ -136,8 +107,8 @@ export async function GET(context: { site: string | undefined }) {
       // Also remove empty figure tags
       contentHtml = contentHtml.replace(/<figure[^>]*>\s*<\/figure>/gi, "");
 
-      // Sanitize the HTML to ensure safe RSS output
-      // Allow video tags and their attributes (simplified for RSS compatibility)
+      // Sanitize the HTML to ensure safe RSS output. `video`/`source` stay
+      // allowlisted for raw <video> embeds in MDX, which pass straight through.
       const sanitizedContent = sanitizeHtml(contentHtml, {
         allowedTags: sanitizeHtml.defaults.allowedTags.concat([
           "img",
@@ -148,11 +119,7 @@ export async function GET(context: { site: string | undefined }) {
         ]),
         allowedAttributes: {
           ...sanitizeHtml.defaults.allowedAttributes,
-          video: [
-            "width",
-            "height",
-            // Removed controls and poster for RSS validator compatibility
-          ],
+          video: ["src", "width", "height"],
           source: ["src", "type"],
           img: ["src", "alt", "width", "height", "loading", "class"],
         },
@@ -179,8 +146,8 @@ export async function GET(context: { site: string | undefined }) {
 
   return rss({
     title: site.name,
-    // Feed-channel description — lives here (the RSS feed owns it), not in site.config.
-    description: "Posts and guides about building your site with the Zmoki Astro Starter.",
+    // Feed-channel description — the feed is the blog, so reuse its description.
+    description: blogIndexMeta.description,
     site: siteUrl,
     // Add media and atom namespaces for better RSS compatibility
     xmlns: {

@@ -36,14 +36,14 @@ Preview everything at `/-/astro/brand/color/`.
 
 **Brand mark.** Replace **`public/brand-mark.svg`** with your own mark — a **square, full-bleed SVG** (the art fills its own background, corner to corner). It's the single source for both the favicon set and the mark on the OG social cards. After swapping it, run **`npm run favicons`** to regenerate the raster icons (`favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`) and commit them; the SVG favicon and the OG cards render straight from `brand-mark.svg`, so they update with no extra step. The shipped default is an indigo square with a "Z" — keep the full-bleed square shape so the Apple-touch / Android icons don't get transparent corners.
 
-Type is **self-hosted via [Astro's Fonts API](https://docs.astro.build/en/guides/fonts/)** and wired into Tailwind's `font-sans` / `font-serif` / `font-mono` families through CSS variables — the site is **all-sans**: one sans for headings and body, a mono for code (`font-serif` stays available but unused). The family names live in `src/design-tokens.mjs` (`export const fonts`). To change them, run **`/brand`** — it walks the full swap (the names in `src/design-tokens.mjs`, the provider/axes in `astro.config.mjs`, and the brand specimen). Preview at `/-/astro/brand/typography/`.
+Type is **self-hosted via [Astro's Fonts API](https://docs.astro.build/en/guides/fonts/)** and wired into Tailwind's `font-sans` / `font-mono` families through CSS variables — the site is **all-sans**: one sans for headings and body, a mono for code (`font-serif` remains Tailwind's static fallback stack, unused and not self-hosted). The family names live in `src/design-tokens.mjs` (`export const fonts`). To change them, run **`/brand`** — it walks the full swap (the names in `src/design-tokens.mjs`, the provider/axes in `astro.config.mjs`, and the brand specimen). Preview at `/-/astro/brand/typography/`.
 
 ## 3. Content
 
 Replace the placeholder content:
 
-- `src/content/blog/` — `1-about-me.mdx` and `2-example-post.mdx` are examples. Each post's frontmatter carries its own `author` (`name`, `url`, `bio`) for the byline. Higher `order` = newer.
-- `src/content/resources/` — `example-resource.mdx` shows the shape. `type: "page"` makes a page; `type: "link"` is just an outbound link.
+- `src/content/blog/` — `1-set-up-your-site.mdx` is the example post. Each post's frontmatter carries its own `author` (`name`, `url`, `bio`) for the byline. Higher `order` = newer.
+- `src/content/resources/` — `new-website-seo-checklist.mdx` shows the shape. `type: "page"` makes a page; `type: "link"` is just an outbound link.
 - `src/content/legal/` — `privacy.mdx` and `terms.mdx` are **placeholders, not legal advice**. Fill in the bracketed bits and review before launch.
 
 Content images are **optimized at build** by Astro (responsive `webp`, served from your deploy host). Either commit them under `src/images/` and import them, or host originals on a bucket/CDN (e.g. R2) and set **`platform.imagesCDNHost`** in `src/site.config.ts` so Astro downloads + optimizes them at build (keeps binaries out of git) — see the `/images` skill. Give image-heavy posts a **`cover`** (`{ image, alt }`) — a real landscape photo (≥1200px, 16:9) that becomes the post's hero image and the image Google Discover uses. Whenever you edit a content file, bump its `contentModifiedDate`.

@@ -18,12 +18,9 @@ const hex = (c: string): string => formatHex(c) ?? c;
 
 export const theme = {
   bg: hex(cream[100]), // warm ivory page background
-  card: "#ffffff", // white panel
   ink: hex(stone[900]), // headings / primary text
   muted: hex(stone[500]), // secondary / meta text
-  border: hex(stone[200]), // soft panel border
   accent: hex(indigo[600]), // links / brand mark (WCAG-AA on white & cream)
-  accentSoft: hex(indigo[50]), // soft accent fill
 } as const;
 
 // OG images are served at the recommended 1.91:1 ratio.

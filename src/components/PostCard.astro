@@ -13,7 +13,7 @@ const { title, description, contentModifiedDate } = data;
     <h2 class="text-zmoki-stone-900 pb-2 text-2xl leading-normal font-semibold xl:text-3xl">
       <span set:html={title} />
     </h2>
-    {description && <p class="text-zmoki-stone-600" set:html={description} />}
+    <p class="text-zmoki-stone-600" set:html={description} />
     <p class="text-zmoki-stone-500 order-first text-sm">
       <Time datetime={contentModifiedDate} />
     </p>

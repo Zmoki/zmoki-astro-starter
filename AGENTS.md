@@ -6,7 +6,7 @@
 
 ## Project overview
 
-An Astro starter for personal websites — posts, projects, and resources. Built from zmoki.xyz and genericized into a reusable template. Everything site-specific lives in **`src/site.config.ts`**; the rest is the reusable shell.
+An Astro starter for personal websites — posts, resources, and legal pages. Built from zmoki.xyz and genericized into a reusable template. Everything site-specific lives in **`src/site.config.ts`**; the rest is the reusable shell.
 
 When starting a new site from this template, see **`SETUP.md`** for the checklist.
 
@@ -84,7 +84,12 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 6. **Build** — `npm run build`
 7. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
 8. **Internal link check** — `npm run check:links` (runs after build; two rules over `dist/`: (a) every relative internal `<a href>` must resolve to a built file — no 404s; redirect sources and off-site links are skipped; (b) no `<a href>` may hard-code our own origin — the production URL or a preview deploy for the configured host — those must be relative paths. Preview-host detection is shared with the OG image URLs via `src/lib/deploy.ts`.)
-9. **Sitemap check** — `npm run check:sitemap` (runs after build; three rules over `dist/`: (a) **coverage** — every built, indexable HTML page appears in `sitemap.xml`; this catches a new page section whose collection wasn't registered in `src/lib/page-collections.ts` (or a standalone page not wired into `src/pages/sitemap.xml.ts`) — its pages build but silently never get indexed. A page counts as noindex (and is skipped) when its rendered `<meta name="robots">` says so or its path matches an `X-Robots-Tag` rule in `src/headers/headers.config.ts`. (b) **no noindex in the sitemap** — no `<loc>` may point at a noindex page (the inverse: a page marked noindex but still advertised). (c) **resolvability** — every `<loc>` resolves to a built _file_, so a stale/renamed entry fails instead of 404-ing. The rule: an indexable page belongs in the sitemap, and only such pages do; to keep one out, mark it noindex.) Standalone-page metadata completeness (`title`+`description` set together) is validated separately at **build time** in `src/og/manifest.ts`, since a plain-node script can't import an `.astro` page.
+9. **Sitemap check** — `npm run check:sitemap` (runs after build; three rules over `dist/`, all built on the principle _an indexable page belongs in the sitemap, and only such pages do_ — to keep a page out, mark it noindex:
+   - **coverage** — every built, indexable HTML page appears in `sitemap.xml`. Catches a collection not registered in `src/lib/page-collections.ts` (or a standalone page not wired into `src/pages/sitemap.xml.ts`), whose pages would otherwise build but silently never get indexed. Noindex pages (per `<meta name="robots">` or an `X-Robots-Tag` rule in `src/headers/headers.config.ts`) are skipped.
+   - **no noindex in the sitemap** — the inverse: no `<loc>` may point at a noindex page.
+   - **resolvability** — every `<loc>` resolves to a built _file_, so a stale/renamed entry fails instead of 404-ing.
+
+   Standalone-page metadata completeness (`title`+`description` set together) is validated separately at **build time** in `src/og/manifest.ts`, since a plain-node script can't import an `.astro` page.
 
 No GitHub secrets are required for the build step: provider config (PostHog, GTM, Turnstile, Brevo, the image origin) is all committed, not env vars — see **Analytics**/**Captcha**/**Forms** below. Analytics/captcha default off; the `Build` step's `env:` turns them on only when `github.ref == 'refs/heads/main'` (a push to `main`, not a PR), so this build reflects what production actually ships.
 
@@ -134,7 +139,7 @@ npm run format
 
 ## Site configuration (`src/site.config.ts`)
 
-The single source of truth for everything personal to a site: domain, name (also the OG `og:site_name` + RSS feed title), default description, top-nav links (`nav`), the site owner (`organization`), contact email, source repo, copyright year, and the deploy target (`platform.deploy`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (`astro.config.mjs`'s `site` reads `site.domain` from it; plus the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages pull the site name from `site.name`, but their content (specimens, voice, house style) is otherwise edited directly rather than driven by the config.
+The single source of truth for everything personal to a site: domain, name (also the OG `og:site_name` + RSS feed title), default description, top-nav links (`nav`), the site owner (`organization`), contact email, the source-repo link (`social.github`), copyright year, and the deploy target (`platform.deploy`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (`astro.config.mjs`'s `site` reads `site.domain` from it; plus the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages pull the site name from `site.name`, but their content (specimens, voice, house style) is otherwise edited directly rather than driven by the config.
 
 ---
 
@@ -155,7 +160,7 @@ imported from `astro:content` (not the legacy `entry.render()`).
 
 ### Page collections & the sitemap registry
 
-The collections that render one page per entry are declared once in **`src/lib/page-collections.ts`** (`pageCollections`: collection name → URL base + optional entry filter + optional OG byline). `getPageRecords()` projects them into normalized `PageRecord`s, and **two consumers iterate that one list**: **`src/pages/sitemap.xml.ts`** and the **OG image manifest `src/og/manifest.ts`** both call `getPageRecords()`. So **adding a new page section is one entry there — both the sitemap and the OG cards pick it up automatically** (no separate edit to either to forget). Adding a section is still: (1) define the collection in `src/content.config.ts` (include `title`/`description`/`publishDate`/`contentModifiedDate`/`robots`), (2) create its `[...slug].astro` route, (3) register it in `page-collections.ts`. The two non-collection pages (home `/`, blog index `/blog/`) **each export a `meta` object from their own frontmatter** (`src/pages/index.astro`, `src/pages/blog/index.astro`) — `{ path, ogKey, title?, description?, publishDate?, contentModifiedDate? }`, typed by `src/lib/standalone-page.ts`. The page is the single source: its own `BaseLayout` props, its OG card (`src/og/manifest.ts`), and the sitemap `<lastmod>` all read that exported `meta`, so page ↔ card ↔ sitemap can't drift. `title`+`description` are optional but must be set together (validated at build in the manifest); omit both to fall back to site defaults + the default OG card. The sitemap excludes noindex pages (both content-level `robots` and path-level headers, above); **CI's `npm run check:sitemap` fails the build if an indexable page is missing from the sitemap** (see CI step 9), so forgetting step 3 is a red build, not a silent SEO gap.
+The collections that render one page per entry are declared once in **`src/lib/page-collections.ts`** (`pageCollections`: collection name → URL base + optional entry filter + optional OG byline). `getPageRecords()` projects them into normalized `PageRecord`s, and **two consumers iterate that one list**: **`src/pages/sitemap.xml.ts`** and the **OG image manifest `src/og/manifest.ts`** both call `getPageRecords()`. So **adding a new page section is one entry there — both the sitemap and the OG cards pick it up automatically** (no separate edit to either to forget). Adding a section is still: (1) define the collection in `src/content.config.ts` (include `title`/`description`/`publishDate`/`contentModifiedDate`/`robots`), (2) create its `[...slug].astro` route, (3) register it in `page-collections.ts`. The two non-collection pages (home `/`, blog index `/blog/`) **each export a `meta` object from their own frontmatter** (`src/pages/index.astro`, `src/pages/blog/index.astro`) — `{ path, ogKey, title?, description?, publishDate?, contentModifiedDate? }`, typed by `src/standalone-page.d.ts` (a global ambient type — no import needed). The page is the single source: its own `BaseLayout` props, its OG card (`src/og/manifest.ts`), and the sitemap `<lastmod>` all read that exported `meta`, so page ↔ card ↔ sitemap can't drift. `title`+`description` are optional but must be set together (validated at build in the manifest); omit both to fall back to site defaults + the default OG card. The sitemap excludes noindex pages (both content-level `robots` and path-level headers, above); **CI's `npm run check:sitemap` fails the build if an indexable page is missing from the sitemap** (see CI step 9), so forgetting step 3 is a red build, not a silent SEO gap.
 
 ---
 
@@ -173,8 +178,9 @@ The collections that render one page per entry are declared once in **`src/lib/p
 /og/{...path}.png        # generated OG images (build-time endpoint, dist/og/)
 /-/astro/health          # health check — returns "ok" + short commit hash
 /-/astro/brand/          # brand design system home (internal, noindex)
-/-/astro/brand/color/    # color palette reference (BrandLayout)
-/-/astro/brand/og/       # OG / social-card reference (BrandLayout)
+/-/astro/brand/{page}/   # brand references (BrandLayout): color, typography,
+                         #   forms, components, voice, og
+/site.webmanifest        # web app manifest (dynamic endpoint)
 ```
 
 ---
@@ -205,7 +211,7 @@ Standalone layout for the internal brand pages under `/-/astro/brand/`. Like `Ba
 
 ## Color system
 
-All colors come from **`src/design-tokens.mjs`** — the single source of truth, imported by both `tailwind.config.mjs` (to generate utilities) and the brand reference page. It re-exports Tailwind's default color palettes under the **`zmoki-`** prefix, so every group is a namespaced full 50→950 scale: `zmoki-slate`, `zmoki-gray`, `zmoki-zinc`, `zmoki-neutral`, `zmoki-stone`, plus the chromatic ramps (`zmoki-red`, `zmoki-orange`, … `zmoki-rose`). Templates use these `zmoki-*` utility classes; **no inline hex**. Live reference: `/-/astro/brand/color/`.
+All colors come from **`src/design-tokens.mjs`** — the single source of truth, imported by both `tailwind.config.mjs` (to generate utilities) and the brand reference page. It re-exports Tailwind's default color palettes under the **`zmoki-`** prefix, so every group is a namespaced full 50→950 scale: `zmoki-slate`, `zmoki-gray`, `zmoki-zinc`, `zmoki-neutral`, `zmoki-stone`, plus the chromatic ramps (`zmoki-red`, `zmoki-orange`, … `zmoki-rose`). Templates use these `zmoki-*` utility classes; **no inline hex** — the one exception is host-chrome literals that must not re-theme (e.g. the macOS traffic-light dots on the home-page terminal mockup). Live reference: `/-/astro/brand/color/`.
 
 The starter palette is a **bright, warm, minimal B2B** look: an ivory canvas, white cards with soft borders and gentle shadows, and a single **indigo** accent. Templates reach for **`zmoki-cream`** (custom warm-ivory scale), **`zmoki-stone`** (warm greys — text, borders), and **`zmoki-indigo`** (accent) — every other chromatic group is generated and available, but unused until you want it.
 

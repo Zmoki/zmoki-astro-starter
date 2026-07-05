@@ -24,6 +24,14 @@ interface Window {
    * See src/components/Analytics.astro.
    */
   track?: (event: string, props?: Record<string, unknown>) => void;
-  posthog?: { capture: (event: string, props?: Record<string, unknown>) => void };
+  /**
+   * Companion facade to `track` — associates the current visitor with an id.
+   * Same chaining and optional-call rules: `window.identify?.(...)`.
+   */
+  identify?: (id: string, props?: Record<string, unknown>) => void;
+  posthog?: {
+    capture: (event: string, props?: Record<string, unknown>) => void;
+    identify: (id: string, props?: Record<string, unknown>) => void;
+  };
   dataLayer?: unknown[];
 }

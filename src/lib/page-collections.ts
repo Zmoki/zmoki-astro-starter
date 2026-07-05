@@ -8,6 +8,13 @@ type PageCollectionName = "blog" | "resources" | "legal";
 export const isResourcePage = (entry: CollectionEntry<"resources">): boolean =>
   entry.data.type === "page";
 
+/** Blog posts newest-first (`order`: higher = newer) — the one ordering rule,
+ *  shared by the blog index, prev/next navigation, and the RSS feed. */
+export async function getPostsNewestFirst(): Promise<CollectionEntry<"blog">[]> {
+  const posts = await getCollection("blog");
+  return posts.sort((a, b) => b.data.order - a.data.order);
+}
+
 /** The common fields every page collection exposes, projected once so consumers
  *  (sitemap, OG manifest) don't reach into per-collection schemas. */
 export interface PageRecord {

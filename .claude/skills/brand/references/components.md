@@ -15,25 +15,24 @@ can never drift:
 
 - `forms.astro` pins the real class strings in frontmatter (`labelClass`,
   `inputClass`, `inputErrorClass`, `buttonClass`) — the same classes
-  `src/components/BrevoForm.astro` renders. The newsletter signup is the canonical
+  `src/components/forms/brevo.astro` renders. The resource-gate signup is the canonical
   example; every pattern on the page comes from it.
 - `components.astro` documents each block (cards, links, buttons, meta labels,
   nav/footer/hero) with a live example **and** the canonical Tailwind recipe,
-  mirroring `BaseLayout`, `PostLayout`, `BrevoForm`, and `Button.astro`.
+  mirroring `BaseLayout`, `PostLayout`, `forms/brevo.astro`, and `Button.astro`.
 
 So a component change is **two edits that must agree**: the real component in
 `src/` **and** its specimen/recipe on the brand page.
 
 ## Where the real components live
 
-| Block                         | Real implementation                 |
-| ----------------------------- | ----------------------------------- |
-| Nav, footer, meta chrome      | `src/layouts/BaseLayout.astro`      |
-| Hero, cards, CTA band         | `src/pages/index.astro`             |
-| Post header, prev/next, links | `src/layouts/PostLayout.astro`      |
-| Button (all variants)         | `src/components/Button.astro`       |
-| Form inputs, states, submit   | `src/components/BrevoForm.astro`    |
-| Resource link                 | `src/components/ResourceLink.astro` |
+| Block                         | Real implementation                |
+| ----------------------------- | ---------------------------------- |
+| Nav, footer, meta chrome      | `src/layouts/BaseLayout.astro`     |
+| Hero, cards, CTA band         | `src/pages/index.astro`            |
+| Post header, prev/next, links | `src/layouts/PostLayout.astro`     |
+| Button (all variants)         | `src/components/Button.astro`      |
+| Form inputs, states, submit   | `src/components/forms/brevo.astro` |
 
 `Button.astro` variants: `primary` (indigo fill), `secondary` (white + soft stone
 border), `inverse` (white, for an indigo band); sizes `md` / `lg`. It renders an
