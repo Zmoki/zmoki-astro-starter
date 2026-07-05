@@ -1,9 +1,12 @@
 import type { APIRoute } from "astro";
 import { homePagePublishDate, homePageContentModifiedDate } from "@/data/home-page";
 import { isoDate } from "@/lib/dates";
-import { getPageRecords, type SitemapEntry } from "@/lib/page-collections";
+import { getPageRecords, standaloneRoutes } from "@/lib/page-collections";
 import { isNoindex } from "@/lib/robots";
 import { isNoindexPath } from "@/lib/noindex";
+
+/** One sitemap URL: a site-relative path (trailing slash, no leading slash) + its <lastmod>. */
+type SitemapEntry = { path: string; lastmod: Date };
 
 export const GET: APIRoute = async ({ site }) => {
   // One load of every collection-driven page; both the URL list and the index
@@ -37,13 +40,12 @@ export const GET: APIRoute = async ({ site }) => {
   </url>
   `;
 
-  // Standalone (non-collection) pages listed explicitly: the home page (with its
-  // computed <lastmod>) and the blog index (which shares it). Everything is then
-  // run through isNoindexPath so any URL the headers config marks noindex
+  // Standalone (non-collection) pages come from the shared registry (home + blog
+  // index) and all take the computed index <lastmod>. Everything is then run
+  // through isNoindexPath so any URL the headers config marks noindex
   // (X-Robots-Tag) is excluded.
   const urls: SitemapEntry[] = [
-    { path: "", lastmod: indexPageLatestDate },
-    { path: "blog/", lastmod: indexPageLatestDate },
+    ...standaloneRoutes.map((route) => ({ path: route.path, lastmod: indexPageLatestDate })),
     ...collectionEntries,
   ].filter((url) => !isNoindexPath(`/${url.path}`));
 

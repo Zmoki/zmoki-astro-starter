@@ -1,5 +1,6 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "fs";
+import { existsSync, readFileSync, statSync } from "fs";
 import { join } from "path";
+import { DIST_DIR, htmlFiles, routeForFile } from "./lib/dist-files.ts";
 import { isNoindexPath } from "../src/lib/noindex.ts";
 import { isNoindex } from "../src/lib/robots.ts";
 
@@ -27,36 +28,22 @@ import { isNoindex } from "../src/lib/robots.ts";
 // `npm run check:sitemap`.
 //
 // Assumes Astro's default directory build format (pages at `/route/` →
-// dist/route/index.html). A site switched to `build.format: "file"` (pages at
-// dist/route.html served at `/route`) isn't covered by check (1) — those routes
-// lack the trailing slash the walk keys on.
+// dist/route/index.html). A site switched to `build.format: "file"` produces
+// bare `dist/route.html` files with no trailing-slash route, so check (1) would
+// cover nothing — guarded by the "no directory-format pages" fail-fast below.
 
-const DIST_DIR = "dist";
 const SITEMAP = join(DIST_DIR, "sitemap.xml");
 
-const ROBOTS_META_RE = /<meta[^>]+name=["']robots["'][^>]+content=["']([^"']*)["'][^>]*>/i;
+// Match the <meta name="robots"> tag (attribute order-independent), then pull
+// its content — so this doesn't silently stop matching if BaseLayout's tag shape
+// changes. isNoindex() splits the content on commas.
+const ROBOTS_META_RE = /<meta\b[^>]*\bname=["']robots["'][^>]*>/i;
+const CONTENT_ATTR_RE = /\bcontent=["']([^"']*)["']/i;
 const htmlIsNoindex = (html: string): boolean => {
-  const m = html.match(ROBOTS_META_RE);
-  return m ? isNoindex(m[1].split(",")) : false;
+  const tag = html.match(ROBOTS_META_RE)?.[0];
+  const content = tag?.match(CONTENT_ATTR_RE)?.[1];
+  return content ? isNoindex([content]) : false;
 };
-
-/** Recursively collect every .html file under a directory. */
-function htmlFiles(dir: string): string[] {
-  const files: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) files.push(...htmlFiles(path));
-    else if (entry.isFile() && entry.name.endsWith(".html")) files.push(path);
-  }
-  return files;
-}
-
-/** Map a dist/ .html file to the directory-format route it serves. */
-function routeForFile(file: string): string {
-  const rel = file.slice(DIST_DIR.length).replace(/\\/g, "/");
-  if (rel.endsWith("/index.html")) return rel.slice(0, -"index.html".length); // "/blog/foo/"
-  return rel; // e.g. "/404.html"
-}
 
 /** Sitemap <loc> routes, as pathnames (directory format, e.g. "/blog/foo/"). */
 function sitemapRoutes(): string[] {
@@ -64,9 +51,9 @@ function sitemapRoutes(): string[] {
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
 }
 
-/** The built file a route serves, or null if none exists (must be a file, not a
- *  bare directory — a `/section/` whose own index.html was never emitted is a
- *  404 even though `dist/section/` exists because of child pages). */
+/** The built file a route serves, or null if none exists — must be a file, not a
+ *  bare directory (a `/section/` whose own index.html was never emitted is a 404
+ *  even though `dist/section/` exists because of child pages). */
 function builtFileForRoute(route: string): string | null {
   const candidates = route.endsWith("/")
     ? [join(DIST_DIR, route, "index.html")]
@@ -82,28 +69,39 @@ function main(): void {
 
   const sitemap = new Set(sitemapRoutes());
 
-  // Coverage: built, indexable, directory-format pages must be in the sitemap.
-  const missing: string[] = [];
-  let checked = 0;
-  for (const file of htmlFiles(DIST_DIR)) {
+  // Single walk over dist/: record each built page's route and whether its
+  // rendered <meta robots> is noindex, so nothing below re-reads a file.
+  const metaNoindex = new Map<string, boolean>();
+  const builtDirRoutes: string[] = [];
+  for (const file of htmlFiles()) {
     const route = routeForFile(file);
-    if (!route.endsWith("/")) continue; // bare files like /404.html aren't sitemap pages
-    if (isNoindexPath(route)) continue; // noindex via X-Robots-Tag path rule
-    if (htmlIsNoindex(readFileSync(file, "utf8"))) continue; // noindex via <meta robots>
-    checked++;
-    if (!sitemap.has(route)) missing.push(route);
+    metaNoindex.set(route, htmlIsNoindex(readFileSync(file, "utf8")));
+    if (route.endsWith("/")) builtDirRoutes.push(route); // directory-format pages
   }
 
-  // Resolvability + no-noindex, over every sitemap entry.
+  // Fail loud if the directory-format assumption doesn't hold (e.g. a site on
+  // `build.format: "file"`) rather than silently checking nothing.
+  if (!builtDirRoutes.length) {
+    console.error(
+      `✖ No directory-format pages found in ${DIST_DIR}/ — check:sitemap assumes Astro's default \`build.format: "directory"\`. Update this guard if the site uses \`file\`.`,
+    );
+    process.exit(1);
+  }
+
+  const isRouteNoindex = (route: string): boolean =>
+    isNoindexPath(route) || (metaNoindex.get(route) ?? false);
+
+  // (1) Coverage: built, indexable, directory-format pages must be in the sitemap.
+  const indexable = builtDirRoutes.filter((route) => !isRouteNoindex(route));
+  const missing = indexable.filter((route) => !sitemap.has(route));
+
+  // (2) + (3) over every sitemap entry: it must resolve to a built file, and not
+  // be noindex.
   const stale: string[] = [];
   const noindexed: string[] = [];
   for (const route of sitemap) {
-    const file = builtFileForRoute(route);
-    if (!file) {
-      stale.push(route);
-      continue;
-    }
-    if (isNoindexPath(route) || htmlIsNoindex(readFileSync(file, "utf8"))) noindexed.push(route);
+    if (!builtFileForRoute(route)) stale.push(route);
+    else if (isRouteNoindex(route)) noindexed.push(route);
   }
 
   let failed = false;
@@ -132,7 +130,7 @@ function main(): void {
   if (failed) process.exit(1);
 
   console.log(
-    `✓ Sitemap OK — ${sitemap.size} URL(s); all ${checked} indexable page(s) covered, none noindex, every entry resolves.`,
+    `✓ Sitemap OK — ${sitemap.size} URL(s); all ${indexable.length} indexable page(s) covered, none noindex, every entry resolves.`,
   );
 }
 

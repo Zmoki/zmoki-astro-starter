@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync } from "fs";
-import { join } from "path";
+import { readFileSync } from "fs";
+import { DIST_DIR, htmlFiles } from "./lib/dist-files.ts";
 
 // CI guard for structured data (schema.org JSON-LD).
 //
@@ -18,22 +18,7 @@ import { join } from "path";
 //
 // Run after `npm run build` (needs dist/). Wired into CI and `npm run check:sd`.
 
-const DIST_DIR = "dist";
 const LD_JSON_RE = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
-
-/** Recursively collect every .html file under a directory. */
-function htmlFiles(dir: string): string[] {
-  const files: string[] = [];
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    const path = join(dir, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...htmlFiles(path));
-    } else if (entry.isFile() && entry.name.endsWith(".html")) {
-      files.push(path);
-    }
-  }
-  return files;
-}
 
 /** Walk every string in a JSON-LD value, flagging obviously unresolved output. */
 function leftoverStrings(value: unknown): string[] {
@@ -78,7 +63,7 @@ function validateNode(node: unknown): string[] {
 function main(): void {
   let files: string[];
   try {
-    files = htmlFiles(DIST_DIR);
+    files = htmlFiles();
   } catch {
     console.error(`✖ ${DIST_DIR}/ not found — run \`npm run build\` first.`);
     process.exit(1);

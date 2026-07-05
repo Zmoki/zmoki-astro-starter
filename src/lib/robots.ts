@@ -18,7 +18,12 @@ const NOINDEX_TOKENS = new Set(["noindex", "none"]);
  * header rules (a comma-separated string, split by the caller).
  */
 export function isNoindex(directives?: string[]): boolean {
-  return (directives ?? []).some((d) => NOINDEX_TOKENS.has(d.trim().toLowerCase()));
+  // Split each element on commas too, so a single comma-joined entry
+  // (`["noindex, nofollow"]`) is read the same as `["noindex", "nofollow"]` —
+  // both render the same <meta robots>, so both must filter the same way.
+  return (directives ?? [])
+    .flatMap((d) => d.split(","))
+    .some((token) => NOINDEX_TOKENS.has(token.trim().toLowerCase()));
 }
 
 /**

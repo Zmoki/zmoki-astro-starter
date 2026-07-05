@@ -18,8 +18,6 @@ export const isResourcePage = (entry: CollectionEntry<"resources">): boolean =>
  * reach into the per-collection schema. See getPageRecords().
  */
 export interface PageRecord {
-  /** Entry slug, e.g. "1-set-up-your-site". */
-  id: string;
   /** URL path, trailing slash, no leading slash: "blog/1-set-up-your-site/". */
   path: string;
   title: string;
@@ -48,7 +46,6 @@ function definePageCollection<K extends PageCollectionName>(config: {
     async records(): Promise<PageRecord[]> {
       const entries = await getCollection(config.collection, config.filter);
       return entries.map((entry) => ({
-        id: entry.id,
         path: `${config.basePath}${entry.id}/`,
         title: entry.data.title,
         description: entry.data.description,
@@ -72,7 +69,7 @@ function definePageCollection<K extends PageCollectionName>(config: {
  * (include title/description/publishDate/contentModifiedDate/robots), (2) create
  * its [...slug].astro route, (3) register it here.
  */
-export const pageCollections = [
+const pageCollections = [
   definePageCollection({
     collection: "blog",
     basePath: "blog/",
@@ -88,5 +85,14 @@ export async function getPageRecords(): Promise<PageRecord[]> {
   return groups.flat();
 }
 
-/** One sitemap URL: a site-relative path (trailing slash, no leading slash) + its <lastmod>. */
-export type SitemapEntry = { path: string; lastmod: Date };
+/**
+ * Standalone (non-collection) pages that still need a sitemap entry and an OG
+ * card — the home page and the blog index. Listed once so the sitemap and the OG
+ * manifest agree on the set and the card text (rather than each hardcoding it).
+ * Their sitemap <lastmod> is a computed freshness value the endpoint supplies,
+ * so it isn't stored here; all use the OG `site` template.
+ */
+export const standaloneRoutes = [
+  { path: "", og: { key: "index", title: site.name, description: site.description } },
+  { path: "blog/", og: { key: "blog", title: site.name, description: "Blog" } },
+];
