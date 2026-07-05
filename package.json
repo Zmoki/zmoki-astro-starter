@@ -17,6 +17,7 @@
     "check:headers": "node scripts/generate-headers.ts && (git diff --exit-code -- public/_headers vercel.json customHeaders.json || (echo '\\n✖ Header artifacts are out of date. Run: npm run build:headers, then commit the result.' && exit 1))",
     "check": "astro check",
     "check:sd": "node scripts/check-structured-data.ts",
+    "check:links": "node scripts/check-links.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
