@@ -13,13 +13,13 @@ Edit **`src/site.config.ts`** — this is the main one. Set:
 - `organization.name` and `organization.url` — the site owner shown in the footer copyright (also the content-image credit)
 - `contact.email` — the footer Contact link and mailto target
 - `social.github` — the footer "Source" link
-- `copyrightStartYear`
+- `copyright.year` — first year shown in the footer copyright range
+- `copyright.images.license` — license URL for content images (schema.org ImageObject); point it at your terms page
 
 The home page (`src/pages/index.astro`) is a landing page, edited directly in that file. The blog list lives at `src/pages/blog/index.astro` (`/blog/`).
 
-Then set the domain in two more places:
+Then set the domain in one more place (`astro.config.mjs` reads `site.domain` automatically):
 
-- **`astro.config.mjs`** → `site:` (used for canonical URLs, RSS, sitemap)
 - **`public/robots.txt`** → the `Sitemap:` line
 
 ## 2. Palette & typography
@@ -46,7 +46,7 @@ Replace the placeholder content:
 - `src/content/resources/` — `example-resource.mdx` shows the shape. `type: "page"` makes a page; `type: "link"` is just an outbound link.
 - `src/content/legal/` — `privacy.mdx` and `terms.mdx` are **placeholders, not legal advice**. Fill in the bracketed bits and review before launch.
 
-Add content images to `src/images/`. Whenever you edit a content file, bump its `contentModifiedDate`.
+Content images are **optimized at build** by Astro (responsive `webp`, served from your deploy host). Either commit them under `src/images/` and import them, or host originals on a bucket/CDN (e.g. R2) and set **`platform.imagesCDNHost`** in `src/site.config.ts` so Astro downloads + optimizes them at build (keeps binaries out of git) — see the `/images` skill. Give image-heavy posts a **`cover`** (`{ image, alt }`) — a real landscape photo (≥1200px, 16:9) that becomes the post's hero image and the image Google Discover uses. Whenever you edit a content file, bump its `contentModifiedDate`.
 
 ## 4. Brand / design-system pages
 
@@ -62,6 +62,7 @@ Copy `.env.example` to `.env` and fill in what you use (every var is declared an
   - `PUBLIC_ANALYTICS_ENABLED=false` turns **all** analytics off (e.g. in dev). If you use a GTM host beyond the defaults, allowlist it in the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`). See AGENTS.md → Analytics to add another provider.
 - **Forms** — provider-agnostic email capture (like analytics), single-select. Built in: **Brevo** — set `PUBLIC_BREVO_ACCOUNT_ID`, plus a `form` block (with `formId`) in a resource's frontmatter to show a signup form. To swap the backend, see AGENTS.md → Forms.
 - **Captcha** — provider-agnostic bot protection on forms (like analytics), single-select. Built in: **Cloudflare Turnstile** — set `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`. `PUBLIC_CAPTCHA_ENABLED=false` turns it off (e.g. in dev). To swap in reCAPTCHA/hCaptcha, see AGENTS.md → Captcha. Note: the provider must also be the one configured on your Brevo form, which validates the token.
+- **Content image origin** — optional, **decoupled from your deploy host**, and **committed config, not an env var**: set `platform.imagesCDNHost` in `src/site.config.ts` (e.g. `"https://images.example.com"`, an R2 bucket on a custom domain) to host image originals externally; Astro downloads + optimizes them at build (keeping binaries out of git), and the same value drives the CSP — run `npm run build:headers` after changing it. Leave it `""` to commit images to `src/images` instead. A build with an origin set must be able to reach it. See the `/images` skill.
 
 All are optional — the site builds and runs without them.
 
@@ -69,7 +70,7 @@ All are optional — the site builds and runs without them.
 
 Set up hosting. The starter is platform-agnostic — it builds to a static `dist/` any host serves — and supports **Cloudflare Pages** (the default), **Netlify**, **Vercel**, and **AWS Amplify**. Connect your host to the GitHub repo so pushing to `main` deploys (Cloudflare Pages, Netlify, and Vercel all support push-to-deploy).
 
-**Pick your platform for redirects.** Redirects are authored once as CSV in `src/redirects/` and compiled to whatever your host expects. Set `deploy.platform` in **`src/site.config.ts`**:
+**Pick your platform for redirects.** Redirects are authored once as CSV in `src/redirects/` and compiled to whatever your host expects. Set `platform.deploy` in **`src/site.config.ts`**:
 
 | `platform`               | Compiles to         | Host                                   |
 | ------------------------ | ------------------- | -------------------------------------- |

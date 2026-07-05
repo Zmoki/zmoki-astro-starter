@@ -1,11 +1,26 @@
 import { defineConfig, fontProviders } from "astro/config";
 import { fonts } from "./src/design-tokens.mjs";
+import { site } from "./src/site.config.ts";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
 import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
+
+// Authorize the content-image origin (site.platform.imagesCDNHost) for build-time
+// optimization (image.remotePatterns below). Empty ⇒ no remote optimization.
+const imagesCDNHost = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
+let imageHostname = "";
+if (imagesCDNHost) {
+  try {
+    imageHostname = new URL(imagesCDNHost).hostname;
+  } catch {
+    throw new Error(
+      `site.platform.imagesCDNHost must be a full URL (e.g. "https://images.example.com") or "": got "${imagesCDNHost}"`,
+    );
+  }
+}
 
 // Rehype plugin to add IDs to definition list terms
 function rehypeDefinitionListIds() {
@@ -151,7 +166,14 @@ function rehypeCodeBlockCopy() {
 // https://astro.build/config
 export default defineConfig({
   integrations: [mdx()],
-  site: "https://starter.zmoki.xyz",
+  site: site.domain,
+  // `layout: "constrained"` makes optimized images (<Image> and Markdown `![]()`)
+  // responsive by default; `remotePatterns` authorizes the image origin for
+  // build-time optimization. Unset origin ⇒ remote images render unoptimized.
+  image: {
+    layout: "constrained",
+    ...(imageHostname ? { remotePatterns: [{ protocol: "https", hostname: imageHostname }] } : {}),
+  },
   // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
   // served same-origin from /_astro/fonts, with automatic optimized fallback
   // metrics (zero CLS) and preload links. The site is all-sans — a body/heading

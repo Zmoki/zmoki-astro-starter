@@ -22,7 +22,7 @@ When you implement a specific type, **fetch that type's page from the gallery** 
 
 Every change must satisfy these, or Google can ignore the markup or issue a manual action:
 
-- **Format: JSON-LD.** Google recommends JSON-LD (Microdata/RDFa are also parsed, but this site standardises on JSON-LD in a `<script type="application/ld+json">`). The one pre-existing exception is `src/components/PostImage.astro`, which uses inline Microdata `ImageObject` — leave it unless asked.
+- **Format: JSON-LD.** Google recommends JSON-LD (Microdata/RDFa are also parsed, but this site standardises on JSON-LD in a `<script type="application/ld+json">`). The whole site — including the `ImageObject` image-license metadata emitted by `src/components/Image.astro` for captioned content images — uses JSON-LD; there is no Microdata.
 - **Markup must match visible content.** Never mark up information that isn't on the page and visible to the user. The JSON-LD must be a **true representation** of the page.
 - **No misleading / fake / irrelevant content.** No fabricated reviews or ratings, no impersonating a person or org, nothing off-topic from the page's focus.
 - **Complete.** Include **every required** property for the type, plus the **recommended** ones you can honestly fill — more valid detail = better eligibility.

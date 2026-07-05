@@ -7,7 +7,7 @@
 
 /**
  * The supported hosts (mirrors `scripts/generate-{redirects,headers}.ts`). The
- * active one is `site.deploy.platform`, which also drives the redirect/header
+ * active one is `site.platform.deploy`, which also drives the redirect/header
  * artifacts.
  */
 export type DeployPlatform = "cloudflare" | "netlify" | "vercel" | "amplify";

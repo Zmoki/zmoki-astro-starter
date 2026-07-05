@@ -65,11 +65,6 @@ const canonicalURL =
 const ogImage = await getOgImage(pagePathname);
 const pageImageUrl = urls.currentAbsoluteUrl(ogImage.path);
 
-const currentYear = new Date().getFullYear();
-const copyrightYears =
-  currentYear > site.copyrightStartYear
-    ? `${site.copyrightStartYear}–${currentYear}`
-    : `${site.copyrightStartYear}`;
 // Bare host (no protocol) for the footer copyright link, e.g. "zmoki.xyz".
 const ownerSiteLabel = new URL(site.organization.url).host;
 ---
@@ -184,7 +179,7 @@ const ownerSiteLabel = new URL(site.organization.url).host;
         class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8"
       >
         <p>
-          &copy; {copyrightYears} · {site.organization.name} ·{" "}
+          &copy; {site.copyright.year} · {site.organization.name} ·{" "}
           <a href={site.organization.url}>{ownerSiteLabel}</a>
         </p>
         <nav class="flex flex-wrap items-center gap-x-6 gap-y-2">

@@ -21,6 +21,8 @@ export interface PageRecord {
   byline: string;
   /** robots directives from frontmatter (drives sitemap noindex filtering). */
   robots?: string[];
+  /** Cover image URL for the image-sitemap <image:loc> (blog covers). */
+  imageLoc?: string;
 }
 
 function definePageCollection<K extends PageCollectionName>(config: {
@@ -31,6 +33,8 @@ function definePageCollection<K extends PageCollectionName>(config: {
   filter?: (entry: CollectionEntry<K>) => boolean;
   /** OG-card byline; defaults to the site owner's name. */
   byline?: (entry: CollectionEntry<K>) => string;
+  /** Cover image URL for the image-sitemap, if the collection has one. */
+  image?: (entry: CollectionEntry<K>) => string | undefined;
 }) {
   return {
     ...config,
@@ -44,6 +48,7 @@ function definePageCollection<K extends PageCollectionName>(config: {
         contentModifiedDate: entry.data.contentModifiedDate,
         byline: config.byline?.(entry) ?? site.name,
         robots: entry.data.robots,
+        imageLoc: config.image?.(entry),
       }));
     },
   };
@@ -59,6 +64,7 @@ const pageCollections = [
     collection: "blog",
     basePath: "blog/",
     byline: (entry) => entry.data.author.name,
+    image: (entry) => entry.data.cover?.image,
   }),
   definePageCollection({ collection: "resources", basePath: "resources/", filter: isResourcePage }),
   definePageCollection({ collection: "legal", basePath: "legal/" }),
