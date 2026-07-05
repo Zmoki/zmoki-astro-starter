@@ -39,7 +39,7 @@ function convertRelativeUrlsToAbsolute(html: string, siteUrl: string): string {
 
 /**
  * Converts MDX components to HTML for RSS feed
- * Handles <Image> and <Video> components using regex parsing.
+ * Handles <Image> components using regex parsing.
  *
  * Note: this parses MDX/HTML with regexes, which is inherently brittle (attribute
  * ordering, nested figures, etc.). It's kept intentionally narrow — only the
@@ -69,31 +69,6 @@ function convertMdxComponentsToHtml(content: string): string {
 
     // Create a placeholder for the image
     return `<p><em>[Image: ${alt}]</em></p>`;
-  });
-
-  // Convert <Video> components to <video> tags
-  // Note: RSS validators prefer simpler video tags without controls/poster
-  // Matches: <Video src="..." poster="..." width="..." height="..." />
-  processed = processed.replace(/<Video\s+([^>]+)\s*\/?>/g, (match, attrs) => {
-    // Extract attributes
-    const srcMatch = attrs.match(/src=["']([^"']+)["']/);
-    const widthMatch = attrs.match(/width=["']?(\d+)["']?/);
-    const heightMatch = attrs.match(/height=["']?(\d+)["']?/);
-
-    const src = srcMatch ? srcMatch[1] : "";
-    const width = widthMatch ? widthMatch[1] : "";
-    const height = heightMatch ? heightMatch[1] : "";
-
-    if (!src) return "";
-
-    // Build video tag - simplified for RSS compatibility
-    // Remove controls and poster attributes as validators prefer simpler tags
-    let videoTag = `<video`;
-    if (width) videoTag += ` width="${width}"`;
-    if (height) videoTag += ` height="${height}"`;
-    videoTag += `><source src="${src}" type="video/mp4" />Your browser does not support the video tag.</video>`;
-
-    return videoTag;
   });
 
   return processed;
@@ -134,23 +109,10 @@ export async function GET(context: { site: string | undefined }) {
       contentHtml = contentHtml.replace(/<figure[^>]*>\s*<\/figure>/gi, "");
 
       // Sanitize the HTML to ensure safe RSS output
-      // Allow video tags and their attributes (simplified for RSS compatibility)
       const sanitizedContent = sanitizeHtml(contentHtml, {
-        allowedTags: sanitizeHtml.defaults.allowedTags.concat([
-          "img",
-          "video",
-          "source",
-          "figure",
-          "figcaption",
-        ]),
+        allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img", "figure", "figcaption"]),
         allowedAttributes: {
           ...sanitizeHtml.defaults.allowedAttributes,
-          video: [
-            "width",
-            "height",
-            // Removed controls and poster for RSS validator compatibility
-          ],
-          source: ["src", "type"],
           img: ["src", "alt", "width", "height", "loading", "class"],
         },
       });

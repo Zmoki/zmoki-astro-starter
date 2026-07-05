@@ -35,13 +35,13 @@ Every change must satisfy these, or Google can ignore the markup or issue a manu
 
 From the gallery, the types that map onto this starter's content model (`blog`, `resources`, `legal` collections + landing page):
 
-| Google feature   | schema.org type          | Where it belongs here                                             |
-| ---------------- | ------------------------ | ----------------------------------------------------------------- |
-| **Article**      | `BlogPosting`            | Blog posts (`PostLayout.astro`) — headline, dates, author, image  |
-| **Breadcrumb**   | `BreadcrumbList`         | Any nested page (Home › Blog › Post) — build from the URL path    |
-| **Organization** | `Organization`           | Site-wide, once (home page) — name, url, logo, `sameAs`, contact  |
-| **Profile Page** | `ProfilePage` + `Person` | The author "about" page — a page focused on one person            |
-| **Video**        | `VideoObject`            | Posts using `Video.astro` / `RawVideo.astro` — needs a real video |
+| Google feature   | schema.org type          | Where it belongs here                                            |
+| ---------------- | ------------------------ | ---------------------------------------------------------------- |
+| **Article**      | `BlogPosting`            | Blog posts (`PostLayout.astro`) — headline, dates, author, image |
+| **Breadcrumb**   | `BreadcrumbList`         | Any nested page (Home › Blog › Post) — build from the URL path   |
+| **Organization** | `Organization`           | Site-wide, once (home page) — name, url, logo, `sameAs`, contact |
+| **Profile Page** | `ProfilePage` + `Person` | The author "about" page — a page focused on one person           |
+| **Video**        | `VideoObject`            | Posts embedding a real video (raw `<video>` in MDX)              |
 
 `QAPage` / `FAQPage` exist in schema.org but their **rich result is gov/health-only** (see eligibility gotcha above) — don't reach for them on this site expecting a Search feature.
 
