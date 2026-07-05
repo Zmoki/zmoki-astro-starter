@@ -74,21 +74,6 @@ const blogPostingLd = {
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">
-    <!-- Cover image — the post's LCP + Discover primary image. -->
-    {
-      cover && (
-        <Image
-          src={cover.image}
-          alt={cover.alt}
-          width={1200}
-          height={675}
-          priority
-          sizes="(min-width: 768px) 768px, 100vw"
-          class="border-zmoki-stone-200 w-full rounded-2xl border shadow-sm"
-        />
-      )
-    }
-
     <!-- Post Header -->
     <header
       class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
@@ -118,6 +103,21 @@ const blogPostingLd = {
         }
       </p>
     </header>
+
+    <!-- Cover image — the post's primary image for Discover (below the header). -->
+    {
+      cover && (
+        <Image
+          src={cover.image}
+          alt={cover.alt}
+          width={1200}
+          height={675}
+          priority
+          sizes="(min-width: 768px) 768px, 100vw"
+          class="border-zmoki-stone-200 w-full rounded-2xl border shadow-sm"
+        />
+      )
+    }
 
     <!-- Post Content -->
     <Prose class="prose-xl xl:prose-2xl xl:px-28 xl:py-16">
