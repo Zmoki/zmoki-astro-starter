@@ -128,7 +128,7 @@ npm run format
 
 ## Site configuration (`src/site.config.ts`)
 
-The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), primary CTA (`cta`), hero copy (`hero`), closing CTA band (`finalCta`), author name + about-slug, contact email, source repo, copyright year, and the deploy target (`deploy.platform`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages are not wired to it — they use the `My Project X` placeholder and are edited directly.
+The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), the site owner (`organization`), contact email, source repo, copyright year, and the deploy target (`deploy.platform`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages are not wired to it — they use the `My Project X` placeholder and are edited directly.
 
 ---
 
@@ -173,13 +173,13 @@ imported from `astro:content` (not the legacy `entry.render()`).
 
 Props are defined in the file; the one with non-obvious behavior is **`wide`** (default `false`) — `true` gives a full-width `<main>` for landing-page sections that own their own containers, `false` a centered `max-w-3xl` container for articles. (`description` defaults to `site.description`.)
 
-Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + `site.cta` button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
+Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + a "Get started" button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
 
 Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
 ### `PostLayout.astro`
 
-Wraps `BaseLayout`. Props: `title`, `description`, `publishDate`, `contentModifiedDate`, `prevPost?`, `nextPost?`. Shows article header with publish/modified dates, prose content, author bio, prev/next navigation. The home page (`src/pages/index.astro`) is a standalone landing page using `BaseLayout` with `wide`; the blog list lives at `src/pages/blog/index.astro`.
+Wraps `BaseLayout`. Props: `title`, `description`, `publishDate`, `contentModifiedDate`, `author`, `prevPost?`, `nextPost?`. The `author` (`{ name, url, bio }`) comes from the post's own frontmatter — it drives the byline, the "Written by" bio, and the schema.org `author`. Shows article header with publish/modified dates, prose content, author bio, prev/next navigation. The home page (`src/pages/index.astro`) is a standalone landing page using `BaseLayout` with `wide`; the blog list lives at `src/pages/blog/index.astro`.
 
 ### `ResourceLayout.astro`, `LegalLayout.astro`
 

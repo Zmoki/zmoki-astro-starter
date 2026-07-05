@@ -83,12 +83,16 @@ const securityGrade = "A";
   <!-- Hero -->
   <section class="px-4 py-16 text-center lg:py-28">
     <div class="mx-auto max-w-3xl">
-      <h1 class="text-5xl font-semibold tracking-tight md:text-6xl">{site.hero.heading}</h1>
+      <h1 class="text-5xl font-semibold tracking-tight md:text-6xl">
+        A website starter your AI can make its own.
+      </h1>
       <p class="text-zmoki-stone-600 mx-auto mt-6 max-w-2xl text-xl md:text-2xl">
-        {site.hero.subhead}
+        An Astro starter for personal and project sites — landing page, blog, RSS, analytics, and
+        email forms already wired. It ships with AGENTS.md, so Claude Code, Codex, Cursor, or any AI
+        coding agent understands the codebase and rebrands it for you.
       </p>
       <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Button href={site.cta.href} size="lg">{site.cta.label}</Button>
+        <Button href="https://github.com/Zmoki/zmoki-astro-starter" size="lg">Get started</Button>
         <Button href="/blog/" variant="secondary" size="lg">Read the blog →</Button>
       </div>
     </div>
@@ -220,10 +224,17 @@ const securityGrade = "A";
     <div
       class="bg-zmoki-indigo-600 mx-auto max-w-6xl rounded-3xl px-6 py-16 text-center text-white shadow-sm md:py-20"
     >
-      <h2 class="text-3xl font-semibold md:text-4xl">{site.finalCta.heading}</h2>
-      <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">{site.finalCta.text}</p>
-      <Button href={site.finalCta.button.href} variant="inverse" size="lg" class="mt-8">
-        {site.finalCta.button.label}
+      <h2 class="text-3xl font-semibold md:text-4xl">Ready to get started?</h2>
+      <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">
+        Grab the template, tell your AI agent what you want, and deploy.
+      </p>
+      <Button
+        href="https://github.com/Zmoki/zmoki-astro-starter"
+        variant="inverse"
+        size="lg"
+        class="mt-8"
+      >
+        Use this template
       </Button>
     </div>
   </section>

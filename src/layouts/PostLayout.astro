@@ -13,11 +13,13 @@ export interface Props {
   description?: string;
   publishDate: Date;
   contentModifiedDate: Date;
+  author: CollectionEntry<"blog">["data"]["author"];
   prevPost?: CollectionEntry<"blog"> | null;
   nextPost?: CollectionEntry<"blog"> | null;
 }
 
-const { title, description, publishDate, contentModifiedDate, prevPost, nextPost } = Astro.props;
+const { title, description, publishDate, contentModifiedDate, author, prevPost, nextPost } =
+  Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
 // BlogPosting structured data (schema.org Article) → Google rich result.
@@ -38,13 +40,13 @@ const blogPostingLd = {
   dateModified: contentModifiedDate.toISOString(),
   author: {
     "@type": "Person",
-    name: site.author.name,
-    url: urls.absolute(`/blog/${site.author.aboutSlug}/`),
+    name: author.name,
+    url: author.url,
   },
   publisher: {
     "@type": "Organization",
-    name: site.name,
-    url: urls.siteOrigin.toString(),
+    name: site.organization.name,
+    url: site.organization.url,
   },
   image: urls.absolute(ogImage.path),
   mainEntityOfPage: urls.canonical,
@@ -98,13 +100,12 @@ const blogPostingLd = {
     <aside
       class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white lg:p-20"
     >
-      <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">Written by {site.author.name}</h2>
+      <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">Written by {author.name}</h2>
       <p>
-        I build small, fast websites and the tools around them — this starter is one of them. Find
-        more of my work at <a
-          href={site.author.url}
+        {author.bio} Find more of my work at <a
+          href={author.url}
           class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
-          >{new URL(site.author.url).host}</a
+          >{new URL(author.url).host}</a
         >.
       </p>
     </aside>
