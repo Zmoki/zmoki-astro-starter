@@ -3,41 +3,204 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { fonts } from "@/design-tokens.mjs";
+import { commitHash } from "@/lib/version";
+import { ArrowRightLeft, Plus, Sparkles } from "@lucide/astro";
+// Brand marks come from @thesvg/icons: each module exposes the raw SVG string
+// as `.svg` (default variant) plus `.variants`. Where the default is drawn for
+// a dark background, we pick the light-background variant instead.
+import claudeCode from "@thesvg/icons/claude-code";
+import cursor from "@thesvg/icons/cursor";
+import codex from "@thesvg/icons/codex";
+import cloudflarePages from "@thesvg/icons/cloudflare-pages";
+import netlify from "@thesvg/icons/netlify";
+import vercel from "@thesvg/icons/vercel";
+import aws from "@thesvg/icons/amazon-web-services";
+import posthog from "@thesvg/icons/posthog";
+import googleTagManager from "@thesvg/icons/google-tag-manager";
+import brevo from "@thesvg/icons/brevo";
+import formspree from "@thesvg/icons/formspree";
+import github from "@thesvg/icons/github";
+import cloudflare from "@thesvg/icons/cloudflare";
+import recaptcha from "@thesvg/icons/recaptcha";
 // This page's metadata — also read by its OG card and the sitemap.
 export const meta = {
   path: "",
   ogKey: "index",
-  title: `${site.name} — a website your AI can make its own`,
-  description: site.description,
+  title: `${site.name} — AI & SEO ready website template`,
+  description:
+    "An Astro starter your AI can make its own. Technical SEO done and guarded by CI, swappable vendors, and a built-in brand system. Ahrefs site health 100.",
   publishDate: new Date("2026-07-04"),
-  contentModifiedDate: new Date("2026-07-04"),
+  contentModifiedDate: new Date("2026-07-05"),
 } satisfies StandalonePageMeta;
 
-// Real features of the starter — edit, extend, or remove.
-const features = [
+// securityheaders.com report for the deployed site. Update the grade below if it
+// changes (the scan is live). See public/_headers → src/headers/headers.config.ts.
+const securityReport =
+  "https://securityheaders.com/?q=https%3A%2F%2Fstarter.zmoki.xyz%2F&followRedirects=on";
+const securityGrade = "A";
+
+// Proof first: the scores this starter actually holds. Update if they change.
+const seoScores = [
+  { value: "100", label: "Ahrefs site health", note: "Excellent" },
   {
-    title: "Understood by your AI",
-    text: "Ships with AGENTS.md, so Claude Code, Codex, Cursor, or any coding agent knows the codebase and can rebrand it on request.",
+    value: securityGrade,
+    label: "Security headers",
+    note: "securityheaders.com",
+    href: securityReport,
   },
   {
-    title: "Social cards, generated",
-    text: "Open Graph images are rendered at build time with Satori — brand-aware, no browser, nothing committed to git.",
+    value: "100",
+    label: "Lighthouse SEO",
+    note: "and 100 on the other three",
+    href: "#lighthouse",
+  },
+];
+
+// The one-line proof strip used in the hero and the closing CTA.
+const trustChips = [
+  { label: "Ahrefs site health", value: "100" },
+  { label: "Security headers", value: "A" },
+  { label: "Lighthouse", value: "4×100" },
+];
+
+// The technical SEO work that is already done and guarded by CI. Each item
+// ends with a receipt: the real artifact this build emits, not a mockup.
+const seoGroups = [
+  {
+    title: "Indexing",
+    items: [
+      {
+        title: "Sitemap with images",
+        text: "Every indexable page is in the sitemap, and post covers ship in the image sitemap.",
+        chip: "<image:loc>…/cover.jpg</image:loc>",
+      },
+      {
+        title: "Smart canonicals",
+        text: "Each page declares its own canonical URL. A cross-posted article can point at the original.",
+        chip: '<link rel="canonical" href="…">',
+      },
+      {
+        title: "Robots on both layers",
+        text: "Per-page robots directives in the HTML and <code>X-Robots-Tag</code> rules in the response headers.",
+        chip: "X-Robots-Tag: noindex",
+      },
+    ],
   },
   {
-    title: "Rich results, built in",
-    text: "schema.org JSON-LD that follows Google's structured-data guidelines, validated on every build so markup never drifts.",
+    title: "Rich results",
+    items: [
+      {
+        title: "Structured data",
+        text: "schema.org JSON-LD that follows Google's guidelines, on every page that qualifies.",
+        chip: '"@type": "BlogPosting"',
+      },
+      {
+        title: "Open Graph images",
+        text: "Purpose-built social cards, rendered at build time. Design your own templates in the brand system.",
+        chip: "og:image → /og/blog/my-post.png",
+      },
+      {
+        title: "Ready for Google Discover",
+        text: "Posts carry a real cover photo at 1200px or wider, and the cover feeds the image sitemap.",
+        chip: "max-image-preview:large",
+      },
+    ],
   },
   {
-    title: "Analytics, vendor-agnostic",
-    text: "One window.track call fans out to PostHog, Google Tag Manager, or whatever you add — swap providers without touching call sites.",
+    title: "Trust and guardrails",
+    items: [
+      {
+        title: "E-E-A-T signals",
+        text: "Authors with bios on every post, privacy and terms pages, and a license on every content image.",
+        chip: '"author": { "@type": "Person" }',
+      },
+      {
+        title: "CI that guards SEO",
+        text: "Broken links, sitemap gaps, and malformed structured data turn the build red. Lighthouse CI tracks the SEO score.",
+        chip: "✓ links ✓ sitemap ✓ structured data",
+      },
+      {
+        title: "Version meta tag",
+        text: "Every page carries the commit hash it was built from, so an Ahrefs or Semrush crawl maps to an exact version.",
+        chip: `<meta name="version" content="${commitHash}">`,
+      },
+    ],
+  },
+];
+
+// A pill is a brand mark: raw SVG markup plus its accessible name.
+type Pill = { label: string; icon: string };
+
+// Every integration point ships with a working default and a swap-out seam.
+// `mode` drives the icon strip: "swap" renders ⇄ between the marks (pick one,
+// switch anytime), "extend" renders + between them (providers stack). Cards
+// with `sparkles` end the strip with a "bring your own" sparkles tile.
+const platformAgnostic: {
+  title: string;
+  text: string;
+  mode: "swap" | "extend";
+  sparkles?: boolean;
+  pills: Pill[];
+}[] = [
+  {
+    title: "AI coding tools",
+    text: "<code>AGENTS.md</code> is the canonical spec. <code>CLAUDE.md</code> imports it, and Cursor or any other tool reads it directly, so any coding agent understands the codebase and can rebrand it on request.",
+    mode: "swap",
+    pills: [
+      { label: "Claude Code", icon: claudeCode.svg },
+      { label: "Cursor", icon: cursor.variants.mono },
+      { label: "Codex", icon: codex.svg },
+    ],
   },
   {
-    title: "Guardrails on every push",
-    text: "CI runs format, type-check, lint, redirect-drift, structured-data, and build checks. Lighthouse CI tracks performance.",
+    title: "Deploy target",
+    text: "Redirects and response headers are authored once, platform-neutral, then compiled per host from a single <code>site.config.ts</code> setting. Switching hosts is a one-line change plus a rebuild.",
+    mode: "swap",
+    pills: [
+      { label: "Cloudflare Pages", icon: cloudflarePages.svg },
+      { label: "Netlify", icon: netlify.svg },
+      { label: "Vercel", icon: vercel.variants.light },
+      { label: "AWS Amplify", icon: aws.variants.light },
+    ],
   },
   {
-    title: "Content ready to grow",
-    text: "MDX blog, resources, and legal collections, an RSS feed, and Brevo email forms with lead-magnet gates — already wired.",
+    title: "Analytics",
+    text: "Call sites fire through one <code>window.track</code> facade, never a vendor SDK directly. Add a new provider by writing one component. The pages that call <code>track</code> don't change.",
+    mode: "extend",
+    sparkles: true,
+    pills: [
+      { label: "PostHog", icon: posthog.svg },
+      { label: "Google Tag Manager", icon: googleTagManager.svg },
+    ],
+  },
+  {
+    title: "Forms",
+    text: "The lead-magnet gate posts through a single dispatcher. The backend handles validation, storage, and delivery. Swap it without touching the page template.",
+    mode: "extend",
+    sparkles: true,
+    pills: [
+      { label: "Brevo", icon: brevo.svg },
+      { label: "Formspree", icon: formspree.svg },
+    ],
+  },
+  {
+    title: "Captcha",
+    text: "Bot protection is single-select and self-gating. A provider renders only when its site key is set, and only one widget ever loads at a time.",
+    mode: "swap",
+    pills: [
+      { label: "Cloudflare Turnstile", icon: cloudflare.svg },
+      { label: "reCAPTCHA", icon: recaptcha.svg },
+    ],
+  },
+  {
+    title: "Image CDN",
+    text: "Host originals on any bucket or CDN behind a custom domain. Astro downloads and optimizes them at build. Fully decoupled from the deploy host.",
+    mode: "swap",
+    sparkles: true,
+    pills: [
+      { label: "R2", icon: cloudflare.svg },
+      { label: "S3", icon: aws.variants.light },
+    ],
   },
 ];
 
@@ -45,12 +208,12 @@ const features = [
 const brandPages = [
   {
     title: "Color",
-    summary: "A warm, minimal token system — ivory canvas and a single indigo accent.",
+    summary: "A warm, minimal token system. Ivory canvas and a single indigo accent.",
     href: "/-/astro/brand/color/",
   },
   {
     title: "Typography",
-    summary: `${fonts.sans.name} throughout — one clean sans for headings, body, and labels.`,
+    summary: `${fonts.sans.name} throughout. One clean sans for headings, body, and labels.`,
     href: "/-/astro/brand/typography/",
   },
   {
@@ -70,7 +233,7 @@ const brandPages = [
   },
   {
     title: "OG images",
-    summary: "Social-share cards — templates, anatomy, and where they come from.",
+    summary: "Social-share cards. Templates, anatomy, and where they come from.",
     href: "/-/astro/brand/og/",
   },
 ];
@@ -78,43 +241,192 @@ const brandPages = [
 // Lighthouse categories — the starter scores a perfect 100 on all four, desktop
 // and mobile, on every page. Reproduce with `npm run lhci:desktop` / `:mobile`.
 const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
-
-// securityheaders.com report for the deployed site. Update the grade below if it
-// changes (the scan is live). See public/_headers → src/headers/headers.config.ts.
-const securityReport =
-  "https://securityheaders.com/?q=https%3A%2F%2Fstarter.zmoki.xyz%2F&followRedirects=on";
-const securityGrade = "A";
 ---
 
 <BaseLayout title={meta.title} description={meta.description} wide>
   <!-- Hero -->
-  <section class="px-4 py-16 text-center lg:py-28">
-    <div class="mx-auto max-w-3xl">
-      <h1 class="text-5xl font-semibold tracking-tight md:text-6xl">
-        A website starter your AI can make its own.
-      </h1>
-      <p class="text-zmoki-stone-600 mx-auto mt-6 max-w-2xl text-xl md:text-2xl">
-        An Astro starter for personal and project sites — landing page, blog, RSS, analytics, and
-        email forms already wired. It ships with AGENTS.md, so Claude Code, Codex, Cursor, or any AI
-        coding agent understands the codebase and rebrands it for you.
-      </p>
-      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Button href={site.social.github} size="lg">Get started</Button>
-        <Button href="/blog/" variant="secondary" size="lg">Read the blog →</Button>
+  <section class="px-4 py-12 lg:py-16">
+    <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
+      <div>
+        <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{site.name}</h1>
+        <p class="text-zmoki-stone-900 mt-6 text-xl font-medium text-balance md:text-2xl">
+          A website template <span class="text-zmoki-indigo-600">your AI</span> can make its own
+        </p>
+        <p class="text-zmoki-stone-600 mt-4 text-lg">
+          An Astro starter for personal and project sites. The technical SEO is done and guarded by
+          CI, every vendor is swappable, and the brand guideline lives inside the site. <code
+            class="bg-zmoki-stone-200/70 rounded px-1.5 py-0.5 font-mono text-base">AGENTS.md</code
+          > explains the codebase to Claude Code, Codex, Cursor, or any AI coding agent, so you can ask
+          for changes in plain words.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-4">
+          <Button href={site.social.github} size="lg" class="pl-5">
+            <span
+              class="flex [&>svg]:h-5 [&>svg]:w-5"
+              aria-hidden="true"
+              set:html={github.variants.dark}
+            />
+            Get started
+          </Button>
+          <Button href="/blog/" variant="secondary" size="lg">Read the blog →</Button>
+        </div>
+        <p class="text-zmoki-stone-500 mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+          {
+            trustChips.map((chip, i) => (
+              <>
+                {i > 0 && <span aria-hidden="true">·</span>}
+                <span>
+                  {chip.label} <span class="text-zmoki-green-700 font-semibold">{chip.value}</span>
+                </span>
+              </>
+            ))
+          }
+        </p>
+      </div>
+      <div class="border-zmoki-stone-200 overflow-hidden rounded-2xl border shadow-lg">
+        <div class="bg-zmoki-stone-800 flex items-center gap-2 px-4 py-3">
+          <span class="h-3 w-3 rounded-full bg-[#ff5f57]" aria-hidden="true"></span>
+          <span class="h-3 w-3 rounded-full bg-[#febc2e]" aria-hidden="true"></span>
+          <span class="h-3 w-3 rounded-full bg-[#28c840]" aria-hidden="true"></span>
+          <span class="text-zmoki-stone-400 ml-3 font-mono text-xs">Terminal</span>
+        </div>
+        <pre
+          class="bg-zmoki-stone-900 text-zmoki-cream-100 overflow-x-auto p-6 font-mono text-sm leading-7"><code><span class="text-zmoki-stone-500">$</span> npm create astro@latest my-site <span class="text-zmoki-stone-500">\</span>
+    -- --template Zmoki/zmoki-astro-starter
+<span class="text-zmoki-stone-500">$</span> cd my-site
+<span class="text-zmoki-stone-500">$</span> claude
+<span class="text-zmoki-indigo-400">&gt;</span> /run
+  <span class="text-zmoki-green-400">➜</span> http://localhost:4321</code></pre>
       </div>
     </div>
   </section>
 
-  <!-- Features -->
-  <section id="features" class="scroll-mt-20 px-4 py-16 lg:py-24">
+  <!-- Technical SEO -->
+  <section id="seo" class="bg-zmoki-indigo-950 scroll-mt-20 px-4 py-16 lg:py-24">
     <div class="mx-auto max-w-6xl">
-      <h2 class="text-center text-3xl font-semibold md:text-4xl">What you get</h2>
+      <div class="text-center">
+        <p class="text-zmoki-indigo-300 text-sm font-semibold tracking-wide uppercase">
+          Technical SEO
+        </p>
+        <h2 class="mt-3 text-3xl font-semibold text-balance text-white md:text-4xl">
+          The technical SEO is <span class="text-zmoki-green-400">already done</span>
+        </h2>
+        <p class="text-zmoki-indigo-200 mx-auto mt-4 max-w-2xl text-xl">
+          The invisible work search engines check is wired in, and{" "}
+          <strong class="font-semibold text-white">CI guards it on every push</strong>. You write
+          posts. The crawlers get everything they ask for.
+        </p>
+      </div>
+      <div
+        class="divide-zmoki-indigo-800/60 border-zmoki-indigo-800/60 mt-12 grid grid-cols-1 divide-y rounded-2xl border sm:grid-cols-3 sm:divide-x sm:divide-y-0"
+      >
+        {
+          seoScores.map((score) => {
+            const Tag = score.href ? "a" : "div";
+            return (
+              <Tag href={score.href} class="flex flex-col items-center px-6 py-8 text-center">
+                <span class="text-zmoki-green-400 text-5xl font-bold">{score.value}</span>
+                <span class="mt-3 text-base font-semibold text-white">{score.label}</span>
+                <span class="text-zmoki-indigo-200 mt-1 text-base">{score.note}</span>
+              </Tag>
+            );
+          })
+        }
+      </div>
+      <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {
+          seoGroups.map((group) => (
+            <div class="bg-zmoki-cream-100 rounded-2xl shadow-sm">
+              <h3 class="text-zmoki-indigo-700 border-zmoki-stone-200 border-b px-6 py-5 text-sm font-semibold tracking-wide uppercase">
+                {group.title}
+              </h3>
+              <ul class="divide-zmoki-stone-200 divide-y">
+                {group.items.map((item) => (
+                  <li class="px-6 py-7">
+                    <h4 class="text-zmoki-stone-900 text-2xl font-semibold">{item.title}</h4>
+                    <p
+                      class="text-zmoki-stone-600 [&_code]:bg-zmoki-stone-200 [&_code]:text-zmoki-stone-900 mt-2 text-base [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm"
+                      set:html={item.text}
+                    />
+                    <p class="mt-4">
+                      <code class="text-zmoki-green-300 bg-zmoki-indigo-950 block rounded-lg px-3 py-2 font-mono text-xs [overflow-wrap:anywhere]">
+                        {item.chip}
+                      </code>
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Platform agnostic -->
+  <section id="platform-agnostic" class="scroll-mt-20 px-4 py-16 lg:py-24">
+    <div class="mx-auto max-w-6xl">
+      <div class="text-center">
+        <p class="text-zmoki-indigo-700 text-sm font-semibold tracking-wide uppercase">
+          Platform agnostic
+        </p>
+        <h2 class="mt-3 text-3xl font-semibold text-balance md:text-4xl">
+          <span class="text-zmoki-indigo-600">No vendor lock-in</span>, anywhere it matters
+        </h2>
+        <p class="text-zmoki-stone-600 mx-auto mt-4 max-w-2xl text-lg">
+          Every integration point ships with a <strong class="text-zmoki-stone-900 font-semibold"
+            >working default</strong
+          > and a clean seam to <strong class="text-zmoki-stone-900 font-semibold"
+            >swap it out</strong
+          >. Pick your own host, analytics vendor, form backend, captcha, or image CDN without
+          touching the rest of the codebase.
+        </p>
+      </div>
       <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
         {
-          features.map((feature) => (
-            <div class="border-zmoki-stone-200 rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
-              <h3 class="text-xl font-semibold">{feature.title}</h3>
-              <p class="text-zmoki-stone-600 mt-3 text-base">{feature.text}</p>
+          platformAgnostic.map((item) => (
+            <div class="border-zmoki-stone-200 flex h-full flex-col rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
+              <h3 class="text-2xl font-semibold">{item.title}</h3>
+              <p
+                class="text-zmoki-stone-600 [&_code]:bg-zmoki-stone-100 [&_code]:text-zmoki-stone-900 mt-3 text-base [&_code]:rounded [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm"
+                set:html={item.text}
+              />
+              <div class="mt-auto flex flex-wrap items-center gap-3 pt-8">
+                {item.pills.map((pill, i) => {
+                  const Separator = item.mode === "swap" ? ArrowRightLeft : Plus;
+                  return (
+                    <>
+                      {i > 0 && (
+                        <Separator size={16} class="text-zmoki-stone-400" aria-hidden="true" />
+                      )}
+                      <span
+                        class="flex items-center [&>svg]:h-auto [&>svg]:w-8"
+                        role="img"
+                        aria-label={pill.label}
+                        title={pill.label}
+                        set:html={pill.icon}
+                      />
+                    </>
+                  );
+                })}
+                {item.sparkles && (
+                  <>
+                    {item.mode === "swap" ? (
+                      <ArrowRightLeft size={16} class="text-zmoki-stone-400" aria-hidden="true" />
+                    ) : (
+                      <Plus size={16} class="text-zmoki-stone-400" aria-hidden="true" />
+                    )}
+                    <span
+                      class="text-zmoki-green-600 flex items-center"
+                      role="img"
+                      aria-label="Add your own"
+                      title="Add your own"
+                    >
+                      <Sparkles size={32} aria-hidden="true" />
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
           ))
         }
@@ -128,10 +440,15 @@ const securityGrade = "A";
       <p class="text-zmoki-green-700 text-sm font-semibold tracking-wide uppercase">
         Fast &amp; accessible
       </p>
-      <h2 class="mt-3 text-3xl font-semibold md:text-4xl">A perfect 100, across the board</h2>
+      <h2 class="mt-3 text-3xl font-semibold md:text-4xl">
+        A perfect <span class="text-zmoki-green-600">100</span>, across the board
+      </h2>
       <p class="text-zmoki-stone-600 mx-auto mt-4 max-w-2xl text-lg">
-        Every page scores 100 on all four Lighthouse categories — on both desktop and mobile.
-        Reproduce it yourself with <span class="font-semibold">npm run lhci:desktop</span>.
+        Every page scores 100 on all four Lighthouse categories, on both desktop and mobile.
+        Reproduce it yourself with <code
+          class="bg-zmoki-stone-200 text-zmoki-stone-900 rounded px-1.5 py-0.5 font-mono text-base"
+          >npm run lhci:mobile</code
+        >.
       </p>
       <div class="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4">
         {
@@ -163,20 +480,11 @@ const securityGrade = "A";
                   100
                 </span>
               </div>
-              <div class="text-zmoki-stone-900 mt-4 text-sm font-semibold">{label}</div>
+              <div class="text-zmoki-stone-900 mt-4 text-2xl font-semibold">{label}</div>
             </div>
           ))
         }
       </div>
-      <p class="mt-8">
-        <a
-          href={securityReport}
-          class="border-zmoki-green-200 bg-zmoki-green-50 text-zmoki-green-700 hover:bg-zmoki-green-100 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-        >
-          Security Headers: {securityGrade}
-          <span aria-hidden="true">↗</span>
-        </a>
-      </p>
     </div>
   </section>
 
@@ -189,18 +497,18 @@ const securityGrade = "A";
             <p class="text-zmoki-indigo-700 text-sm font-semibold tracking-wide uppercase">
               Brand system
             </p>
-            <h2 class="mt-3 text-3xl font-semibold md:text-4xl">
-              A living brand guideline, built in
+            <h2 class="mt-3 text-3xl font-semibold text-balance md:text-4xl">
+              A living brand guideline, <span class="text-zmoki-indigo-600">built in</span>
             </h2>
             <p class="text-zmoki-stone-600 mt-4 text-lg">
-              Every site ships with an internal style guide — color, typography, forms, components,
-              and voice &amp; tone — rendered from the same design tokens the site itself uses.
-              Change a token and the guideline and the site move together.
+              Every site ships with an internal style guide for color, typography, forms,
+              components, and voice &amp; tone. It renders from the same design tokens the site
+              itself uses. Change a token and the guideline and the site move together.
             </p>
             <p class="text-zmoki-stone-600 mt-4 text-lg">
-              The <span class="font-semibold">/brand</span> skill lets Claude Code — or any agent — evolve
-              it end to end: recolor the palette, swap fonts, rewrite the voice, and keep the guideline
-              and the implementation in sync.
+              The <code class="rounded bg-white px-1.5 py-0.5 font-mono text-base">/brand</code> skill
+              lets Claude Code or any agent evolve it end to end. Recolor the palette, swap fonts, rewrite
+              the voice, and keep the guideline and the implementation in sync.
             </p>
             <div class="mt-8">
               <Button href="/-/astro/brand/" size="lg" rel="nofollow"
@@ -232,15 +540,34 @@ const securityGrade = "A";
   <!-- Final CTA -->
   <section id="cta" class="scroll-mt-20 px-4 pt-4 pb-20">
     <div
-      class="bg-zmoki-indigo-600 mx-auto max-w-6xl rounded-3xl px-6 py-16 text-center text-white shadow-sm md:py-20"
+      class="bg-zmoki-indigo-950 mx-auto max-w-6xl rounded-3xl px-6 py-16 text-center text-white shadow-sm md:py-20"
     >
       <h2 class="text-3xl font-semibold md:text-4xl">Ready to get started?</h2>
       <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">
         Grab the template, tell your AI agent what you want, and deploy.
       </p>
       <Button href={site.social.github} variant="inverse" size="lg" class="mt-8">
+        <span
+          class="flex [&>svg]:h-5 [&>svg]:w-5"
+          aria-hidden="true"
+          set:html={github.variants.mono}
+        />
         Use this template
       </Button>
+      <p
+        class="text-zmoki-indigo-300 mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm"
+      >
+        {
+          trustChips.map((chip, i) => (
+            <>
+              {i > 0 && <span aria-hidden="true">·</span>}
+              <span>
+                {chip.label} <span class="text-zmoki-green-400 font-semibold">{chip.value}</span>
+              </span>
+            </>
+          ))
+        }
+      </p>
     </div>
   </section>
 </BaseLayout>

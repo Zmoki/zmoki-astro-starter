@@ -10,7 +10,7 @@ cover:
 author:
   name: "Zarema Khalilova"
   url: "https://zmoki.xyz"
-  bio: "I build small, fast websites and the tools around them — this starter is one of them."
+  bio: "I build small, fast websites and the tools around them. This starter is one of them."
 ---
 
 import Image from "@/components/Image.astro";
@@ -35,19 +35,21 @@ npm install
 Point your agent at the repo and let it read the two files that describe the
 project: `AGENTS.md` (the technical spec) and
 [`SETUP.md`](https://github.com/Zmoki/zmoki-astro-starter/blob/main/SETUP.md)
-(the checklist). Everything site-specific lives in one place — `src/site.config.ts` —
-so most of the work is a single, well-scoped file.
+(the checklist). Everything site-specific lives in `src/site.config.ts`, so most
+of the work is one well-scoped file.
 
 ## 3. Make it yours
 
 Work down `SETUP.md` with your agent. The essentials:
 
-- **Identity** — set `domain`, `name`, hero copy, and the CTA in `src/site.config.ts`
-  (and the `site` in `astro.config.mjs`).
-- **Look** — swap the accent color or define your own palette in
-  `src/design-tokens.mjs`; the whole site and the OG cards follow. Preview at
-  `/-/astro/brand/color/`.
-- **Content** — replace this post, add your own resources, and fill in the legal
+- **Identity.** Set `domain`, `name`, and other things like the organization and
+  social links in `src/site.config.ts`.
+- **Look.** Check the brand pages at `/-/astro/brand/` and run the `/brand` skill
+  to adapt the palette, fonts, and voice to your brand and needs. The whole site
+  and the OG cards follow.
+- **Platform.** Switch the deploy target and the image CDN by editing
+  `src/site.config.ts`. The redirects, headers, and CSP follow on the next build.
+- **Content.** Replace this post, add your own resources, and fill in the legal
   pages. Ask your agent to draft them in your voice.
 
 Because the brand system is a living style guide, you can just say _"make the
@@ -60,20 +62,23 @@ touch and how to keep the guideline honest.
   width={1200}
   height={675}
 >
-  Content images are hosted on a remote origin and optimized at build — responsive `webp`,
+  Content images are hosted on a remote origin and optimized at build. Responsive `webp`,
   content-hashed, and served from your deploy host. The origin is decoupled from where the site
   deploys.
 </Image>
 
 ## 4. Run it
 
-```bash
-npm run dev
+Ask your agent. The `/run` skill launches the dev server and verifies it is up:
+
+```
+$ claude
+> /run
 ```
 
-Open the local URL and click through. The site ships with a blog, resources, RSS,
-analytics, email forms, structured data, and build-time OG images already wired —
-nothing to bolt on.
+Prefer the classic way? `npm run dev` works too. Open the local URL and click
+through. The site ships with a blog, resources, RSS, analytics, email forms,
+structured data, and build-time OG images already wired. Nothing to bolt on.
 
 ## 5. Verify and deploy
 
@@ -86,5 +91,9 @@ npm run lint
 npm run build
 ```
 
-Then connect the repo to your host — the original deploys to Cloudflare Pages on
-every push to `main`. That's it: cloned, rebranded, and live.
+After the build, CI also validates the structured data, internal links, and the
+sitemap, so an SEO mistake turns the build red instead of shipping.
+
+Then connect the repo to your host. Cloudflare Pages, Netlify, Vercel, and AWS
+Amplify are all supported, and pushing to `main` deploys. That's it. Cloned,
+rebranded, and live.
