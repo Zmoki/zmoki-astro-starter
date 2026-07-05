@@ -65,7 +65,7 @@ All are optional — the site builds and runs without them.
 
 ## 6. Deploy
 
-Set up hosting (the original uses Cloudflare Pages on the `main` branch — every push deploys).
+Set up hosting. The starter is platform-agnostic — it builds to a static `dist/` any host serves — and supports **Cloudflare Pages** (the default), **Netlify**, **Vercel**, and **AWS Amplify**. Connect your host to the GitHub repo so pushing to `main` deploys (Cloudflare Pages, Netlify, and Vercel all support push-to-deploy).
 
 **Pick your platform for redirects.** Redirects are authored once as CSV in `src/redirects/` and compiled to whatever your host expects. Set `deploy.platform` in **`src/site.config.ts`**:
 

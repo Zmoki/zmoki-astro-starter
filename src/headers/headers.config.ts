@@ -109,9 +109,10 @@ export const headerRules: HeaderRule[] = [
     source: "/*",
     headers: {
       // Standard security headers — kept here (not only at the CDN/zone level) so
-      // the template is A-grade on every platform, not just Cloudflare. NOTE: if
-      // your Cloudflare zone (Terraform) also sets HSTS / X-Content-Type-Options /
-      // Referrer-Policy, drop them there so responses don't carry duplicates.
+      // the template is A-grade on every host. NOTE: if your CDN or DNS layer
+      // (e.g. a Cloudflare zone managed in Terraform) also sets HSTS /
+      // X-Content-Type-Options / Referrer-Policy, drop them there so responses
+      // don't carry duplicates.
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY", // legacy; CSP frame-ancestors 'none' is the modern equivalent
       "Referrer-Policy": "strict-origin-when-cross-origin",

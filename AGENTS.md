@@ -302,18 +302,13 @@ Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guid
 
 ## Deploy & infrastructure
 
-**Hosting:** Cloudflare Pages, connected to your site's GitHub repo.
+**Hosting is platform-agnostic.** The build produces a static `dist/` that any static host serves. The two host-specific concerns — redirects and response headers — are authored platform-neutrally and compiled per host from **`site.deploy.platform`** in `src/site.config.ts` (see below). Supported targets: **Cloudflare Pages** (the default / reference host), **Netlify**, **Vercel**, and **AWS Amplify**. Switching hosts is a one-line change to `deploy.platform` plus a rebuild — nothing else in the codebase is host-specific.
 
-**Production branch:** `main` — every push to `main` triggers a Cloudflare Pages deploy. No preview branches.
+**Deploy on push:** connect the GitHub repo to your host and pushing to `main` triggers a production build+deploy (Cloudflare Pages, Netlify, and Vercel all support this). The reference setup uses no preview branches. Configure the connection in your host's dashboard.
 
-**Infrastructure as code:** Cloudflare account, DNS zones (including your site's zone), and Pages config are managed via Terraform in a separate repo:
+**DNS / hosting config:** manage it however your host prefers (dashboard, or infrastructure-as-code such as Terraform against your host's provider). None of it lives in this repo.
 
-- GitHub: `https://github.com/Zmoki/my-infrastructure`
-- Local path: `~/Projects/Zmoki/my-infrastructure/`
-
-If DNS, zone settings, or Cloudflare Pages project config need changing, edit the Terraform config in that repo — not the Cloudflare dashboard directly.
-
-**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.deploy.platform`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). When adding an analytics/asset host, add it to the CSP directive arrays in `headers.config.ts`. If your Cloudflare zone (Terraform) also sets some of these security headers, drop them there to avoid duplicates.
+**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.deploy.platform`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). When adding an analytics/asset host, add it to the CSP directive arrays in `headers.config.ts`. If your CDN or DNS layer also sets some of these security headers, drop them there to avoid duplicates.
 
 **Redirects** — authored as platform-neutral CSV in **`src/redirects/`** and compiled by `scripts/generate-redirects.ts` into the artifact for the host set by **`site.deploy.platform`** in `src/site.config.ts` (`public/_redirects` for Cloudflare/Netlify, `vercel.json` for Vercel, `redirects.json` for Amplify). The artifact is **committed** and CI's `npm run check:redirects` fails on drift, so rebuild (`npm run build:redirects`) and commit it alongside any CSV change.
 

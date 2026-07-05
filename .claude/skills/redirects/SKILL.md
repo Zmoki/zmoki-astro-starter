@@ -75,4 +75,4 @@ For a personal site you'll be far under these, but the guard means a runaway gen
 - **301 vs 302:** use `301` (permanent) for slugs that moved for good — this passes SEO signal. Use `302` (temporary) only when the move is provisional.
 - Trailing slashes matter — this site's URLs end in `/`. Match the real path.
 - **Validation:** an invalid `code`, or a row missing `source`/`destination`, fails the build with a line-numbered error (e.g. `blog.csv:2: invalid code "999"`). Fix the CSV and rebuild.
-- Do not add redirects in Terraform (`my-infrastructure`) or edit the generated artifact directly — both are wrong paths for this.
+- Do not add redirects at the CDN/DNS layer (e.g. Terraform-managed zone rules) or edit the generated artifact directly — both are wrong paths for this. Author them as CSV here and let the build compile the artifact.

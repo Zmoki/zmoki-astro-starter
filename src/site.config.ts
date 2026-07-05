@@ -59,11 +59,12 @@ export const site = {
   /** Deploy-time settings (hosting). See SETUP.md §6. */
   deploy: {
     /**
-     * Hosting target for the redirects build (`npm run build:redirects`).
-     * Selects which artifact the CSVs in src/redirects/ compile to:
-     *   "cloudflare" | "netlify" → public/_redirects
-     *   "vercel"                 → vercel.json (redirects[] merged in)
-     *   "amplify"                → redirects.json (paste into the Amplify console/IaC)
+     * Hosting target. The starter is platform-agnostic; this one field selects
+     * which host the redirects (`npm run build:redirects`) and response-header
+     * (`npm run build:headers`) artifacts compile to. Default is "cloudflare".
+     *   "cloudflare" | "netlify" → public/_redirects + public/_headers
+     *   "vercel"                 → vercel.json (redirects[] + headers[] merged in)
+     *   "amplify"                → redirects.json + customHeaders.json
      */
     platform: "cloudflare",
   },
