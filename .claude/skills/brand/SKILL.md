@@ -24,6 +24,7 @@ directly in the pages — you edit it there.
 | `forms/`                  | `src/pages/-/astro/brand/forms.astro`      | Inputs, labels, action button, states     |
 | `components/`             | `src/pages/-/astro/brand/components.astro` | Nav, footer, hero, cards, links, buttons  |
 | `voice/`                  | `src/pages/-/astro/brand/voice.astro`      | Voice pillars, house style, rewrites      |
+| `og/`                     | `src/pages/-/astro/brand/og.astro`         | OG / social cards — templates + anatomy   |
 
 Start here: run **`/run`** and open the page you're changing. It shows the current
 guideline live, and its `.astro` frontmatter holds the data you'll usually edit.

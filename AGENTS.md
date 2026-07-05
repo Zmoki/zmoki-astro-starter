@@ -164,6 +164,7 @@ imported from `astro:content` (not the legacy `entry.render()`).
 /-/astro/health          # health check — returns "ok" + short commit hash
 /-/astro/brand/          # brand design system home (internal, noindex)
 /-/astro/brand/color/    # color palette reference (BrandLayout)
+/-/astro/brand/og/       # OG / social-card reference (BrandLayout)
 ```
 
 ---

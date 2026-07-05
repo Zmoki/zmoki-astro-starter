@@ -30,7 +30,10 @@ export const GET: APIRoute = async ({ props }) => {
   return new Response(new Uint8Array(png), {
     headers: {
       "Content-Type": "image/png",
-      "Cache-Control": "public, max-age=31536000, immutable",
+      // Long-lived immutable in prod (cards are build output); no caching under
+      // `astro dev` so edits to the card templates show on reload instead of
+      // serving a stale PNG from the browser cache.
+      "Cache-Control": import.meta.env.PROD ? "public, max-age=31536000, immutable" : "no-store",
     },
   });
 };
