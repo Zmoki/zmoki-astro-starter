@@ -3,12 +3,13 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import PostCard from "@/components/PostCard.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 import { site } from "@/site.config";
+import { blogIndexPage } from "@/data/standalone-pages";
 
 const allPosts: CollectionEntry<"blog">[] = await getCollection("blog");
 const sortedPosts = allPosts.sort((a, b) => b.data.order - a.data.order);
 ---
 
-<BaseLayout title={`Blog — ${site.name}`} description={site.feedDescription}>
+<BaseLayout title={blogIndexPage.title ?? site.name} description={blogIndexPage.description}>
   <header class="mb-10">
     <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">Blog</h1>
     <p class="text-zmoki-stone-600 mt-3 text-lg">{site.feedDescription}</p>

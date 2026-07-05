@@ -10,7 +10,8 @@
 // brand, health, 404, …) — are listed explicitly.
 import { site } from "@/site.config";
 import { formatShortDate } from "@/lib/dates";
-import { getPageRecords, standaloneRoutes } from "@/lib/page-collections";
+import { getPageRecords } from "@/lib/page-collections";
+import { standalonePages } from "@/data/standalone-pages";
 import type { OgEntry } from "./types";
 
 /** Card text has no line-clamp, so cap lengths that would overflow the layout. */
@@ -64,12 +65,20 @@ async function computeEntries(): Promise<RoutedEntry[]> {
   const records = await getPageRecords();
 
   return [
-    // Standalone cards (home, blog index) — the same set the sitemap lists,
-    // from the shared registry. All use the `site` template.
-    ...standaloneRoutes.map((route) => ({
-      route: route.path === "" ? "/" : `/${route.path}`,
-      entry: siteEntry(route.og.key, route.og.title, route.og.description),
-    })),
+    // Standalone cards (home, blog index) — the same set the sitemap lists, from
+    // the shared data module. Each gets its own `site`-template card from its
+    // real title/description; a page that sets neither falls back to the default
+    // card (getOgImage returns DEFAULT_ENTRY for any route without an entry).
+    ...standalonePages.flatMap((page) =>
+      page.title !== undefined && page.description !== undefined
+        ? [
+            {
+              route: page.path === "" ? "/" : `/${page.path}`,
+              entry: siteEntry(page.ogKey, page.title, page.description),
+            },
+          ]
+        : [],
+    ),
     // One article card per collection-driven page. `path` is "blog/foo/"; the
     // route keeps the trailing slash, the card key drops it → /og/blog/foo.png.
     ...records.map((record) => ({

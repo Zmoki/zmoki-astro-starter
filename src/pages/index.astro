@@ -3,9 +3,10 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { fonts } from "@/design-tokens.mjs";
+import { homePage } from "@/data/standalone-pages";
 
-// The landing page's publish/modified dates live in src/data/home-page.ts so the
-// sitemap can read them without importing from this page component.
+// Title / description / dates live in src/data/standalone-pages.ts (homePage) so
+// the page, its OG card, and the sitemap all read one source.
 
 // Real features of the starter — edit, extend, or remove.
 const features = [
@@ -80,11 +81,7 @@ const securityReport =
 const securityGrade = "A";
 ---
 
-<BaseLayout
-  title={`${site.name} — a website your AI can make its own`}
-  description={site.description}
-  wide
->
+<BaseLayout title={homePage.title ?? site.name} description={homePage.description} wide>
   <!-- Hero -->
   <section class="px-4 py-16 text-center lg:py-28">
     <div class="mx-auto max-w-3xl">

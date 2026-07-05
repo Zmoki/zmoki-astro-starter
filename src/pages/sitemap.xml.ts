@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
-import { homePagePublishDate, homePageContentModifiedDate } from "@/data/home-page";
 import { isoDate } from "@/lib/dates";
-import { getPageRecords, standaloneRoutes } from "@/lib/page-collections";
+import { getPageRecords } from "@/lib/page-collections";
+import { standalonePages } from "@/data/standalone-pages";
 import { isNoindex } from "@/lib/robots";
 import { isNoindexPath } from "@/lib/noindex";
 
@@ -20,13 +20,17 @@ export const GET: APIRoute = async ({ site }) => {
     .filter((record) => !isNoindex(record.robots))
     .map((record) => ({ path: record.path, lastmod: record.contentModifiedDate }));
 
-  // The index page's <lastmod> is the newest of its own dates and the most
-  // recently modified post (all posts, incl. any noindex — matches the page's
-  // own freshness). Spread into Math.max so an empty blog falls back cleanly.
-  const indexPageLatestDate = new Date(
+  // The standalone pages' shared <lastmod>: the newest of any date set on a
+  // standalone page (src/data/standalone-pages.ts) and the most recently
+  // modified post (all posts, incl. any noindex — matches the pages' freshness,
+  // since home + blog index surface recent content). Spread into Math.max so an
+  // empty blog falls back to the page dates cleanly.
+  const standaloneLatestDate = new Date(
     Math.max(
-      homePagePublishDate.getTime(),
-      homePageContentModifiedDate.getTime(),
+      ...standalonePages
+        .flatMap((page) => [page.publishDate, page.contentModifiedDate])
+        .filter((date): date is Date => date !== undefined)
+        .map((date) => date.getTime()),
       ...records
         .filter((record) => record.path.startsWith("blog/"))
         .map((record) => record.contentModifiedDate.getTime()),
@@ -40,12 +44,12 @@ export const GET: APIRoute = async ({ site }) => {
   </url>
   `;
 
-  // Standalone (non-collection) pages come from the shared registry (home + blog
-  // index) and all take the computed index <lastmod>. Everything is then run
-  // through isNoindexPath so any URL the headers config marks noindex
-  // (X-Robots-Tag) is excluded.
+  // Standalone (non-collection) pages come from the shared data module (home +
+  // blog index) and take that computed <lastmod>. Everything is then run through
+  // isNoindexPath so any URL the headers config marks noindex (X-Robots-Tag) is
+  // excluded.
   const urls: SitemapEntry[] = [
-    ...standaloneRoutes.map((route) => ({ path: route.path, lastmod: indexPageLatestDate })),
+    ...standalonePages.map((page) => ({ path: page.path, lastmod: standaloneLatestDate })),
     ...collectionEntries,
   ].filter((url) => !isNoindexPath(`/${url.path}`));
 

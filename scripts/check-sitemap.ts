@@ -3,9 +3,15 @@ import { join } from "path";
 import { DIST_DIR, htmlFiles, routeForFile } from "./lib/dist-files.ts";
 import { isNoindexPath } from "../src/lib/noindex.ts";
 import { isNoindex } from "../src/lib/robots.ts";
+import { standalonePages } from "../src/data/standalone-pages.ts";
 
 // CI guard for the sitemap. Runs after `npm run build`, offline over dist/.
-// Three checks keep the sitemap in sync with what the site actually publishes:
+// Checks that keep the sitemap in sync with what the site actually publishes
+// (plus a source-metadata sanity check):
+//
+// 0. Standalone page metadata completeness — each standalone page
+//    (src/data/standalone-pages.ts) sets title + description together, or
+//    neither. One without the other is a half-populated OG card / <title>.
 //
 // 1. Coverage — every built, indexable HTML page (a directory-format route like
 //    `/blog/foo/`) appears in dist/sitemap.xml. This is what catches a new page
@@ -69,6 +75,13 @@ function main(): void {
 
   const sitemap = new Set(sitemapRoutes());
 
+  // (0) Standalone page metadata completeness (src/data/standalone-pages.ts):
+  // title and description must be set together, or neither — one without the
+  // other renders a half-populated OG card / <title>.
+  const incompleteMeta = standalonePages.filter(
+    (page) => (page.title === undefined) !== (page.description === undefined),
+  );
+
   // Single walk over dist/: record each built page's route and whether its
   // rendered <meta robots> is noindex, so nothing below re-reads a file.
   const metaNoindex = new Map<string, boolean>();
@@ -105,6 +118,16 @@ function main(): void {
   }
 
   let failed = false;
+  if (incompleteMeta.length) {
+    failed = true;
+    console.error(
+      `✖ ${incompleteMeta.length} standalone page(s) with incomplete metadata — set title and description together, or neither (src/data/standalone-pages.ts):\n`,
+    );
+    for (const page of incompleteMeta) {
+      console.error(`  • ${page.path === "" ? "/" : `/${page.path}`}`);
+    }
+    console.error("");
+  }
   if (missing.length) {
     failed = true;
     console.error(

@@ -84,15 +84,3 @@ export async function getPageRecords(): Promise<PageRecord[]> {
   const groups = await Promise.all(pageCollections.map((pc) => pc.records()));
   return groups.flat();
 }
-
-/**
- * Standalone (non-collection) pages that still need a sitemap entry and an OG
- * card — the home page and the blog index. Listed once so the sitemap and the OG
- * manifest agree on the set and the card text (rather than each hardcoding it).
- * Their sitemap <lastmod> is a computed freshness value the endpoint supplies,
- * so it isn't stored here; all use the OG `site` template.
- */
-export const standaloneRoutes = [
-  { path: "", og: { key: "index", title: site.name, description: site.description } },
-  { path: "blog/", og: { key: "blog", title: site.name, description: "Blog" } },
-];
