@@ -1,6 +1,12 @@
 ---
+// Brevo email-capture provider (the built-in resource-gate form). Selected by
+// Form.astro (the dispatcher). Renders a native HTML form that POSTs to Brevo's
+// hosted endpoint; Brevo validates the captcha token, stores the contact, emails
+// the lead-magnet asset, and redirects to the thank-you page (all configured on
+// the Brevo form). The <Captcha /> and the resource_gate_* analytics are the
+// shared, vendor-neutral bits.
 export interface Props {
-  brevoFormId: string;
+  formId: string;
   buttonText?: string;
   resourceSlug?: string;
 }
@@ -9,14 +15,14 @@ import Button from "@/components/Button.astro";
 import Captcha from "@/components/Captcha.astro";
 
 const defaultButtonText = "Subscribe";
-const { brevoFormId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.props;
+const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.props;
 ---
 
 <!-- Main form -->
 <form
   id="brevo-form"
   method="POST"
-  action={`https://${import.meta.env.PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/${brevoFormId}`}
+  action={`https://${import.meta.env.PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/${formId}`}
   class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
 >
   <section class="prose prose-headings:font-semibold !leading-tight md:w-1/2">

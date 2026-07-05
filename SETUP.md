@@ -58,7 +58,7 @@ Copy `.env.example` to `.env` and fill in what you use (every var is declared an
   - **PostHog** — `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`.
   - **Google Tag Manager** — `PUBLIC_GTM_CONTAINER_ID` (`GTM-XXXXXXX`); wire GA4/Ads/etc. inside the GTM UI.
   - `PUBLIC_ANALYTICS_ENABLED=false` turns **all** analytics off (e.g. in dev). If you use a GTM host beyond the defaults, allowlist it in the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`). See AGENTS.md → Analytics to add another provider.
-- **Brevo** — `PUBLIC_BREVO_ACCOUNT_ID`, plus a `form` block in a resource's frontmatter to show a signup form.
+- **Forms** — provider-agnostic email capture (like analytics), single-select. Built in: **Brevo** — set `PUBLIC_BREVO_ACCOUNT_ID`, plus a `form` block (with `formId`) in a resource's frontmatter to show a signup form. To swap the backend, see AGENTS.md → Forms.
 - **Captcha** — provider-agnostic bot protection on forms (like analytics), single-select. Built in: **Cloudflare Turnstile** — set `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`. `PUBLIC_CAPTCHA_ENABLED=false` turns it off (e.g. in dev). To swap in reCAPTCHA/hCaptcha, see AGENTS.md → Captcha. Note: the provider must also be the one configured on your Brevo form, which validates the token.
 
 All are optional — the site builds and runs without them.

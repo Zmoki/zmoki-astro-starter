@@ -2,7 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Time from "@/components/Time.astro";
 import Prose from "@/components/Prose.astro";
-import BrevoForm from "@/components/BrevoForm.astro";
+import Form from "@/components/Form.astro";
 
 export interface Props {
   type: "page" | "link";
@@ -12,7 +12,7 @@ export interface Props {
   contentModifiedDate: Date;
   slug?: string;
   form?: {
-    brevoFormId: string;
+    formId: string;
     buttonText: string;
     title: string;
     description: string;
@@ -65,11 +65,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
       {
         form && (
           <div class="order-first">
-            <BrevoForm
-              brevoFormId={form.brevoFormId}
-              buttonText={form.buttonText}
-              resourceSlug={slug}
-            >
+            <Form formId={form.formId} buttonText={form.buttonText} resourceSlug={slug}>
               <h2 set:html={form.title} />
               <p set:html={form.description} />
               <p>
@@ -84,7 +80,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
                   </em>
                 </p>
               )}
-            </BrevoForm>
+            </Form>
           </div>
         )
       }

@@ -3,7 +3,8 @@ import BrandLayout from "@/layouts/BrandLayout.astro";
 import { site } from "@/site.config";
 
 // Shared input class strings so the live examples and the usage code stay in
-// sync with what BrevoForm.astro actually renders.
+// sync with what the resource-gate form (src/components/forms/brevo.astro)
+// actually renders.
 const labelClass = "text-sm font-medium";
 const inputClass =
   "w-full rounded-lg border border-zmoki-stone-300 bg-white p-2 text-lg focus:border-zmoki-indigo-500 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500/30";
@@ -28,7 +29,7 @@ const buttonClass =
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Forms</h1>
     <p class="text-zmoki-stone-700 mt-4 max-w-2xl text-xl md:text-2xl">
       Inputs, labels, and the action button. The newsletter signup (<code
-        class="rounded bg-white px-1.5 py-0.5 text-base">BrevoForm</code
+        class="rounded bg-white px-1.5 py-0.5 text-base">Form</code
       >) is the canonical example — every pattern below comes from it.
     </p>
   </header>
