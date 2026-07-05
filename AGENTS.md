@@ -84,7 +84,7 @@ GitHub Actions workflow at `.github/workflows/ci.yml` runs on every push and PR 
 7. **Structured data check** — `npm run check:sd` (runs after build; parses every schema.org JSON-LD block in `dist/` and fails on malformed/unsound markup — see `/structured-data`)
 8. **Internal link check** — `npm run check:links` (runs after build; two rules over `dist/`: (a) every relative internal `<a href>` must resolve to a built file — no 404s; redirect sources and off-site links are skipped; (b) no `<a href>` may hard-code our own origin — the production URL or a preview deploy for the configured host — those must be relative paths. Preview-host detection is shared with the OG image URLs via `src/lib/deploy.ts`.)
 
-Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`.
+Required GitHub secrets for the build step: `PUBLIC_POSTHOG_PROJECT_TOKEN`, `PUBLIC_POSTHOG_HOST`, `PUBLIC_BREVO_ACCOUNT_ID`, `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`. Optional build var: `PUBLIC_IMAGE_CDN_HOST` (the image origin — a non-secret, so a repo **variable** is preferred; the build step reads `vars` then `secrets`). When set, CI/Lighthouse optimize remote content images at build (the origin must be reachable); unset, they render unoptimized.
 
 A separate `lighthouse.yml` workflow runs Lighthouse CI after every push to `main`.
 
