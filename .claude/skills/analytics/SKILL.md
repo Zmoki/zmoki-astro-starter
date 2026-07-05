@@ -11,12 +11,12 @@ Add/enable/swap analytics providers and tracked events. The system is **provider
 Call sites never name a vendor. They fire events through a global facade — `window.track(event, props)`, always called optionally (`window.track?.(...)`) so an unconfigured site is a silent no-op. Each **active provider chains onto `window.track`** (wrapping the previous one), so one call fans out to every provider.
 
 - **`src/components/analytics/*.astro`** — one component per provider. Each exports its own committed config constant(s) (not env vars — these are public, non-secret values), renders its loader snippet, **and** defines/extends `window.track`.
-- **`src/components/Analytics.astro`** — the **dispatcher**. Imports each provider's constant(s), computes an enable flag from them, and renders it. All providers are further gated on one global switch that's on only for the deploy host's real production build of `main` (`isProductionDeploy`, `src/lib/deploy.ts`) — off in dev/CI/previews automatically, no config needed. A provider whose constant is empty emits **nothing** — no 404ing script, no Lighthouse Best-Practices hit.
+- **`src/components/Analytics.astro`** — the **dispatcher**. Imports each provider's constant(s), computes an enable flag from them, and renders it. All providers are further gated on one global switch, `PUBLIC_ANALYTICS_ENABLED === "true"` — **off by default**, so nothing fires unless that env var is explicitly `"true"`. A provider whose constant is empty emits **nothing** either way — no 404ing script, no Lighthouse Best-Practices hit.
 - Tracked events fire from inline scripts across layouts, pages, and components — see the **Tracked events (catalog)** section below for the full list and where each lives.
 
 Built-in providers: **PostHog** (`POSTHOG_PROJECT_TOKEN` + `POSTHOG_HOST` constants in `posthog.astro`) and **Google Tag Manager** (`GTM_CONTAINER_ID` constant in `gtm.astro`, empty by default).
 
-`PUBLIC_ANALYTICS_ENABLED` (`src/env.d.ts`) is an optional override of the production-only default — set to `"true"`/`"false"` to force it either way. The full picture is in `AGENTS.md` → **Analytics**.
+`PUBLIC_ANALYTICS_ENABLED` (`src/env.d.ts`) is set to `"true"` in your host's production env and in CI for pushes to `main` (`.github/workflows/ci.yml`) — leave it unset anywhere you want analytics off (dev, PRs, previews). The full picture is in `AGENTS.md` → **Analytics**.
 
 ## Step 1 — Figure out the task
 
@@ -34,7 +34,7 @@ Set the provider's committed constant (values are public/non-secret, so this is 
 - **PostHog** — `POSTHOG_PROJECT_TOKEN` and `POSTHOG_HOST` in `src/components/analytics/posthog.astro` (both required, or PostHog stays off).
 - **GTM** — `GTM_CONTAINER_ID` in `src/components/analytics/gtm.astro` (e.g. `GTM-XXXXXXX`). Wire the actual tags (GA4, Ads, …) inside the GTM UI; match tracked events with a **Custom Event** trigger on the event name.
 
-Both can be on at once. Once their constants are filled in, both stay off everywhere except the deploy host's real production build of `main` (`isProductionDeploy`) — no extra config needed for dev/CI/Lighthouse to stay analytics-free. To test one locally, prefix the dev/build command with `PUBLIC_ANALYTICS_ENABLED=true`.
+Both can be on at once. Once their constants are filled in, analytics still stays off until `PUBLIC_ANALYTICS_ENABLED=true` (production env, or CI on `main`). To test locally, prefix the dev/build command with it.
 
 **PostHog CSP host.** The snippet loads its script from (`script-src`) and sends events to (`connect-src`) `POSTHOG_HOST`, so that origin must be in the CSP or the browser blocks it in production. A cross-origin host needs an explicit allowlist entry — PostHog Cloud (`app.posthog.com`) is cross-origin, and so is a **reverse-proxy subdomain** on your own domain. It's hard-coded as a literal (in `script-src` and `connect-src`) in **`src/headers/headers.config.ts`** — **keep it in sync with the `POSTHOG_HOST` constant in `posthog.astro`**. The value is duplicated on purpose: `headers.config.ts` compiles into a committed, drift-checked `public/_headers` artifact that can only import plain TS modules, not `.astro` component exports, so the CSP needs its own literal. After editing either one, run `npm run build:headers` and commit the regenerated `public/_headers`.
 
@@ -124,9 +124,9 @@ The events this starter fires today. All go through `window.track(...)` and reac
 
 ## Step 5 — Disable analytics (D)
 
-- **All providers, permanently in production** — set `PUBLIC_ANALYTICS_ENABLED=false` in the host's env config (overrides the automatic default).
-- **One provider** — blank its constant(s) (`GTM_CONTAINER_ID = ""` in `gtm.astro`, or both PostHog constants in `posthog.astro`). It then emits nothing.
-- Everywhere else (dev, CI, previews) analytics is already off by default — nothing to do.
+- **Everywhere it's currently off by default** (dev, PRs, previews) — nothing to do.
+- **In production** — remove/unset `PUBLIC_ANALYTICS_ENABLED=true` from the host's env config.
+- **One provider only** — blank its constant(s) (`GTM_CONTAINER_ID = ""` in `gtm.astro`, or both PostHog constants in `posthog.astro`). It then emits nothing regardless of the switch.
 
 ## Step 6 — Verify
 

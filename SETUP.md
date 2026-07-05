@@ -54,14 +54,14 @@ The pages under `/-/astro/brand/` are a living style guide (internal, noindex). 
 
 ## 5. Analytics and forms (optional but wired)
 
-No `.env` file needed — this site has no custom env vars. All config below is committed constants, and analytics/captcha activate only on the host's real production build of `main` (see `src/lib/deploy.ts`). The features and where to set them:
+All config below is committed constants — no `.env` file is needed to build. The features and where to set them:
 
-- **Analytics** — provider-agnostic and multi-provider; each provider is active once its own committed constant is filled in. Built in:
+- **Analytics** — provider-agnostic and multi-provider; each provider is active once its own committed constant is filled in, but analytics as a whole is **off by default** — set `PUBLIC_ANALYTICS_ENABLED=true` in your host's production env to turn it on (also settable in CI for `main`, or locally to test). Built in:
   - **PostHog** — `POSTHOG_PROJECT_TOKEN` + `POSTHOG_HOST` constants in `src/components/analytics/posthog.astro`. Keep `POSTHOG_HOST` in sync with the matching literal in `src/headers/headers.config.ts` (the CSP artifact).
   - **Google Tag Manager** — `GTM_CONTAINER_ID` constant in `src/components/analytics/gtm.astro` (e.g. `GTM-XXXXXXX`; empty by default); wire GA4/Ads/etc. inside the GTM UI.
   - If you use a GTM host beyond the defaults, allowlist it in the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`). See AGENTS.md → Analytics to add another provider.
 - **Forms** — provider-agnostic email capture (like analytics), single-select. Built in: **Brevo** — set the `BREVO_ACCOUNT_ID` constant in `src/components/forms/brevo.astro`, plus a `form` block (with `formId`) in a resource's frontmatter to show a signup form. To swap the backend, see AGENTS.md → Forms.
-- **Captcha** — provider-agnostic bot protection on forms (like analytics), single-select. Built in: **Cloudflare Turnstile** — set the `TURNSTILE_SITE_KEY` constant in `src/components/captcha/turnstile.astro`. To swap in reCAPTCHA/hCaptcha, see AGENTS.md → Captcha. Note: the provider must also be the one configured on your Brevo form, which validates the token.
+- **Captcha** — provider-agnostic bot protection on forms (like analytics), single-select, also **off by default** — set `PUBLIC_CAPTCHA_ENABLED=true` the same way. Built in: **Cloudflare Turnstile** — set the `TURNSTILE_SITE_KEY` constant in `src/components/captcha/turnstile.astro`. To swap in reCAPTCHA/hCaptcha, see AGENTS.md → Captcha. Note: the provider must also be the one configured on your Brevo form, which validates the token.
 - **Content image origin** — optional, **decoupled from your deploy host**: set `platform.imagesCDNHost` in `src/site.config.ts` (e.g. `"https://images.example.com"`, an R2 bucket on a custom domain) to host image originals externally; Astro downloads + optimizes them at build (keeping binaries out of git), and the same value drives the CSP — run `npm run build:headers` after changing it. Leave it `""` to commit images to `src/images` instead. A build with an origin set must be able to reach it. See the `/images` skill.
 
 All are optional — the site builds and runs without them.

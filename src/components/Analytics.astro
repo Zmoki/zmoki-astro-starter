@@ -1,26 +1,16 @@
 ---
 // Analytics dispatcher. Renders each built-in provider only when its own
-// committed config constant is set — an unconfigured provider emits nothing
-// (no 404ing script, no Lighthouse hit). Providers stack, chaining onto the
-// same `window.track`/`window.identify` facade so one call fans out to all.
+// committed config constant is set, chaining onto the shared window.track/
+// window.identify facade so one call fans out to every active provider.
 //
-// Off by default everywhere (local dev, CI, previews) and on only for the
-// host's real production build of `main` (see isProductionDeploy) — so
-// tracking never fires from a build that isn't the live site.
-// PUBLIC_ANALYTICS_ENABLED overrides that default when explicitly "true" or
-// "false" (e.g. to QA a provider on a preview, or kill it in prod without a
-// redeploy); leave it unset to just use the automatic default.
-// To add a provider: create a component that exports its config constant and
-// chains onto window.track, then import + render it below.
-import { site } from "@/site.config";
-import { isProductionDeploy } from "@/lib/deploy";
+// Off by default; PUBLIC_ANALYTICS_ENABLED="true" turns it on (host's
+// production env, CI on main, or locally to test — see AGENTS.md → Analytics).
+// To add a provider: export a config constant, chain onto window.track, then
+// import + render it below.
 import PostHog, { POSTHOG_PROJECT_TOKEN, POSTHOG_HOST } from "@/components/analytics/posthog.astro";
 import Gtm, { GTM_CONTAINER_ID } from "@/components/analytics/gtm.astro";
 
-const analyticsOverride = import.meta.env.PUBLIC_ANALYTICS_ENABLED;
-const analyticsEnabled = analyticsOverride
-  ? analyticsOverride !== "false"
-  : isProductionDeploy(site.platform.deploy);
+const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED === "true";
 
 const posthogEnabled = !!POSTHOG_PROJECT_TOKEN && !!POSTHOG_HOST;
 const gtmEnabled = !!GTM_CONTAINER_ID;

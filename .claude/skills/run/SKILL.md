@@ -20,7 +20,20 @@ npm install
 
 ## Run
 
-Analytics and captcha are off under `astro dev` automatically (they only activate on the host's real production build of `main` — see `src/lib/deploy.ts`), so dev traffic never reaches PostHog. To force one on for testing, prefix the start command with `PUBLIC_ANALYTICS_ENABLED=true` or `PUBLIC_CAPTCHA_ENABLED=true`.
+Analytics and captcha default off. **Before starting, ask the user:**
+
+```
+question: "Enable analytics and/or captcha for this session?"
+header: "Analytics/Captcha"
+multiSelect: true
+options:
+  - label: "Analytics"
+    description: "Sets PUBLIC_ANALYTICS_ENABLED=true — real events will be sent to PostHog"
+  - label: "Captcha"
+    description: "Sets PUBLIC_CAPTCHA_ENABLED=true — note Turnstile's domain check may reject localhost"
+```
+
+Use the answer to set the corresponding env var(s) on the start command below (default: neither set).
 
 Derive a stable port from the working directory so multiple worktrees can run simultaneously without conflict:
 
@@ -31,7 +44,12 @@ PORT=$(( 4300 + $(echo "$PWD" | cksum | cut -d' ' -f1) % 100 ))
 Start the dev server in the background:
 
 ```bash
+# neither enabled (default):
 npm run dev -- --port $PORT &> /tmp/astro-dev.log &
+ZMOKI_PID=$!
+
+# analytics and/or captcha enabled, per the answer above:
+PUBLIC_ANALYTICS_ENABLED=true PUBLIC_CAPTCHA_ENABLED=true npm run dev -- --port $PORT &> /tmp/astro-dev.log &
 ZMOKI_PID=$!
 ```
 

@@ -54,6 +54,11 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Analytics/captcha default off; turn them on for main so this build
+          # reflects what production actually ships (off for PRs).
+          PUBLIC_ANALYTICS_ENABLED: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
+          PUBLIC_CAPTCHA_ENABLED: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
 
       - name: Structured data check
         run: npm run check:sd
