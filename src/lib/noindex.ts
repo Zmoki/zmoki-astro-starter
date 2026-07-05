@@ -1,13 +1,10 @@
-// Relative, dependency-light imports (not the `@/` alias) so the plain-node CI
-// scripts can load this module too — scripts/check-sitemap.ts imports
-// isNoindexPath from here rather than re-deriving it. Mirrors src/lib/deploy.ts.
+// Relative imports (not `@/`) so the plain-node CI scripts can load this too —
+// check-sitemap.ts imports isNoindexPath rather than re-deriving it. Mirrors deploy.ts.
 import { headerRules } from "../headers/headers.config.ts";
 import { isNoindex } from "./robots.ts";
 
-// The header source globs whose `X-Robots-Tag` keeps pages out of the index —
-// derived from the same single source of truth the deploy artifact is built from
-// (src/headers/headers.config.ts), so a path made noindex there is also kept out
-// of the sitemap with no second edit.
+// Header path globs whose `X-Robots-Tag` is noindex — from the same source the
+// deploy artifact is built from, so a noindex path stays out of the sitemap too.
 const noindexPatterns = headerRules
   .filter((rule) =>
     Object.entries(rule.headers).some(
@@ -24,11 +21,7 @@ function globToRegExp(glob: string): RegExp {
 
 const noindexMatchers = noindexPatterns.map(globToRegExp);
 
-/**
- * True if `path` (an absolute site path with a leading slash, e.g.
- * "/thank-you/x/") is marked noindex by a headers rule — so it must be excluded
- * from the sitemap.
- */
+/** True if an absolute site path (e.g. "/thank-you/x/") is noindex by a header rule. */
 export function isNoindexPath(path: string): boolean {
   return noindexMatchers.some((re) => re.test(path));
 }

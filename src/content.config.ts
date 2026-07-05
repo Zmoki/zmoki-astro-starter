@@ -1,17 +1,9 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
-/**
- * Per-entry robots directives, joined into <meta name="robots" content="…">.
- * An array of any directives from Google's spec — e.g. ["noindex"],
- * ["noindex", "nofollow"], ["noarchive"], ["unavailable_after: 2025-12-31"]:
- *   https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag
- * When the directives imply noindex ("noindex"/"none"), the page is also dropped
- * from the sitemap (src/pages/sitemap.xml.ts via src/lib/page-collections.ts).
- * Omit to index normally. This is the per-entry, content-level control;
- * path-level rules live in src/headers/headers.config.ts (X-Robots-Tag). Every
- * page collection includes it so the sitemap can filter uniformly.
- */
+// Per-entry robots directives → <meta name="robots"> (e.g. ["noindex"],
+// ["noindex", "nofollow"]). A noindex value also drops the page from the sitemap.
+// Path-level rules live in src/headers/headers.config.ts. Omit to index normally.
 const robots = z.array(z.string()).optional();
 
 const blog = defineCollection({

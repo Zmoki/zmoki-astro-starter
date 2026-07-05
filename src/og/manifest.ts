@@ -1,17 +1,11 @@
-// The OG image manifest: one entry per generated card. It is the single source
-// of truth shared by two consumers:
-//   • src/pages/og/[...path].png.ts — getStaticPaths() + rendering
-//   • src/layouts/BaseLayout.astro  — the og:image URL + og:image:alt per page
-//
-// The collection-driven cards (posts, resource pages, legal) come from the same
-// page-collections registry the sitemap uses (src/lib/page-collections.ts), so a
-// new page section self-registers here too. Standalone cards (home, blog index)
-// read each page's own exported `meta`, and a `default` fallback — used for any
-// page without its own card (thank-you, brand, health, 404, …) — is explicit.
+// The OG image manifest: one entry per generated card, shared by the endpoint
+// (src/pages/og/[...path].png.ts) and BaseLayout (og:image + alt). Collection
+// cards come from the page-collections registry (self-registering per section);
+// standalone cards (home, blog index) read each page's exported `meta`; a
+// `default` fallback covers pages without their own card.
 import { site } from "@/site.config";
 import { formatShortDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
-import type { StandalonePageMeta } from "@/lib/standalone-page";
 import { meta as homeMeta } from "@/pages/index.astro";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 import type { OgEntry } from "./types";
@@ -54,9 +48,7 @@ const siteEntry = (key: string, title: string, description: string): OgEntry => 
 
 const DEFAULT_ENTRY: OgEntry = siteEntry("default", site.name, site.description);
 
-// Memoized so the record load and the array build run once per process, not on
-// every getOgImage() call — BaseLayout resolves an OG image for every page (and
-// PostLayout again for each post), so this is hit N+ times.
+// Memoized — BaseLayout resolves an OG image for every page, so this runs once.
 let entriesPromise: Promise<RoutedEntry[]> | null = null;
 
 function buildEntries(): Promise<RoutedEntry[]> {
@@ -66,10 +58,8 @@ function buildEntries(): Promise<RoutedEntry[]> {
 async function computeEntries(): Promise<RoutedEntry[]> {
   const records = await getPageRecords();
 
-  // Standalone pages own their metadata (read at runtime — not at module top
-  // level, which would race the page↔manifest import cycle). title/description
-  // must be set together — this is the build-time "incomplete page metadata"
-  // check the CI relies on (a plain-node script can't import an .astro page).
+  // Read page metas at runtime (not at module top level — import cycle). This is
+  // also the build-time "incomplete metadata" check: title/description together.
   const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
   for (const page of standalonePages) {
     if ((page.title === undefined) !== (page.description === undefined)) {
@@ -80,10 +70,8 @@ async function computeEntries(): Promise<RoutedEntry[]> {
   }
 
   return [
-    // Standalone cards (home, blog index) — the same set the sitemap lists. Each
-    // gets its own `site`-template card from its real title/description; a page
-    // that sets neither falls back to the default card (getOgImage returns
-    // DEFAULT_ENTRY for any route without an entry).
+    // Standalone cards (home, blog index) from each page's `meta`; a page that
+    // sets no title/description falls back to the default card.
     ...standalonePages.flatMap((page) =>
       page.title !== undefined && page.description !== undefined
         ? [
@@ -94,8 +82,7 @@ async function computeEntries(): Promise<RoutedEntry[]> {
           ]
         : [],
     ),
-    // One article card per collection-driven page. `path` is "blog/foo/"; the
-    // route keeps the trailing slash, the card key drops it → /og/blog/foo.png.
+    // One article card per collection page; card key drops the trailing slash.
     ...records.map((record) => ({
       route: `/${record.path}`,
       entry: article(
