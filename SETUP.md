@@ -48,7 +48,7 @@ Add content images to `src/images/`. Whenever you edit a content file, bump its 
 
 ## 4. Brand / design-system pages
 
-The pages under `/-/astro/brand/` are a living style guide (internal, noindex). They pull the site name from `site.name`, but their content is otherwise edited directly rather than wired to `site.config`. Edit them directly — especially **`voice.astro`**, which still carries an example "house style" you'll want to rewrite for your own project.
+The pages under `/-/astro/brand/` are a living style guide (internal, noindex). They read the site name from `site.name`; the rest of the copy is written directly in the pages. Edit them there — especially **`voice.astro`**, which still carries an example "house style" you'll want to rewrite for your own project.
 
 ## 5. Analytics and forms (optional but wired)
 
