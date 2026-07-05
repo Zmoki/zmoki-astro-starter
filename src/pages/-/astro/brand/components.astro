@@ -10,11 +10,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
 
 // Mirrors the real footer copyright (see BaseLayout): a start–current range,
 // or just the start year until a year has passed.
-const currentYear = new Date().getFullYear();
-const copyrightYears =
-  currentYear > site.copyright.year
-    ? `${site.copyright.year}–${currentYear}`
-    : `${site.copyright.year}`;
 ---
 
 <BrandLayout
@@ -190,7 +185,7 @@ const copyrightYears =
       <div
         class="border-zmoki-stone-200 text-zmoki-stone-500 flex items-center justify-between gap-4 border-t bg-white px-4 py-3 text-xs"
       >
-        <span>© {site.name} {copyrightYears}</span>
+        <span>© {site.name} {site.copyright.year}</span>
         <span>Privacy · Terms · Source</span>
       </div>
     </div>

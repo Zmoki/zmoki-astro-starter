@@ -166,7 +166,7 @@ function rehypeCodeBlockCopy() {
 // https://astro.build/config
 export default defineConfig({
   integrations: [mdx()],
-  site: "https://starter.zmoki.xyz",
+  site: site.domain,
   // `layout: "constrained"` makes optimized images (<Image> and Markdown `![]()`)
   // responsive by default; `remotePatterns` authorizes the image origin for
   // build-time optimization. Unset origin ⇒ remote images render unoptimized.

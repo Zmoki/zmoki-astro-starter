@@ -32,7 +32,7 @@ export const GET: APIRoute = async ({ site }) => {
   const indexPageLatestDate = isoDate(new Date(indexPageLatestDateTimestamp));
 
   // A <url> entry, optionally carrying an image-sitemap <image:image> for the
-  // page's primary image (hero). Post-2022 the image extension is just
+  // page's primary image (cover). Post-2022 the image extension is just
   // <image:loc> — caption/title/license were removed. Helps Google discover
   // images hosted on a different domain (our CDN) and bind them to the page.
   const sitemapUrl = (path: string, lastmod: string, imageLoc?: string) => `
@@ -59,7 +59,11 @@ export const GET: APIRoute = async ({ site }) => {
   ${sitemapUrl("blog/", indexPageLatestDate)}
   ${allFeedIems
     .map((post: CollectionEntry<"blog">) =>
-      sitemapUrl(`blog/${post.id}/`, isoDate(post.data.contentModifiedDate), post.data.hero?.image),
+      sitemapUrl(
+        `blog/${post.id}/`,
+        isoDate(post.data.contentModifiedDate),
+        post.data.cover?.image,
+      ),
     )
     .join("")}
   ${allResources

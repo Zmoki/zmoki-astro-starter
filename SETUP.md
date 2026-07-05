@@ -18,9 +18,8 @@ Edit **`src/site.config.ts`** — this is the main one. Set:
 
 The home page (`src/pages/index.astro`) is a landing page, edited directly in that file. The blog list lives at `src/pages/blog/index.astro` (`/blog/`).
 
-Then set the domain in two more places:
+Then set the domain in one more place (`astro.config.mjs` reads `site.domain` automatically):
 
-- **`astro.config.mjs`** → `site:` (used for canonical URLs, RSS, sitemap)
 - **`public/robots.txt`** → the `Sitemap:` line
 
 ## 2. Palette & typography
@@ -47,7 +46,7 @@ Replace the placeholder content:
 - `src/content/resources/` — `example-resource.mdx` shows the shape. `type: "page"` makes a page; `type: "link"` is just an outbound link.
 - `src/content/legal/` — `privacy.mdx` and `terms.mdx` are **placeholders, not legal advice**. Fill in the bracketed bits and review before launch.
 
-Content images are **optimized at build** by Astro (responsive `webp`, served from your deploy host). Either commit them under `src/images/` and import them, or host originals on a bucket/CDN (e.g. R2) and set **`platform.imagesCDNHost`** in `src/site.config.ts` so Astro downloads + optimizes them at build (keeps binaries out of git) — see the `/images` skill. Give image-heavy posts a **`hero`** (`{ image, alt }`) — a real landscape photo (≥1200px, 16:9) that becomes the post hero and the image Google Discover uses. Whenever you edit a content file, bump its `contentModifiedDate`.
+Content images are **optimized at build** by Astro (responsive `webp`, served from your deploy host). Either commit them under `src/images/` and import them, or host originals on a bucket/CDN (e.g. R2) and set **`platform.imagesCDNHost`** in `src/site.config.ts` so Astro downloads + optimizes them at build (keeps binaries out of git) — see the `/images` skill. Give image-heavy posts a **`cover`** (`{ image, alt }`) — a real landscape photo (≥1200px, 16:9) that becomes the post's hero image and the image Google Discover uses. Whenever you edit a content file, bump its `contentModifiedDate`.
 
 ## 4. Brand / design-system pages
 

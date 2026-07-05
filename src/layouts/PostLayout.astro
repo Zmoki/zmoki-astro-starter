@@ -15,7 +15,7 @@ export interface Props {
   publishDate: Date;
   contentModifiedDate: Date;
   author: CollectionEntry<"blog">["data"]["author"];
-  hero?: CollectionEntry<"blog">["data"]["hero"];
+  cover?: CollectionEntry<"blog">["data"]["cover"];
   /** Overrides the canonical URL — set for cross-posted content. See the blog schema. */
   canonical?: string;
   prevPost?: CollectionEntry<"blog"> | null;
@@ -28,7 +28,7 @@ const {
   publishDate,
   contentModifiedDate,
   author,
-  hero,
+  cover,
   canonical,
   prevPost,
   nextPost,
@@ -37,12 +37,12 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
 // BlogPosting structured data → Google rich result. Absolute URLs come from the
 // shared siteUrls() helper, so the SD can't drift from the meta tags. `image`
-// prefers the post's real hero photo — the primary-image signal Google Discover
+// prefers the post's real cover photo — the primary-image signal Google Discover
 // reads — falling back to the OG card (which stays og:image for social). See the
 // /structured-data skill.
 const urls = siteUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
-const schemaImage = hero?.image ?? urls.absoluteUrl(ogImage.path);
+const schemaImage = cover?.image ?? urls.absoluteUrl(ogImage.path);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -74,12 +74,12 @@ const blogPostingLd = {
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">
-    <!-- Hero image — the post's LCP + Discover primary image. -->
+    <!-- Cover image — the post's LCP + Discover primary image. -->
     {
-      hero && (
+      cover && (
         <Image
-          src={hero.image}
-          alt={hero.alt}
+          src={cover.image}
+          alt={cover.alt}
           width={1200}
           height={675}
           priority

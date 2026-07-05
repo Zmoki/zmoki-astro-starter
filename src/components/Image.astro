@@ -27,6 +27,10 @@ interface Props {
   /** Eager + fetchpriority=high — set on the LCP/hero image only. */
   priority?: boolean;
   sizes?: string;
+  /** Override the image's creator (ImageObject) — a Person; defaults to the site organization. */
+  author?: { name: string; url: string };
+  /** Override the license URL (ImageObject); defaults to site.copyright.images.license. */
+  licenseUrl?: string;
   class?: string;
   [key: string]: unknown;
 }
@@ -39,6 +43,8 @@ const {
   layout = "constrained",
   priority = false,
   sizes,
+  author,
+  licenseUrl,
   class: className,
   ...rest
 } = Astro.props;
@@ -65,15 +71,17 @@ const hasCaption = Astro.slots.has("default");
 const contentUrl = isString
   ? (src as string)
   : new URL((src as ImageMetadata).src, Astro.site ?? Astro.url).href;
+// creator defaults to the site Organization; pass `author` to credit a Person.
+const credit = author ?? { name: site.organization.name, url: site.organization.url };
 const imageLd = {
   "@context": "https://schema.org",
   "@type": "ImageObject",
   contentUrl,
-  license: site.copyright.images.license,
-  acquireLicensePage: site.copyright.images.license,
-  creditText: site.organization.name,
-  copyrightNotice: `© ${site.copyright.year} ${site.organization.name}`,
-  creator: { "@type": "Person", name: site.organization.name, url: site.organization.url },
+  license: licenseUrl ?? site.copyright.images.license,
+  acquireLicensePage: licenseUrl ?? site.copyright.images.license,
+  creditText: credit.name,
+  copyrightNotice: `© ${site.copyright.year} ${credit.name}`,
+  creator: { "@type": author ? "Person" : "Organization", name: credit.name, url: credit.url },
 };
 
 const captionImgClasses =

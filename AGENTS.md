@@ -132,7 +132,7 @@ npm run format
 
 ## Site configuration (`src/site.config.ts`)
 
-The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), the site owner (`organization`), contact email, source repo, copyright year, and the deploy target (`platform.deploy`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages pull the site name from `site.name`, but their content (specimens, voice, house style) is otherwise edited directly rather than driven by the config.
+The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), the site owner (`organization`), contact email, source repo, copyright year, and the deploy target (`platform.deploy`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (`astro.config.mjs`'s `site` reads `site.domain` from it; plus the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages pull the site name from `site.name`, but their content (specimens, voice, house style) is otherwise edited directly rather than driven by the config.
 
 ---
 
@@ -368,11 +368,11 @@ Component: **`src/components/Image.astro`** — the one content-image component 
 
 **Authoring** — two ways: `<Image>` (imported asset or **full remote URL**; a remote src needs `width`+`height`; a caption adds the figure), and plain Markdown `![]()` (Astro's built-in optimization — local images, and full remote URLs whose domain is authorized in `image.remotePatterns`). No custom Markdown-image plugin.
 
-**Post hero & Google Discover** — a post's optional **`hero`** (`{ image, alt }`, blog frontmatter) is a real non-text photo (distinct from the OG card). `hero.image` drives the post hero (LCP), the schema.org `BlogPosting.image` (the primary-image signal Discover reads), and the image-sitemap `<image:loc>` (`src/pages/sitemap.xml.ts`, namespace `sitemap-image/1.1`); `og:image` stays the OG card. Both fields are required when `hero` is set (schema-enforced). For Discover, use a well-cropped landscape ≥1200px wide at 16:9 (`max-image-preview:large` is already set).
+**Post cover & Google Discover** — a post's optional **`cover`** (`{ image, alt }`, blog frontmatter) is a real non-text photo (distinct from the OG card). `cover.image` renders as the hero (LCP) and drives the schema.org `BlogPosting.image` (the primary-image signal Discover reads) + the image-sitemap `<image:loc>` (`src/pages/sitemap.xml.ts`, namespace `sitemap-image/1.1`); `og:image` stays the OG card. Both fields are required when `cover` is set (schema-enforced). For Discover, use a well-cropped landscape ≥1200px wide at 16:9 (`max-image-preview:large` is already set). The `<Image>` ImageObject `creator` defaults to the site Organization; override per image with `author={{ name, url }}` / `licenseUrl`.
 
 **Reachability & caching:** because `site.platform.imagesCDNHost` is committed, **every** build (CI, previews, production) optimizes on-origin images, so the origin **must be reachable** at build; an off-origin image (or `imagesCDNHost: ""`) renders as a plain unoptimized `<img>`, **no fetch**. Astro caches optimized images + fonts in **`node_modules/.astro`** (keyed by content hash) — CI restores it via `actions/cache` so unchanged images aren't re-processed. The CSP `img-src` host comes from the same `site.platform.imagesCDNHost` (`src/headers/headers.config.ts`; `npm run build:headers` after changing it) — single source, no drift.
 
-**The `/images` skill (`.claude/skills/images/SKILL.md`) is the source of truth** for hosting originals, the post hero, CI caching, and image SEO — see it rather than duplicating the details here.
+**The `/images` skill (`.claude/skills/images/SKILL.md`) is the source of truth** for hosting originals, the post cover, CI caching, and image SEO — see it rather than duplicating the details here.
 
 ---
 

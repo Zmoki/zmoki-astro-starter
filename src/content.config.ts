@@ -9,13 +9,13 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
-    // Optional hero image — a real, non-text photo (NOT the OG card): the post's
+    // Optional cover image — a real, non-text photo (NOT the OG card): the post's
     // LCP image, the schema.org BlogPosting.image, and the image-sitemap entry —
     // i.e. the primary image Google Discover reads. Use a well-cropped landscape
     // ≥1200px wide at 16:9, as a full URL (on `site.platform.imagesCDNHost` → it's
-    // optimized at build). Both fields are required when `hero` is set, so the
-    // primary image is never decorative. No hero ⇒ schema.image falls back to the OG card.
-    hero: z
+    // optimized at build). Both fields are required when `cover` is set, so the
+    // primary image is never decorative. No cover ⇒ schema.image falls back to the OG card.
+    cover: z
       .object({
         image: z.string(),
         alt: z.string().min(1),
