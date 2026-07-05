@@ -12,7 +12,7 @@ author:
   bio: "I build small, fast websites and the tools around them — this starter is one of them."
 ---
 
-import ContentImage from "@/components/ContentImage.astro";
+import Image from "@/components/Image.astro";
 
 This starter is built to be handed to an AI coding agent. Every convention it
 follows is written down in [`AGENTS.md`](https://github.com/Zmoki/zmoki-astro-starter/blob/main/AGENTS.md),
@@ -53,14 +53,16 @@ Because the brand system is a living style guide, you can just say _"make the
 accent green"_ or _"switch the font to Inter"_ and the agent knows which files to
 touch and how to keep the guideline honest.
 
-<ContentImage
+<Image
   src="https://images.zmoki.xyz/starter/tree-bark-beach.jpeg"
   alt="Close-up of weathered tree bark, with a blurred sandy beach and blue sea in the gap beyond."
+  width={1200}
+  height={675}
 >
   Content images are hosted on a remote origin and optimized at build — responsive `webp`,
   content-hashed, and served from your deploy host. The origin is decoupled from where the site
   deploys.
-</ContentImage>
+</Image>
 
 ## 4. Run it
 

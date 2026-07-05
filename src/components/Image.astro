@@ -1,23 +1,33 @@
 ---
-// Vendor-neutral responsive image. Everything is optimized at build by Astro
+// The one content-image component. Everything is optimized at build by Astro
 // (astro:assets): a repo-committed asset (imported ImageMetadata) or a
 // remote-hosted image (a string key/URL whose origin is authorized in
 // astro.config.mjs `image.remotePatterns`). Astro downloads + resizes +
 // re-encodes to webp/avif, content-hashes into dist/_astro, and the deploy host
 // serves it. No runtime image-CDN transform — see src/image.config.ts.
 //
+// Two modes, chosen by whether you pass a caption (the default slot):
+//   • no caption → a plain responsive <img> (hero/cover, decorative, inline).
+//   • caption    → a <figure> + <figcaption>, plus a schema.org ImageObject
+//     JSON-LD block (Google image-license metadata: license, credit, creator).
+//     Use for meaningful images that warrant a caption + licensing metadata.
+//     License URL + credit come from src/site.config.ts (copyright.images.license,
+//     organization). contentUrl is the resolved ORIGINAL image (the full-res
+//     source you license), which Google supports alongside a displayed derivative.
+//
 // A string `src` is resolved against the image origin (bare key → full URL) and
 // REQUIRES width + height (Astro can't infer a remote image's dimensions). An
 // image on an unauthorized origin renders as-is (unoptimized) rather than
 // failing the build.
 import { Image as AstroImage } from "astro:assets";
+import JsonLd from "@/components/JsonLd.astro";
 import { resolveImageSrc, type ImageLayout } from "@/image.config";
+import { site } from "@/site.config";
 
 interface Props {
-  /** An imported asset (local) or a remote key/URL (string). */
+  /** An imported asset (local) or a remote key/URL (string, needs width+height). */
   src: ImageMetadata | string;
   alt: string;
-  /** Required for a string (remote) src. */
   width?: number;
   height?: number;
   layout?: ImageLayout;
@@ -43,17 +53,63 @@ const {
 const resolvedSrc = typeof src === "string" ? resolveImageSrc(src) : src;
 // Astro spells full-width with a hyphen.
 const astroLayout = layout === "fullWidth" ? "full-width" : layout;
+const resolvedWidth = width ?? (typeof src === "object" ? src.width : undefined);
+
+const shared = {
+  src: resolvedSrc,
+  alt,
+  width: resolvedWidth,
+  height,
+  layout: astroLayout,
+  loading: priority ? "eager" : "lazy",
+  ...(priority ? { fetchpriority: "high" } : {}),
+  ...(sizes ? { sizes } : {}),
+};
+
+// A caption (default slot) turns this into a schema.org ImageObject figure with
+// Google image-license metadata (JSON-LD). Required is contentUrl + at least one
+// of {creator, creditText, copyrightNotice, license}; we fill the full recommended
+// set. Values come from src/site.config.ts. See the /structured-data skill.
+const hasCaption = Astro.slots.has("default");
+const contentUrl =
+  typeof src === "string" ? resolveImageSrc(src) : new URL(src.src, Astro.site ?? Astro.url).href;
+const imageLd = hasCaption
+  ? {
+      "@context": "https://schema.org",
+      "@type": "ImageObject",
+      contentUrl,
+      license: site.copyright.images.license,
+      acquireLicensePage: site.copyright.images.license,
+      creditText: site.organization.name,
+      copyrightNotice: `© ${site.copyright.year} ${site.organization.name}`,
+      creator: {
+        "@type": "Person",
+        name: site.organization.name,
+        url: site.organization.url,
+      },
+    }
+  : null;
 ---
 
-<AstroImage
-  src={resolvedSrc}
-  alt={alt}
-  width={width ?? (typeof src === "object" ? src.width : undefined)}
-  height={height}
-  layout={astroLayout}
-  loading={priority ? "eager" : "lazy"}
-  {...priority ? { fetchpriority: "high" } : {}}
-  {...sizes ? { sizes } : {}}
-  class={className}
-  {...rest}
-/>
+{
+  imageLd ? (
+    <Fragment>
+      <figure class="!my-0 flex w-full flex-col items-center">
+        <AstroImage
+          {...shared}
+          class:list={[
+            "border-zmoki-stone-200 max-w-[min(600px,100%)] rounded-xl border shadow-sm",
+            className,
+          ]}
+          {...rest}
+        />
+        <figcaption class="text-zmoki-stone-500 !mt-0 max-w-[520px] text-center text-sm">
+          <slot />
+        </figcaption>
+      </figure>
+      <JsonLd schema={imageLd} />
+    </Fragment>
+  ) : (
+    <AstroImage {...shared} class={className} {...rest} />
+  )
+}

@@ -1,5 +1,5 @@
 ---
-description: Set up or work on content images (png/jpg/webp) — remote-hosted originals, build-time optimization, responsive images, post cover/hero, and image SEO (Google Discover / image sitemaps). Use when the user wants to add content images, host originals on a bucket/CDN (R2, S3…), add a post cover, cache optimized images in CI, or change how <Image>/<ContentImage>/Markdown images work.
+description: Set up or work on content images (png/jpg/webp) — remote-hosted originals, build-time optimization, responsive images, post cover/hero, and image SEO (Google Discover / image sitemaps). Use when the user wants to add content images, host originals on a bucket/CDN (R2, S3…), add a post cover, cache optimized images in CI, or change how the <Image> component / Markdown images work.
 ---
 
 # Content images
@@ -13,22 +13,21 @@ Every content image is **optimized at build by Astro** (`astro:assets`, Sharp): 
 Originals come from one of two places:
 
 - **Committed** — drop the file in `src/images/`, import it, done. Zero external dependency; builds never fetch.
-- **Remote origin (recommended for anything non-trivial)** — host originals on a bucket/CDN (e.g. an **R2 bucket on a custom domain**), set `PUBLIC_IMAGE_CDN_BASE`, and Astro **downloads + optimizes them at build**. Keeps binaries out of git. The origin is pure storage — there is **no runtime image-CDN transform** — and is **decoupled from `site.deploy.platform`** (deploy anywhere, host images anywhere).
+- **Remote origin (recommended for anything non-trivial)** — host originals on a bucket/CDN (e.g. an **R2 bucket on a custom domain**), set `PUBLIC_IMAGE_CDN_HOST`, and Astro **downloads + optimizes them at build**. Keeps binaries out of git. The origin is pure storage — there is **no runtime image-CDN transform** — and is **decoupled from `site.deploy.platform`** (deploy anywhere, host images anywhere).
 
 > Why build-time (not runtime CDN transforms)? Simpler, no per-transform billing, no extra runtime service, host-agnostic, and the deploy host already CDN-serves `/_astro/`. Trade-off: a build with the origin authorized **must reach it** (it downloads at build); and variants are baked, not on-the-fly. See "Reachability & CI" below.
 
 ### Key files
 
-- **`src/image.config.ts`** — `imageOriginBase` (from `PUBLIC_IMAGE_CDN_BASE`) + `resolveImageSrc()` (bare key → full URL). No provider/transform logic.
-- **`src/components/Image.astro`** — vendor-neutral responsive image; wraps `astro:assets`. Imported asset **or** remote key/URL.
-- **`src/components/ContentImage.astro`** — captioned, meaningful (non-decorative) image with schema.org `ImageObject` markup; delegates to `<Image>`. Site-wide, not post-only.
-- **`astro.config.mjs`** — `image.layout: "constrained"` + `image.remotePatterns` authorizing the origin domain (from `PUBLIC_IMAGE_CDN_BASE`).
+- **`src/image.config.ts`** — `imageCdnHost` (from `PUBLIC_IMAGE_CDN_HOST`) + `resolveImageSrc()` (bare key → full URL). No provider/transform logic.
+- **`src/components/Image.astro`** — the one content-image component; wraps `astro:assets`. Imported asset **or** remote key/URL. Pass a caption (default slot) and it becomes a `<figure>` + schema.org `ImageObject` JSON-LD (license/credit); no caption ⇒ a plain `<img>`.
+- **`astro.config.mjs`** — `image.layout: "constrained"` + `image.remotePatterns` authorizing the origin domain (from `PUBLIC_IMAGE_CDN_HOST`).
 
 ## Enable a remote origin
 
 1. **Set env** (`.env`, declared in `src/env.d.ts`, mirrored in `.env.example`):
    ```
-   PUBLIC_IMAGE_CDN_BASE=https://images.zmoki.xyz
+   PUBLIC_IMAGE_CDN_HOST=https://images.zmoki.xyz
    ```
    This authorizes the domain for build-time optimization **and** lets content reference images by bare key.
 2. **Add the origin host to the CSP** — set `IMAGE_CDN_HOST` + the `img-src` entry in `src/headers/headers.config.ts`, then `npm run build:headers` and commit. (Optimized images are served from `'self'`; the host is listed as a fallback for images that render unoptimized.)
@@ -36,17 +35,20 @@ Originals come from one of two places:
 
 Unset ⇒ commit images to `src/images` and import them; a full remote URL in content still renders (just unoptimized) if its domain isn't authorized.
 
-## Authoring — three ways
+## Authoring — two ways
 
-1. **`<Image>`** (layouts/components, and the post cover) — the responsive image. `src` is an imported asset **or** a string (bare key / full URL). A string (remote) src **requires `width` + `height`** (Astro can't infer a remote image's size):
-   ```astro
-   <Image src="starter/photo.jpg" alt="…" width={1200} height={675} priority />
-   ```
-   `priority` = eager + `fetchpriority=high`; use it only on the LCP/hero image.
-2. **`<ContentImage>`** — a meaningful image that needs a **caption + licensing schema** (`ImageObject`). Same `src` rules; adds `<figure>` + credit + a `<figcaption>` slot. For a purely decorative image use `<Image>` (or CSS).
-3. **Plain Markdown `![alt](…)`** — handled by **Astro's built-in optimization**: local (`./photo.jpg`) images, and remote URLs whose domain is authorized in `image.remotePatterns`, are optimized + made responsive at build.
+1. **`<Image>`** — the one component. `src` is an imported asset **or** a string (bare key / full URL); a string (remote) src **requires `width` + `height`** (Astro can't infer a remote image's size). `priority` = eager + `fetchpriority=high` (LCP/hero only).
+   - **No caption** → a plain responsive `<img>` (hero/cover, decorative, inline):
+     ```astro
+     <Image src="starter/photo.jpg" alt="…" width={1200} height={675} priority />
+     ```
+   - **With a caption** (default slot) → a `<figure>` + `<figcaption>` **plus a schema.org `ImageObject` JSON-LD** block (Google image-license metadata — license/acquireLicensePage/creditText/copyrightNotice/creator, sourced from `site.copyright.images.license` + `site.organization`). Use for meaningful images that warrant a caption + licensing:
+     ```astro
+     <Image src="starter/photo.jpg" alt="…" width={1200} height={675}>A caption.</Image>
+     ```
+2. **Plain Markdown `![alt](…)`** — handled by **Astro's built-in optimization**: local (`./photo.jpg`) images, and remote URLs whose domain is authorized in `image.remotePatterns`, are optimized + made responsive at build.
 
-> **Content robustness:** reference remote images by **full URL** in Markdown/frontmatter (not a bare key) unless you're sure `PUBLIC_IMAGE_CDN_BASE` is always set at build — a bare key with no base is treated as a (missing) local path and fails the build. Full URLs render either way.
+> **Content robustness:** reference remote images by **full URL** in Markdown/frontmatter (not a bare key) unless you're sure `PUBLIC_IMAGE_CDN_HOST` is always set at build — a bare key with no base is treated as a (missing) local path and fails the build. Full URLs render either way.
 
 ## Cover / hero images & Google Discover
 

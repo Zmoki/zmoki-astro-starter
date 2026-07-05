@@ -15,7 +15,7 @@ import { visit } from "unist-util-visit";
 // cover, <Image>/<ContentImage>) instead go through the CDN's own transform URLs
 // at runtime — see src/image.config.ts. Unset ⇒ no remote domain is authorized.
 const env = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "PUBLIC_");
-const imageCdnBase = (env.PUBLIC_IMAGE_CDN_BASE || "").replace(/\/+$/, "");
+const imageCdnBase = (env.PUBLIC_IMAGE_CDN_HOST || "").replace(/\/+$/, "");
 const imageCdnHost = imageCdnBase ? new URL(imageCdnBase).hostname : "";
 
 // Rehype plugin to add IDs to definition list terms

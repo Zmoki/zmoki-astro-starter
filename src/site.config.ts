@@ -53,8 +53,20 @@ export const site = {
     github: "https://github.com/Zmoki/zmoki-astro-starter",
   },
 
-  /** First year shown in the footer copyright range. */
-  copyrightStartYear: 2026,
+  /** Copyright / content-licensing settings. */
+  copyright: {
+    /** First year shown in the footer copyright range. */
+    year: 2026,
+    /** Content-image licensing (schema.org ImageObject on captioned images). */
+    images: {
+      /**
+       * License URL for content images — the `license` + `acquireLicensePage`
+       * on each captioned image's schema.org ImageObject. Point it at your terms
+       * / licensing page. Absolute URL.
+       */
+      license: "https://starter.zmoki.xyz/legal/terms/",
+    },
+  },
 
   /** Deploy-time settings (hosting). See SETUP.md §6. */
   deploy: {

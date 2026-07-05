@@ -12,9 +12,9 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
 // or just the start year until a year has passed.
 const currentYear = new Date().getFullYear();
 const copyrightYears =
-  currentYear > site.copyrightStartYear
-    ? `${site.copyrightStartYear}–${currentYear}`
-    : `${site.copyrightStartYear}`;
+  currentYear > site.copyright.year
+    ? `${site.copyright.year}–${currentYear}`
+    : `${site.copyright.year}`;
 ---
 
 <BrandLayout

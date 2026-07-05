@@ -17,7 +17,7 @@
 export type ImageLayout = "constrained" | "fullWidth" | "fixed";
 
 /** Base URL of the remote image origin, e.g. "https://images.zmoki.xyz". Empty ⇒ none set. */
-export const imageOriginBase = (import.meta.env.PUBLIC_IMAGE_CDN_BASE || "")
+export const imageCdnHost = (import.meta.env.PUBLIC_IMAGE_CDN_HOST || "")
   .trim()
   .replace(/\/+$/, "");
 
@@ -29,6 +29,6 @@ export const imageOriginBase = (import.meta.env.PUBLIC_IMAGE_CDN_BASE || "")
  */
 export function resolveImageSrc(src: string): string {
   if (/^https?:\/\//i.test(src)) return src;
-  if (!imageOriginBase) return src;
-  return `${imageOriginBase}/${src.replace(/^\/+/, "")}`;
+  if (!imageCdnHost) return src;
+  return `${imageCdnHost}/${src.replace(/^\/+/, "")}`;
 }

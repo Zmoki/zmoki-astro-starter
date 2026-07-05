@@ -39,7 +39,7 @@ const CAPTCHA_HOST = "https://challenges.cloudflare.com";
 // an R2 bucket on a custom domain). Content images are optimized at build and
 // served same-origin from /_astro, so 'self' covers the common case; this host is
 // listed so an image on an UNauthorized origin (which renders unoptimized, as the
-// original remote URL) isn't CSP-blocked. Keep in sync with `PUBLIC_IMAGE_CDN_BASE`
+// original remote URL) isn't CSP-blocked. Keep in sync with `PUBLIC_IMAGE_CDN_HOST`
 // (src/env.d.ts): that env var drives the build, this literal drives the committed
 // CSP artifact. Change it if you move the image origin.
 const IMAGE_CDN_HOST = "https://images.zmoki.xyz";

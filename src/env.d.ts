@@ -31,7 +31,7 @@ interface ImportMetaEnv {
    * and lets content reference images by bare key. Unset ⇒ commit images to
    * src/images and import them. See src/image.config.ts.
    */
-  readonly PUBLIC_IMAGE_CDN_BASE: string;
+  readonly PUBLIC_IMAGE_CDN_HOST: string;
 }
 
 interface ImportMeta {
