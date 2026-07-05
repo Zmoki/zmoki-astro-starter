@@ -27,17 +27,25 @@
 // drift-checked `public/_headers` can't read env, so it's duplicated.
 const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 
+// Captcha host — the origin the built-in captcha (Cloudflare Turnstile) loads its
+// widget script (script-src) and iframe (frame-src) from, and which the form
+// iframe is granted feature permissions for (Permissions-Policy below). Captcha
+// is provider-agnostic (see src/components/Captcha.astro) — if you swap the
+// provider, change this one constant to its host (e.g. https://www.google.com for
+// reCAPTCHA, https://hcaptcha.com for hCaptcha).
+const CAPTCHA_HOST = "https://challenges.cloudflare.com";
+
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": [
     "'self'",
     "'unsafe-inline'",
     "https://static.cloudflareinsights.com",
-    "https://challenges.cloudflare.com",
+    CAPTCHA_HOST, // built-in captcha (Turnstile) widget script
     POSTHOG_HOST,
     "https://www.googletagmanager.com",
   ],
-  "frame-src": ["https://challenges.cloudflare.com"],
+  "frame-src": [CAPTCHA_HOST], // captcha widget iframe
   "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
     "'self'",
@@ -77,15 +85,15 @@ const permissionsPolicy = [
   "microphone=()",
   "midi=()",
   "payment=()",
-  'picture-in-picture=(self "https://challenges.cloudflare.com")',
+  `picture-in-picture=(self "${CAPTCHA_HOST}")`,
   "publickey-credentials-get=()",
   "screen-wake-lock=()",
   "sync-xhr=()",
   "usb=()",
   "xr-spatial-tracking=()",
-  'autoplay=(self "https://challenges.cloudflare.com")',
-  'cross-origin-isolated=(self "https://challenges.cloudflare.com")',
-  'fullscreen=(self "https://challenges.cloudflare.com")',
+  `autoplay=(self "${CAPTCHA_HOST}")`,
+  `cross-origin-isolated=(self "${CAPTCHA_HOST}")`,
+  `fullscreen=(self "${CAPTCHA_HOST}")`,
 ].join(", ");
 
 export interface HeaderRule {
@@ -110,9 +118,10 @@ export const headerRules: HeaderRule[] = [
     source: "/*",
     headers: {
       // Standard security headers — kept here (not only at the CDN/zone level) so
-      // the template is A-grade on every platform, not just Cloudflare. NOTE: if
-      // your Cloudflare zone (Terraform) also sets HSTS / X-Content-Type-Options /
-      // Referrer-Policy, drop them there so responses don't carry duplicates.
+      // the template is A-grade on every host. NOTE: if your CDN or DNS layer
+      // (e.g. a Cloudflare zone managed in Terraform) also sets HSTS /
+      // X-Content-Type-Options / Referrer-Policy, drop them there so responses
+      // don't carry duplicates.
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY", // legacy; CSP frame-ancestors 'none' is the modern equivalent
       "Referrer-Policy": "strict-origin-when-cross-origin",

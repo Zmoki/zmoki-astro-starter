@@ -34,7 +34,9 @@ const resources = defineCollection({
     order: z.number(),
     form: z
       .object({
-        brevoFormId: z.string(),
+        // Provider-neutral form id, rendered by the site-wide form provider
+        // (built-in: Brevo → the sibforms serve id). See src/components/Form.astro.
+        formId: z.string(),
         buttonText: z.string(),
         title: z.string(),
         description: z.string(),

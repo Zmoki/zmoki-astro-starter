@@ -1,0 +1,40 @@
+---
+// Form dispatcher — the provider-agnostic email-capture form behind the resource
+// lead-magnet gate, structured like Analytics.astro / Captcha.astro. Renders one
+// provider component from src/components/forms/, passing the per-resource form id
+// + slotted copy through. Built-in provider: Brevo (forms/brevo.astro).
+//
+// Single-select: a gate posts to exactly one backend, so the first registered
+// provider wins. Unlike analytics/captcha (selected by env vars), the form
+// backend is chosen site-wide here — flip `providers` when you add another.
+//
+// To add a provider (ConvertKit, Formspree, a custom endpoint): create
+// forms/<provider>.astro that renders its own form markup (action URL, email
+// field name, hidden fields) plus the shared bits (<Captcha />, the consent
+// checkbox, the submit <Button />, and the resource_gate_viewed /
+// resource_gate_submitted analytics), then add it to `providers` below.
+//
+// Backend coupling: the captcha token and the lead-magnet delivery (emailing the
+// asset, redirecting to the thank-you page) are handled by the form backend, so a
+// provider swap must be matched on that backend — the frontend swap alone is not
+// enough. See src/content.config.ts (resource lead-magnet gate) and
+// AGENTS.md → Captcha.
+import Brevo from "@/components/forms/brevo.astro";
+
+export interface Props {
+  /** Provider form id (Brevo: the sibforms serve id). */
+  formId: string;
+  buttonText?: string;
+  resourceSlug?: string;
+}
+
+const { formId, buttonText, resourceSlug } = Astro.props;
+
+// Registered providers, in priority order. First one wins (single-select).
+const providers = [Brevo];
+const Provider = providers[0];
+---
+
+<Provider formId={formId} buttonText={buttonText} resourceSlug={resourceSlug}>
+  <slot />
+</Provider>

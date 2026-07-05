@@ -22,7 +22,7 @@ When starting a new site from this template, see **`SETUP.md`** for the checklis
 | Content             | MDX via @astrojs/mdx                                                       | ^7                            |
 | Fonts               | Sans (headings + body) + mono (code) — families in `src/design-tokens.mjs` | Astro Fonts API (self-hosted) |
 | Analytics           | Provider-agnostic; PostHog + Google Tag Manager built in                   | posthog-js                    |
-| Email/Forms         | Brevo                                                                      | —                             |
+| Email/Forms         | Provider-agnostic; Brevo built in                                          | —                             |
 | OG images           | Satori + resvg (build-time PNG endpoint)                                   | —                             |
 | RSS                 | @astrojs/rss                                                               | —                             |
 | Syntax highlighting | Shiki, theme: `catppuccin-mocha` (dark, WCAG-AA contrast)                  | —                             |
@@ -145,7 +145,7 @@ imported from `astro:content` (not the legacy `entry.render()`).
 - **Filenames & order** — `blog` posts are `src/content/blog/{order}-{slug}.{md,mdx}`. `order` (higher = newer) drives prev/next post nav and blog-list ordering.
 - **Rule:** whenever you edit content in any collection file (`blog`, `resources`, `legal`), bump its `contentModifiedDate` to today's date.
 - **`resources` `type`** — `"page"` renders a `/resources/{slug}/` page; `"link"` is just an external link (uses `url`) with no page of its own.
-- **`resources` lead-magnet gate** — a resource carrying both a `form` and an `asset` captures an email via Brevo (which emails the asset and redirects to `/thank-you/resources/{slug}/`); the thank-you page _also_ surfaces the `asset` as a direct download so delivery doesn't depend solely on the email. Host the asset externally (R2, S3, a CDN/bucket, Brevo's own hosting) — don't commit binaries. This is not access control: a public URL is reachable by anyone who has it.
+- **`resources` lead-magnet gate** — a resource carrying both a `form` and an `asset` captures an email via the site's form provider (Brevo by default, provider-agnostic — see **Forms**), which emails the asset and redirects to `/thank-you/resources/{slug}/`; the thank-you page _also_ surfaces the `asset` as a direct download so delivery doesn't depend solely on the email. Host the asset externally (R2, S3, a CDN/bucket, Brevo's own hosting) — don't commit binaries. This is not access control: a public URL is reachable by anyone who has it.
 
 ---
 
@@ -280,11 +280,37 @@ All events fire via `window.track(...)` and reach every active provider; pagevie
 
 ---
 
+## Forms
+
+The email-capture form behind the resource lead-magnet gate is **provider-agnostic**, structured like analytics/captcha: **`Form.astro`** is the dispatcher and each backend is a component in **`src/components/forms/`**. `ResourceLayout` renders `<Form formId=… />` (the id comes from the resource's `form.formId` frontmatter) and never names a vendor. **Built-in provider: Brevo** (`forms/brevo.astro`) — a native HTML POST to `{PUBLIC_BREVO_ACCOUNT_ID}.sibforms.com/serve/{formId}`.
+
+**Single-select** (a gate posts to one backend). Unlike analytics/captcha — selected by env vars — the form backend is chosen site-wide in `Form.astro`'s `providers` registry.
+
+**Backend coupling:** the backend does the heavy lifting — validating the captcha token, storing the contact, emailing the `asset`, and redirecting to `/thank-you/resources/{slug}/`. So swapping providers means matching the change on that backend (and its captcha config), not just the frontend. The thank-you page also surfaces the `asset` as a direct download so delivery never depends solely on the email.
+
+**To add a provider** (ConvertKit, Formspree, a custom endpoint): add `forms/<provider>.astro` rendering its own form markup (action URL, email field name, hidden fields) plus the shared bits — `<Captcha />`, the consent checkbox, the submit `<Button />`, and the `resource_gate_viewed` / `resource_gate_submitted` events — then register it in `Form.astro`.
+
+---
+
+## Captcha
+
+Form bot-protection is **provider-agnostic**, structured like analytics: **`Captcha.astro`** is the dispatcher and each provider is a self-gating component in **`src/components/captcha/`** that emits nothing unless its own site-key env var is set. The resource-gate form (`forms/brevo.astro`) renders `<Captcha />` and never names a vendor. **Built-in provider: Cloudflare Turnstile** (`captcha/turnstile.astro`, active on `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`).
+
+**Difference from analytics — single-select.** Analytics providers stack (every event fans out to all of them); a form needs exactly **one** captcha (two widgets would inject competing hidden tokens), so the dispatcher renders only the **first** configured provider in its priority list. `PUBLIC_CAPTCHA_ENABLED="false"` is a global kill switch (e.g. for dev, where Turnstile's domain check is a nuisance).
+
+**Backend coupling (important):** the widget produces a hidden token that **Brevo validates server-side against the captcha configured on that form**. So the provider you enable here must match the one enabled on the Brevo form — the frontend swap alone isn't enough. (This is why the Turnstile widget also carries the `g-recaptcha` class: it matches Brevo's own generated embed / field detection.)
+
+**To add a provider** (e.g. Google reCAPTCHA, hCaptcha): drop a component in `src/components/captcha/` that renders its widget + loader script gated on its own `PUBLIC_*` site key; declare that key in `src/env.d.ts` + `.env.example`; add a `{ enabled, Component }` entry to the `providers` list in `Captcha.astro`; and add its script/frame host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`).
+
+---
+
 Components live in **`src/components/`** — they're small and self-documenting, so read them there rather than maintaining a catalog here. The ones with non-obvious contracts:
 
-- **`Prose.astro`** — the content-card panel for rendered MD/MDX (post body, resource + legal pages, thank-you copy): the shared card+prose styling plus the code-block copy behavior, scoped per instance. `BrevoForm`'s inline `prose prose-lg` is a deliberately different, non-card pattern.
+- **`Prose.astro`** — the content-card panel for rendered MD/MDX (post body, resource + legal pages, thank-you copy): the shared card+prose styling plus the code-block copy behavior, scoped per instance. the resource-gate form's (`forms/brevo.astro`) inline `prose prose-lg` is a deliberately different, non-card pattern.
 - **`Button.astro`**, **`Analytics.astro`**, **Fonts** — see the subsections below.
 - **`analytics/*.astro`** — one component per analytics provider (loader + `track`/`identify` facade); see **Analytics** above and the `/analytics` skill.
+- **`Form.astro` + `forms/*.astro`** — provider-agnostic resource-gate email form (dispatcher + one component per backend); single-select, Brevo built in — see **Forms** above.
+- **`Captcha.astro` + `captcha/*.astro`** — provider-agnostic form captcha (dispatcher + one self-gating component per provider); single-select, Turnstile built in — see **Captcha** above.
 - **`JsonLd.astro`** — renders a schema.org JSON-LD block; see the `/structured-data` skill.
 
 ### `Button.astro`
@@ -303,18 +329,13 @@ Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guid
 
 ## Deploy & infrastructure
 
-**Hosting:** Cloudflare Pages, connected to your site's GitHub repo.
+**Hosting is platform-agnostic.** The build produces a static `dist/` that any static host serves. The two host-specific concerns — redirects and response headers — are authored platform-neutrally and compiled per host from **`site.deploy.platform`** in `src/site.config.ts` (see below). Supported targets: **Cloudflare Pages** (the default / reference host), **Netlify**, **Vercel**, and **AWS Amplify**. Switching hosts is a one-line change to `deploy.platform` plus a rebuild — nothing else in the codebase is host-specific.
 
-**Production branch:** `main` — every push to `main` triggers a Cloudflare Pages deploy. No preview branches.
+**Deploy on push:** connect the GitHub repo to your host and pushing to `main` triggers a production build+deploy (Cloudflare Pages, Netlify, and Vercel all support this). The reference setup uses no preview branches. Configure the connection in your host's dashboard.
 
-**Infrastructure as code:** Cloudflare account, DNS zones (including your site's zone), and Pages config are managed via Terraform in a separate repo:
+**DNS / hosting config:** manage it however your host prefers (dashboard, or infrastructure-as-code such as Terraform against your host's provider). None of it lives in this repo.
 
-- GitHub: `https://github.com/Zmoki/my-infrastructure`
-- Local path: `~/Projects/Zmoki/my-infrastructure/`
-
-If DNS, zone settings, or Cloudflare Pages project config need changing, edit the Terraform config in that repo — not the Cloudflare dashboard directly.
-
-**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.deploy.platform`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). When adding an analytics/asset host, add it to the CSP directive arrays in `headers.config.ts`. If your Cloudflare zone (Terraform) also sets some of these security headers, drop them there to avoid duplicates.
+**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.deploy.platform`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). When adding an analytics/asset host, add it to the CSP directive arrays in `headers.config.ts`. If your CDN or DNS layer also sets some of these security headers, drop them there to avoid duplicates.
 
 **Redirects** — authored as platform-neutral CSV in **`src/redirects/`** and compiled by `scripts/generate-redirects.ts` into the artifact for the host set by **`site.deploy.platform`** in `src/site.config.ts` (`public/_redirects` for Cloudflare/Netlify, `vercel.json` for Vercel, `redirects.json` for Amplify). The artifact is **committed** and CI's `npm run check:redirects` fails on drift, so rebuild (`npm run build:redirects`) and commit it alongside any CSV change.
 

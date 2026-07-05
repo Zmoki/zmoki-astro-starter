@@ -14,8 +14,14 @@ interface ImportMetaEnv {
   readonly PUBLIC_ANALYTICS_ENABLED: string;
   /** Brevo account ID, for the email signup forms. */
   readonly PUBLIC_BREVO_ACCOUNT_ID: string;
-  /** Cloudflare Turnstile site key — bot protection on forms. */
+  /**
+   * Cloudflare Turnstile site key — the built-in captcha provider for forms.
+   * Captcha is provider-agnostic (see src/components/Captcha.astro); set this to
+   * enable Turnstile, or add another provider's key to swap it.
+   */
   readonly PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: string;
+  /** Global captcha kill switch: set to `"false"` to disable the form captcha. */
+  readonly PUBLIC_CAPTCHA_ENABLED: string;
 }
 
 interface ImportMeta {
