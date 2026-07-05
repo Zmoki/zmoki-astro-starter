@@ -39,7 +39,7 @@ export const site = {
   organization: {
     /** Shown in the footer copyright and as the content-image credit. */
     name: "Zarema Khalilova",
-    /** Personal/company site — linked from the footer copyright. */
+    /** Personal/company site. */
     url: "https://zmoki.xyz",
   },
 
