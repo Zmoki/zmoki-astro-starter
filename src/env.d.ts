@@ -22,16 +22,9 @@ interface ImportMetaEnv {
   readonly PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: string;
   /** Global captcha kill switch: set to `"false"` to disable the form captcha. */
   readonly PUBLIC_CAPTCHA_ENABLED: string;
-  /**
-   * Base URL of the remote image origin for content images, e.g.
-   * "https://images.zmoki.xyz" (an R2 bucket on a custom domain). Content images
-   * are OPTIMIZED AT BUILD by Astro and served by the deploy host — the origin is
-   * pure storage, DECOUPLED from where the site deploys. Setting this authorizes
-   * the domain for build-time optimization (astro.config.mjs `image.remotePatterns`)
-   * and lets content reference images by bare key. Unset ⇒ commit images to
-   * src/images and import them. See src/image.config.ts.
-   */
-  readonly PUBLIC_IMAGE_CDN_HOST: string;
+  // Note: the content-image origin is NOT an env var — it's committed in
+  // src/site.config.ts (`imageOrigin`), since it's non-secret and must be present
+  // in every build environment (CI, host previews, production). See the /images skill.
 }
 
 interface ImportMeta {

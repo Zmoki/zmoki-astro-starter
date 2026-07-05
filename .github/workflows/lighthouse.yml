@@ -27,10 +27,6 @@ jobs:
 
       - name: Build site
         run: npm run build
-        env:
-          # Optimize content images at build so Lighthouse measures the real
-          # (production-like) LCP. Empty ⇒ remote images render unoptimized.
-          PUBLIC_IMAGE_CDN_HOST: ${{ vars.PUBLIC_IMAGE_CDN_HOST || secrets.PUBLIC_IMAGE_CDN_HOST }}
 
       - name: Run Lighthouse CI
         run: npx lhci autorun --collect.settings.chromeFlags="--headless"

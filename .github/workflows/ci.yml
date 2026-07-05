@@ -59,10 +59,6 @@ jobs:
           PUBLIC_POSTHOG_HOST: ${{ secrets.PUBLIC_POSTHOG_HOST }}
           PUBLIC_BREVO_ACCOUNT_ID: ${{ secrets.PUBLIC_BREVO_ACCOUNT_ID }}
           PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY: ${{ secrets.PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY }}
-          # Non-secret (it appears in image URLs) — a repo variable is the natural
-          # home, but fall back to a secret so it resolves either way. Empty ⇒
-          # remote images render unoptimized (no build-time fetch).
-          PUBLIC_IMAGE_CDN_HOST: ${{ vars.PUBLIC_IMAGE_CDN_HOST || secrets.PUBLIC_IMAGE_CDN_HOST }}
 
       - name: Structured data check
         run: npm run check:sd

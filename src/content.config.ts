@@ -16,7 +16,7 @@ const blog = defineCollection({
       // reads to pick a page's primary image. For Discover, use a well-cropped
       // landscape ≥1200px wide at 16:9. Use a **full URL** (e.g.
       // "https://images.example.com/x.jpg"): a bare key ("x.jpg") only resolves
-      // when PUBLIC_IMAGE_CDN_HOST is set, and would fail a build without it. Set
+      // when `site.imageOrigin` is set, and would fail a build without it. Set
       // `coverAlt` too (enforced below). Optimized at build (see src/image.config.ts).
       // Posts without a cover fall back to the OG card for schema.image.
       cover: z.string().optional(),

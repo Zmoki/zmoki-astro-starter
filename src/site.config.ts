@@ -53,16 +53,28 @@ export const site = {
     github: "https://github.com/Zmoki/zmoki-astro-starter",
   },
 
+  /**
+   * Remote origin for content-image originals — e.g. an R2 bucket on a custom
+   * domain — DECOUPLED from where the site deploys. Content images referenced by
+   * a URL on this origin are OPTIMIZED AT BUILD by Astro (authorized via
+   * `image.remotePatterns`) and served by the deploy host; there is no runtime
+   * transform. It's committed here (not an env var) precisely because it's not a
+   * secret — so every build (CI, host previews, production) optimizes with no
+   * per-environment config. A full URL, or `""` to disable a remote origin and
+   * commit images to `src/images` instead. See the /images skill.
+   */
+  imageOrigin: "https://images.zmoki.xyz",
+
   /** Copyright / content-licensing settings. */
   copyright: {
     /** First year shown in the footer copyright range. */
     year: 2026,
-    /** Content-image licensing (schema.org ImageObject on captioned images). */
+    /** Content-image licensing (schema.org ImageObject emitted for each image). */
     images: {
       /**
        * License URL for content images — the `license` + `acquireLicensePage`
-       * on each captioned image's schema.org ImageObject. Point it at your terms
-       * / licensing page. Absolute URL.
+       * on each image's schema.org ImageObject. Point it at your terms /
+       * licensing page. Absolute URL.
        */
       license: "https://starter.zmoki.xyz/legal/terms/",
     },

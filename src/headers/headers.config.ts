@@ -13,6 +13,8 @@
  * See `.claude/skills/redirects/SKILL.md` (headers section) and `src/headers/README.md`.
  */
 
+import { site } from "../site.config.ts";
+
 // ── Content-Security-Policy ───────────────────────────────────────────────────
 // Directives → arrays of sources, joined into the header string below. Add a
 // host by pushing it onto the relevant directive.
@@ -36,13 +38,12 @@ const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 const CAPTCHA_HOST = "https://challenges.cloudflare.com";
 
 // Remote image origin — where content-image originals are hosted (the demo uses
-// an R2 bucket on a custom domain). Content images are optimized at build and
-// served same-origin from /_astro, so 'self' covers the common case; this host is
-// listed so an image on an UNauthorized origin (which renders unoptimized, as the
-// original remote URL) isn't CSP-blocked. Keep in sync with `PUBLIC_IMAGE_CDN_HOST`
-// (src/env.d.ts): that env var drives the build, this literal drives the committed
-// CSP artifact. Change it if you move the image origin.
-const IMAGE_CDN_HOST = "https://images.zmoki.xyz";
+// an R2 bucket on a custom domain). Optimized images are served same-origin from
+// /_astro, so 'self' covers the common case; the origin is listed so an image
+// that renders unoptimized (the original remote URL) isn't CSP-blocked. Sourced
+// from `site.imageOrigin` (src/site.config.ts) — the SINGLE source of truth, so
+// the CSP can't drift from the build. Empty ⇒ not added.
+const IMAGE_CDN_HOST = (site.imageOrigin || "").trim().replace(/\/+$/, "");
 
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
@@ -59,7 +60,8 @@ const cspDirectives: Record<string, string[]> = {
   "img-src": [
     "'self'",
     "data:",
-    IMAGE_CDN_HOST, // remote image origin (fallback for unoptimized/unauthorized images)
+    // remote image origin (fallback for images that render unoptimized); omitted when unset
+    ...(IMAGE_CDN_HOST ? [IMAGE_CDN_HOST] : []),
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
   ],

@@ -14,14 +14,16 @@
  * via `image.remotePatterns`. See the /images skill.
  */
 
+import { site } from "@/site.config";
+
 export type ImageLayout = "constrained" | "fullWidth" | "fixed";
 
 /**
- * Base URL of the remote image origin, e.g. "https://images.zmoki.xyz". Empty ⇒
- * none set. A scheme-less value (`images.example.com`) is assumed https, matching
- * the normalization in astro.config.mjs.
+ * Base URL of the remote image origin (`site.imageOrigin`), e.g.
+ * "https://images.zmoki.xyz". Empty ⇒ none set. A scheme-less value is assumed
+ * https, matching the normalization in astro.config.mjs.
  */
-const rawImageHost = (import.meta.env.PUBLIC_IMAGE_CDN_HOST || "").trim().replace(/\/+$/, "");
+const rawImageHost = (site.imageOrigin || "").trim().replace(/\/+$/, "");
 export const imageCdnHost =
   rawImageHost && !/^https?:\/\//i.test(rawImageHost) ? `https://${rawImageHost}` : rawImageHost;
 

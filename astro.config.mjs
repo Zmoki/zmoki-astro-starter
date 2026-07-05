@@ -1,6 +1,6 @@
 import { defineConfig, fontProviders } from "astro/config";
-import { loadEnv } from "vite";
 import { fonts } from "./src/design-tokens.mjs";
+import { site } from "./src/site.config.ts";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
@@ -8,17 +8,15 @@ import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
 
-// Image origin host (decoupled from the deploy host), read via Vite's loadEnv.
-// Authorizes the origin domain for Astro's BUILD-TIME image optimization
-// (`image.remotePatterns` below) so remote content images — the post cover,
-// `<Image>`, and full-URL Markdown images on that host — are downloaded +
+// Image origin (decoupled from the deploy host), committed in src/site.config.ts
+// (`imageOrigin`). Authorizes the origin domain for Astro's BUILD-TIME image
+// optimization (`image.remotePatterns` below) so remote content images — the post
+// cover, `<Image>`, and full-URL Markdown images on that host — are downloaded +
 // optimized at build. There is no runtime CDN transform (see src/image.config.ts).
-// Unset ⇒ no remote domain is authorized.
-const env = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "PUBLIC_");
-const rawImageHost = (env.PUBLIC_IMAGE_CDN_HOST || "").trim().replace(/\/+$/, "");
-// Tolerate a scheme-less value (the var is named ..._HOST, so `images.example.com`
-// is a natural input) by assuming https, and fail with a clear message on a
-// genuinely invalid one — not a cryptic URL parse error at config load.
+// Empty ⇒ no remote domain is authorized.
+const rawImageHost = (site.imageOrigin || "").trim().replace(/\/+$/, "");
+// Tolerate a scheme-less value by assuming https; fail with a clear message on a
+// genuinely invalid one rather than a cryptic URL parse error at config load.
 const imageCdnBase =
   rawImageHost && !/^https?:\/\//i.test(rawImageHost) ? `https://${rawImageHost}` : rawImageHost;
 let imageCdnHost = "";
@@ -27,8 +25,8 @@ if (imageCdnBase) {
     imageCdnHost = new URL(imageCdnBase).hostname;
   } catch {
     throw new Error(
-      `PUBLIC_IMAGE_CDN_HOST is not a valid host or URL: "${env.PUBLIC_IMAGE_CDN_HOST}". ` +
-        `Use e.g. "https://images.example.com" or "images.example.com".`,
+      `site.imageOrigin is not a valid host or URL: "${site.imageOrigin}". ` +
+        `Use e.g. "https://images.example.com", or "" to disable a remote origin.`,
     );
   }
 }
