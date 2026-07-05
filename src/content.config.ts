@@ -9,6 +9,16 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
+    // Optional cover image — a real, non-text photograph (NOT the branded OG
+    // card). Rendered as the post's hero (LCP) and used as the schema.org
+    // BlogPosting.image + the image-sitemap entry, which is what Google Discover
+    // reads to pick a page's primary image. For Discover, use a well-cropped
+    // landscape ≥1200px wide at 16:9. Value is an image-CDN key ("starter/x.jpg")
+    // or a full URL; served through the configured CDN (see src/image.config.ts).
+    // Posts without a cover fall back to the OG card for schema.image.
+    cover: z.string().optional(),
+    /** Alt text for `cover`. Required-ish when a cover is set (accessibility + SEO). */
+    coverAlt: z.string().optional(),
     // Per-post byline author. Drives the post header credit, the "Written by"
     // bio, the schema.org BlogPosting author, and the OG card credit.
     author: z.object({

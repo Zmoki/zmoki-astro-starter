@@ -35,6 +35,14 @@ const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 // reCAPTCHA, https://hcaptcha.com for hCaptcha).
 const CAPTCHA_HOST = "https://challenges.cloudflare.com";
 
+// Image-CDN host — the origin content images (and their responsive srcset) load
+// from. Decoupled from the deploy host (see src/image.config.ts): the default
+// demo serves from an R2 bucket on a Cloudflare zone with Image Transformations.
+// Keep in sync with `PUBLIC_IMAGE_CDN_BASE` (src/env.d.ts): the env var drives the
+// runtime URLs, this literal drives the committed CSP artifact. If you swap the
+// image CDN (Uploadcare, Cloudinary, imgix…), change this to its host.
+const IMAGE_CDN_HOST = "https://i.zmoki.xyz";
+
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": [
@@ -50,6 +58,7 @@ const cspDirectives: Record<string, string[]> = {
   "img-src": [
     "'self'",
     "data:",
+    IMAGE_CDN_HOST, // content images + responsive srcset (image CDN)
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
   ],

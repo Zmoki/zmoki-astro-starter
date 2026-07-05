@@ -37,6 +37,7 @@
     "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.3.2",
+    "@unpic/core": "^1.0.3",
     "astro": "^7.0.6",
     "culori": "^4.0.2",
     "markdown-it": "^14.1.0",
@@ -46,7 +47,8 @@
     "satori": "^0.26.0",
     "tailwindcss": "^4.3.2",
     "unist-util-visit": "^5.0.0",
-    "unist-util-visit-parents": "^6.0.2"
+    "unist-util-visit-parents": "^6.0.2",
+    "unpic": "^4.2.2"
   },
   "overrides": {
     "tmp": "^0.2.7",

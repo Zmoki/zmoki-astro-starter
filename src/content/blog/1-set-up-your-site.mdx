@@ -4,11 +4,15 @@ title: "Set up your site with an AI agent"
 description: "Clone the starter, point your AI coding agent at it, and go from template to deployed site in an afternoon."
 publishDate: "2026-07-04"
 contentModifiedDate: "2026-07-05"
+cover: "https://i.zmoki.xyz/starter/IMG_3107.jpeg"
+coverAlt: "Pale, softly rounded concrete balconies of a modernist building, seen from below against a clear blue sky."
 author:
   name: "Zarema Khalilova"
   url: "https://zmoki.xyz"
   bio: "I build small, fast websites and the tools around them — this starter is one of them."
 ---
+
+import ContentImage from "@/components/ContentImage.astro";
 
 This starter is built to be handed to an AI coding agent. Every convention it
 follows is written down in [`AGENTS.md`](https://github.com/Zmoki/zmoki-astro-starter/blob/main/AGENTS.md),
@@ -48,6 +52,14 @@ Work down `SETUP.md` with your agent. The essentials:
 Because the brand system is a living style guide, you can just say _"make the
 accent green"_ or _"switch the font to Inter"_ and the agent knows which files to
 touch and how to keep the guideline honest.
+
+<ContentImage
+  src="starter/IMG_4640.jpeg"
+  alt="Close-up of weathered tree bark, with a blurred sandy beach and blue sea in the gap beyond."
+>
+  Content images go through a provider-agnostic image CDN — set `PUBLIC_IMAGE_CDN` and they're
+  served responsively, decoupled from where the site deploys.
+</ContentImage>
 
 ## 4. Run it
 

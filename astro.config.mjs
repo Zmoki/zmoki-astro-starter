@@ -1,4 +1,5 @@
 import { defineConfig, fontProviders } from "astro/config";
+import { loadEnv } from "vite";
 import { fonts } from "./src/design-tokens.mjs";
 import tailwindcss from "@tailwindcss/vite";
 import mdx from "@astrojs/mdx";
@@ -6,6 +7,16 @@ import { unified } from "@astrojs/markdown-remark";
 import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
+
+// Image-CDN base host (decoupled from the deploy host), read via Vite's loadEnv.
+// Used to authorize the CDN domain for Astro's built-in image optimization so
+// that plain Markdown images (`![alt](https://<cdn-base>/key.jpg)`) get
+// downloaded + optimized + made responsive at build. Deliberate images (the post
+// cover, <Image>/<ContentImage>) instead go through the CDN's own transform URLs
+// at runtime — see src/image.config.ts. Unset ⇒ no remote domain is authorized.
+const env = loadEnv(process.env.NODE_ENV || "development", process.cwd(), "PUBLIC_");
+const imageCdnBase = (env.PUBLIC_IMAGE_CDN_BASE || "").replace(/\/+$/, "");
+const imageCdnHost = imageCdnBase ? new URL(imageCdnBase).hostname : "";
 
 // Rehype plugin to add IDs to definition list terms
 function rehypeDefinitionListIds() {
@@ -152,6 +163,17 @@ function rehypeCodeBlockCopy() {
 export default defineConfig({
   integrations: [mdx()],
   site: "https://starter.zmoki.xyz",
+  // Image optimization. `layout: "constrained"` makes every optimized image
+  // (astro:assets <Image> and Markdown `![]()`) responsive with a srcset and
+  // zero-CLS sizing by default. `remotePatterns` authorizes the configured image
+  // CDN's own domain so plain Markdown images hosted there are downloaded +
+  // optimized + made responsive at build (deliberate images — the cover,
+  // <Image>/<ContentImage> — instead use the CDN's runtime transform URLs; see
+  // src/image.config.ts). No CDN configured ⇒ no remote domain authorized.
+  image: {
+    layout: "constrained",
+    ...(imageCdnHost ? { remotePatterns: [{ protocol: "https", hostname: imageCdnHost }] } : {}),
+  },
   // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
   // served same-origin from /_astro/fonts, with automatic optimized fallback
   // metrics (zero CLS) and preload links. The site is all-sans — a body/heading

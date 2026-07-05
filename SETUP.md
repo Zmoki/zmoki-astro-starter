@@ -46,7 +46,7 @@ Replace the placeholder content:
 - `src/content/resources/` — `example-resource.mdx` shows the shape. `type: "page"` makes a page; `type: "link"` is just an outbound link.
 - `src/content/legal/` — `privacy.mdx` and `terms.mdx` are **placeholders, not legal advice**. Fill in the bracketed bits and review before launch.
 
-Add content images to `src/images/`. Whenever you edit a content file, bump its `contentModifiedDate`.
+Content images work out of the box with no CDN: commit them under `src/images/`, import them, and Astro optimizes + makes them responsive at build. To serve them from an **image CDN instead** (decoupled from your deploy host — R2+Cloudflare, Uploadcare, Cloudinary, imgix), see step 5 and the `/images` skill. Give image-heavy posts a **`cover`** (+ `coverAlt`) — a real landscape photo (≥1200px, 16:9) that becomes the post hero and the image Google Discover uses. Whenever you edit a content file, bump its `contentModifiedDate`.
 
 ## 4. Brand / design-system pages
 
@@ -62,6 +62,7 @@ Copy `.env.example` to `.env` and fill in what you use (every var is declared an
   - `PUBLIC_ANALYTICS_ENABLED=false` turns **all** analytics off (e.g. in dev). If you use a GTM host beyond the defaults, allowlist it in the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`). See AGENTS.md → Analytics to add another provider.
 - **Forms** — provider-agnostic email capture (like analytics), single-select. Built in: **Brevo** — set `PUBLIC_BREVO_ACCOUNT_ID`, plus a `form` block (with `formId`) in a resource's frontmatter to show a signup form. To swap the backend, see AGENTS.md → Forms.
 - **Captcha** — provider-agnostic bot protection on forms (like analytics), single-select. Built in: **Cloudflare Turnstile** — set `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`. `PUBLIC_CAPTCHA_ENABLED=false` turns it off (e.g. in dev). To swap in reCAPTCHA/hCaptcha, see AGENTS.md → Captcha. Note: the provider must also be the one configured on your Brevo form, which validates the token.
+- **Image CDN** — optional, and **decoupled from your deploy host**. Set `PUBLIC_IMAGE_CDN` (`r2-cloudflare` / `uploadcare` / `cloudinary` / `imgix`) + `PUBLIC_IMAGE_CDN_BASE` (the image domain) to serve content images from a CDN; leave blank to optimize repo-committed images at build. Then add the CDN host to the CSP (`IMAGE_CDN_HOST` in `src/headers/headers.config.ts` → `npm run build:headers`). The default `r2-cloudflare` needs the R2 bucket on a Cloudflare custom domain with **Image Transformations** enabled. See the `/images` skill.
 
 All are optional — the site builds and runs without them.
 

@@ -3,9 +3,11 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
 import Time from "@/components/Time.astro";
 import Prose from "@/components/Prose.astro";
+import Image from "@/components/Image.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
+import { coverImageUrl } from "@/image.config";
 import { pageUrls } from "@/lib/urls";
 
 export interface Props {
@@ -14,23 +16,41 @@ export interface Props {
   publishDate: Date;
   contentModifiedDate: Date;
   author: CollectionEntry<"blog">["data"]["author"];
+  cover?: string;
+  coverAlt?: string;
   prevPost?: CollectionEntry<"blog"> | null;
   nextPost?: CollectionEntry<"blog"> | null;
 }
 
-const { title, description, publishDate, contentModifiedDate, author, prevPost, nextPost } =
-  Astro.props;
+const {
+  title,
+  description,
+  publishDate,
+  contentModifiedDate,
+  author,
+  cover,
+  coverAlt,
+  prevPost,
+  nextPost,
+} = Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
 // BlogPosting structured data (schema.org Article) → Google rich result.
 // Article has no required properties; we include the recommended ones the page
 // actually backs up. All absolute URLs come from the shared pageUrls() helper
 // (src/lib/urls.ts) — the same source BaseLayout uses for canonical + og:image —
-// so the structured data can't drift from the meta tags. The image reuses the
-// page's OG card via the manifest. See the /structured-data skill and Google's
-// Article reference: https://developers.google.com/search/docs/appearance/structured-data/article
+// so the structured data can't drift from the meta tags.
+//
+// image: prefer the post's real cover photo (≥1200px, 16:9) when set — that's
+// the primary-image signal Google Discover reads. Fall back to the OG card only
+// when a post has no cover. (og:image stays the branded card, which is better
+// for social sharing — the two images serve different surfaces.) The cover URL
+// is the same one used for the hero + the image sitemap (single source).
+// See the /structured-data skill and Google's Article reference:
+// https://developers.google.com/search/docs/appearance/structured-data/article
 const urls = pageUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
+const schemaImage = cover ? coverImageUrl(cover) : urls.absolute(ogImage.path);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -48,7 +68,7 @@ const blogPostingLd = {
     name: site.organization.name,
     url: site.organization.url,
   },
-  image: urls.absolute(ogImage.path),
+  image: schemaImage,
   mainEntityOfPage: urls.canonical,
 };
 ---
@@ -61,6 +81,22 @@ const blogPostingLd = {
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4">
+    <!-- Cover / hero image (the post's primary image for Discover). Priority = LCP. -->
+    {
+      cover && (
+        <Image
+          src={cover}
+          alt={coverAlt ?? ""}
+          width={1200}
+          height={675}
+          layout="constrained"
+          priority
+          sizes="(min-width: 768px) 768px, 100vw"
+          class="border-zmoki-stone-200 w-full rounded-2xl border shadow-sm"
+        />
+      )
+    }
+
     <!-- Post Header -->
     <header
       class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"

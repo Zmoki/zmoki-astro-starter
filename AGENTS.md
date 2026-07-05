@@ -44,6 +44,7 @@ Project skills live in `.claude/skills/`:
 - `/update-deps` — update npm packages + GitHub Actions in staged, verified commits (`.claude/skills/update-deps/SKILL.md`)
 - `/analytics` — enable/add/swap analytics providers or add a tracked event (`.claude/skills/analytics/SKILL.md`)
 - `/structured-data` — add/edit schema.org JSON-LD for Google rich results, per Google's docs (`.claude/skills/structured-data/SKILL.md`)
+- `/images` — content-image CDN (R2/Uploadcare/Cloudinary/imgix, decoupled from the deploy host), responsive images, post cover/hero, and image SEO (Discover / image sitemaps) (`.claude/skills/images/SKILL.md`)
 
 **These are AI-tool-agnostic task playbooks.** Each `SKILL.md` (and its `references/*.md`) is plain, vendor-neutral Markdown — the `/name` shortcut is Claude Code's way of loading it on demand, but any AI coding tool can use them by reading the file directly. Before doing one of the kinds of work above, **read the matching `.claude/skills/<name>/SKILL.md` first** and follow it. They're the source of truth for their topic; the sections below summarize, they don't replace.
 
@@ -354,11 +355,20 @@ When adding a new env var: declare it (with a doc comment) in `src/env.d.ts` fir
 
 ## Content images
 
-Images for posts and pages live in `src/images/`.
+Content images (photos: png/jpg/webp) are **provider-agnostic and decoupled from the deploy host**, structured like analytics/forms/captcha. Two delivery paths behind one vendor-neutral surface:
 
-**Optimization workflow (macOS Automator):** Drop an image into `src/images/tmp/` → ImageOptim picks it up automatically, optimizes it, and saves the result to `src/images/`. Never commit images directly to `src/images/` without going through this pipeline first.
+- **Zero-config baseline (`local`)** — no CDN configured. Repo-committed images (imported assets, in `src/images/`) are optimized at build by Astro (`astro:assets` + Sharp) and served by the deploy host. `astro.config.mjs` sets `image.layout: "constrained"` so every optimized image — `<Image>` and Markdown `![]()` — is responsive with zero CLS by default.
+- **Image CDN (opt-in)** — set `PUBLIC_IMAGE_CDN` + `PUBLIC_IMAGE_CDN_BASE` and content images are served + transformed by a CDN chosen **independently of `site.deploy.platform`**. Built on [Unpic](https://unpic.pics). Providers: **`r2-cloudflare`** (default — R2 storage + Cloudflare Image Transformations on the image domain's own zone), **`uploadcare`**, **`cloudinary`**, **`imgix`**. Unset ⇒ `local`.
 
-Do not commit anything from `src/images/tmp/` — it's a staging folder.
+Engine + config: **`src/lib/image-cdn.mjs`** (framework/env-free provider registry + URL builder) and **`src/image.config.ts`** (binds it to env; exports `imageAttrs`, `imageCdnActive`, `coverImageUrl`). Components: **`src/components/Image.astro`** (the vendor-neutral responsive image) and **`src/components/ContentImage.astro`** (a captioned, meaningful image with schema.org `ImageObject` markup — site-wide, delegates to `<Image>`).
+
+**Authoring** — three ways: `<Image>` (full control, CDN-delivered; used for the post cover), `<ContentImage>` (caption + licensing schema), and plain Markdown `![]()` (handled by **Astro's built-in optimization** — local images optimized at build; CDN-hosted URLs optimized at build because the domain is authorized in `image.remotePatterns`). No custom Markdown-image plugin.
+
+**Cover / hero & Google Discover** — a post's optional **`cover`** (blog frontmatter) is a real non-text photo (distinct from the branded OG card). Via `coverImageUrl()` (single source) it drives the post hero (LCP), the schema.org `BlogPosting.image` (the primary-image signal Discover reads), and the image-sitemap `<image:loc>` (`src/pages/sitemap.xml.ts`, image namespace `sitemap-image/1.1`). `og:image` stays the branded card. For Discover, a cover should be a well-cropped landscape ≥1200px wide at 16:9 (`max-image-preview:large` is already set).
+
+**Enabling a CDN** also needs its host added to the CSP: set `IMAGE_CDN_HOST` + `img-src` in `src/headers/headers.config.ts`, then `npm run build:headers`. Env vars are declared in `src/env.d.ts` and mirrored in `.env.example`. Host originals externally (R2/S3/bucket) — don't commit binaries.
+
+**The `/images` skill (`.claude/skills/images/SKILL.md`) is the source of truth** for enabling/swapping the CDN, R2 + Cloudflare Transformations setup, cover images, adding a provider, and image SEO — see it rather than duplicating the details here.
 
 ---
 

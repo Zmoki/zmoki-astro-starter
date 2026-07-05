@@ -1,10 +1,21 @@
 ---
-import { Image, getImage } from "astro:assets";
-import type { LocalImageProps } from "astro:assets";
+// Captioned, meaningful (non-decorative) content image — usable anywhere on the
+// site (post & resource bodies, landing sections, any page), not just posts. A
+// <figure> carrying schema.org ImageObject microdata (license, creator, credit)
+// with a caption. The image itself is rendered by the vendor-neutral <Image>
+// component, so it works with both a repo-committed asset (imported ImageMetadata,
+// optimized at build) and a CDN-hosted key/URL (string) — see Image.astro.
+//
+// Reach for this for content images that carry meaning + a caption/credit. For a
+// purely decorative image use <Image> directly (or CSS). A plain Markdown image
+// (![alt](key)) is auto-rewritten to a responsive CDN <img> by the
+// rehypeCdnImages plugin instead (see astro.config.mjs).
+import Image from "@/components/Image.astro";
 import { site } from "@/site.config";
 
 interface Props {
-  src: LocalImageProps["src"];
+  /** An imported asset (local, optimized at build) or a CDN key/URL (string). */
+  src: ImageMetadata | string;
   alt: string;
 }
 
@@ -24,7 +35,6 @@ const licenseUrl = new URL("/terms#1-content-images--text", Astro.url).href;
     width={1200}
     height={800}
     layout="constrained"
-    loading="lazy"
     class="border-zmoki-stone-200 max-w-[min(600px,100%)] rounded-xl border shadow-sm"
     itemprop="contentUrl"
   />
