@@ -33,11 +33,11 @@ const cspDirectives: Record<string, string[]> = {
     "'self'",
     "'unsafe-inline'",
     "https://static.cloudflareinsights.com",
-    "https://challenges.cloudflare.com",
+    "https://challenges.cloudflare.com", // Turnstile (built-in captcha) — swap for the new host if you change provider
     POSTHOG_HOST,
     "https://www.googletagmanager.com",
   ],
-  "frame-src": ["https://challenges.cloudflare.com"],
+  "frame-src": ["https://challenges.cloudflare.com"], // Turnstile captcha widget
   "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
     "'self'",

@@ -279,11 +279,24 @@ All events fire via `window.track(...)` and reach every active provider; pagevie
 
 ---
 
+## Captcha
+
+Form bot-protection is **provider-agnostic**, structured like analytics: **`Captcha.astro`** is the dispatcher and each provider is a self-gating component in **`src/components/captcha/`** that emits nothing unless its own site-key env var is set. `BrevoForm.astro` renders `<Captcha />` and never names a vendor. **Built-in provider: Cloudflare Turnstile** (`captcha/turnstile.astro`, active on `PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY`).
+
+**Difference from analytics — single-select.** Analytics providers stack (every event fans out to all of them); a form needs exactly **one** captcha (two widgets would inject competing hidden tokens), so the dispatcher renders only the **first** configured provider in its priority list. `PUBLIC_CAPTCHA_ENABLED="false"` is a global kill switch (e.g. for dev, where Turnstile's domain check is a nuisance).
+
+**Backend coupling (important):** the widget produces a hidden token that **Brevo validates server-side against the captcha configured on that form**. So the provider you enable here must match the one enabled on the Brevo form — the frontend swap alone isn't enough. (This is why the Turnstile widget also carries the `g-recaptcha` class: it matches Brevo's own generated embed / field detection.)
+
+**To add a provider** (e.g. Google reCAPTCHA, hCaptcha): drop a component in `src/components/captcha/` that renders its widget + loader script gated on its own `PUBLIC_*` site key; declare that key in `src/env.d.ts` + `.env.example`; add a `{ enabled, Component }` entry to the `providers` list in `Captcha.astro`; and add its script/frame host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`).
+
+---
+
 Components live in **`src/components/`** — they're small and self-documenting, so read them there rather than maintaining a catalog here. The ones with non-obvious contracts:
 
 - **`Prose.astro`** — the content-card panel for rendered MD/MDX (post body, resource + legal pages, thank-you copy): the shared card+prose styling plus the code-block copy behavior, scoped per instance. `BrevoForm`'s inline `prose prose-lg` is a deliberately different, non-card pattern.
 - **`Button.astro`**, **`Analytics.astro`**, **Fonts** — see the subsections below.
 - **`analytics/*.astro`** — one component per analytics provider (loader + `track`/`identify` facade); see **Analytics** above and the `/analytics` skill.
+- **`Captcha.astro` + `captcha/*.astro`** — provider-agnostic form captcha (dispatcher + one self-gating component per provider); single-select, Turnstile built in — see **Captcha** above.
 - **`JsonLd.astro`** — renders a schema.org JSON-LD block; see the `/structured-data` skill.
 
 ### `Button.astro`
