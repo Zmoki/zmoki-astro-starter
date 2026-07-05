@@ -55,6 +55,7 @@ Project skills live in `.claude/skills/`:
 npm run dev              # dev server
 npm run build            # production build (also emits OG images to dist/og/)
 npm run timeline:blog    # generate blog-timeline.csv
+npm run favicons         # rasterize public/brand-mark.svg → the favicon set (.ico + apple-touch + PWA PNGs)
 npm run build:redirects  # compile src/redirects/*.csv → host redirect artifact (runs automatically before build)
 npm run check:redirects  # CI guard: rebuild redirects and fail if the committed artifact drifted
 npm run build:headers    # compile src/headers/headers.config.ts → host header artifact (runs automatically before build)
@@ -173,7 +174,7 @@ imported from `astro:content` (not the legacy `entry.render()`).
 
 Props are defined in the file; the one with non-obvious behavior is **`wide`** (default `false`) — `true` gives a full-width `<main>` for landing-page sections that own their own containers, `false` a centered `max-w-3xl` container for articles. (`description` defaults to `site.description`.)
 
-Classic landing-page chrome on every page: a sticky top nav (logo + `site.nav` links + a "Get started" button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav, CTA, and footer all read from `src/site.config.ts`.
+Classic landing-page chrome on every page: a sticky top nav (the **brand mark** — `public/brand-mark.svg` — linking home + `site.nav` links + a "Get started" button), a single-column `<main>`, and a footer (copyright + Privacy/Terms/Contact/Source). The nav links, CTA, and footer read from `src/site.config.ts`; the logo is the brand mark (see Favicons & brand mark).
 
 Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts), meta/OG tags, analytics (`Analytics.astro`), canonical URL. Every absolute URL it emits — canonical, `og:url`, `og:image`/`twitter:image` — comes from **`pageUrls(Astro)`** (`src/lib/urls.ts`), the single source of truth for absolute-URL construction; the JSON-LD structured data (`PostLayout`) uses the same helper, so canonical/OG/meta/SD can't drift apart. `pageUrls` separates the **site origin** (production, from astro.config `site` — used for canonical + SD) from the **asset origin** (the dev server under `astro dev`, else production — used for OG image URLs so cards preview locally). The OG image URL + `alt` per page come from the manifest via `getOgImage(pathname)` (see OG image generation below); pages without their own card fall back to the site default.
 
@@ -344,7 +345,7 @@ Do not commit anything from `src/images/tmp/` — it's a staging folder.
 OG images are **purpose-built cards rendered at build time** — no browser, no running server, nothing committed. The pipeline lives in **`src/og/`** and the endpoint **`src/pages/og/[...path].png.ts`**:
 
 - **`src/og/manifest.ts`** — the single source of truth. `getOgEntries()` enumerates every card (home, blog index, each post / resource page / legal page, plus a `default` fallback); each entry carries `{ key, template, title, description, eyebrow, alt }`. `getOgImage(pathname)` returns the `{ path, alt }` for a page. Consumed by both the endpoint (to render) and `BaseLayout` (for `og:image` + `og:image:alt`).
-- **`src/og/card.ts`** — two Satori templates: `article` (eyebrow · title · description · brand footer) and `site` (brand mark · name · tagline). Built as Satori vdom nodes directly (no JSX).
+- **`src/og/card.ts`** — two Satori templates: `article` (eyebrow · title · description · brand footer) and `site` (brand mark · name · tagline). Built as Satori vdom nodes directly (no JSX). The **brand mark** is rasterized once from `public/brand-mark.svg` (via `Resvg`) into a PNG data URI and embedded as an `<img>`, so the cards use the same mark as the favicons (see Favicons & brand mark).
 - **`src/og/theme.ts`** — card colors pulled from `src/design-tokens.mjs`, so a re-skin (the `/brand` skill) recolors the cards automatically. Tokens are run through `culori`'s `formatHex` because Tailwind v4's default palettes are `oklch()` strings, which the resvg rasterizer doesn't render reliably.
 - **`src/og/fonts.ts`** — bundles a Latin subset of the brand sans (`src/og/fonts/*.woff`, Regular + Bold) for Satori. This is the OG card font, **separate** from the site's self-hosted fonts (its own committed `.woff` files) — if you swap the brand font (`/brand` skill), update these too.
 - **`src/pages/og/[...path].png.ts`** — `getStaticPaths()` from the manifest, `GET()` → Satori (vdom → SVG) → resvg (SVG → PNG). `astro build` emits `dist/og/**/*.png`; `astro dev` renders the same route on request. Cards are **1200×630** PNGs.
@@ -352,3 +353,13 @@ OG images are **purpose-built cards rendered at build time** — no browser, no 
 Because the images are produced by `astro build`, production (Cloudflare Pages) and CI get them for free — there's no separate generate step and no binaries in git. `src/pages/rss.xml.ts` references each post's card at `/og/blog/{id}.png`.
 
 **The `/og-images` skill (`.claude/skills/og-images/SKILL.md`) is the source of truth** for customizing the cards (layout, colors, fonts, template variants, which pages get a card) — see it rather than duplicating the details here.
+
+---
+
+## Favicons & brand mark
+
+**`public/brand-mark.svg` is the single source of truth for the site's brand mark** — used for _both_ the favicon set and the mark on the OG social cards, so a site's icon and its share cards always match. It ships as a default (an indigo square with a "Z") and is meant to be **replaced** during setup (SETUP.md → step 2) with the user's own mark. Keep it a **square, full-bleed SVG** (the art fills its own background): the raster icons are rendered from it as-is, and Apple-touch / Android icons can't be transparent, so full-bleed avoids empty/black corners. There's no letter/token generation — the art lives entirely in that one SVG.
+
+**`scripts/generate-favicons.ts`** (`npm run favicons`) rasterizes `brand-mark.svg` with `sharp` into the raster icons, all **committed** under `public/`: `favicon.ico` (16/32/48 legacy fallback, PNG-encoded entries built without an extra dependency), `apple-touch-icon.png` (180×180), `icon-192.png`, `icon-512.png`. **Rerun it whenever `brand-mark.svg` changes**, and commit the results. The SVG favicon is served straight from `/brand-mark.svg` (no separate `favicon.svg`), and the OG cards rasterize the same file (see OG image generation → `src/og/card.ts`), so those two update with no regeneration step.
+
+`BaseLayout` and `BrandLayout` render the full `<link>` set: `icon` (`.ico` + `/brand-mark.svg`) + `apple-touch-icon` + `manifest`. The **web app manifest** is a dynamic endpoint — **`src/pages/site.webmanifest.ts`** — reading the name from `site.config` and `theme_color` / `background_color` from `src/og/theme.ts`, so it stays in sync with a rebrand automatically. The CSP allows the manifest via `manifest-src 'self'` in `src/headers/headers.config.ts`.

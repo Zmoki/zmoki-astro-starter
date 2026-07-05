@@ -32,7 +32,9 @@ The starter is a **bright, warm, minimal** look — an ivory canvas (`zmoki-crea
   2. In the **"Shades and Tints"** section, read off the ramp: the lighter **tints** (toward white) become `400 300 200 100 50`, your base is `500`, and the darker **shades** (toward black) become `600 700 800 900 950`. Pick by eye for even spacing.
   3. Add the scale to `customPalettes` in `design-tokens.mjs` (the `zmoki-cream` scale already there is the worked example). It becomes a `zmoki-<name>-*` utility and shows on the reference page.
 
-Preview everything at `/-/astro/brand/color/`. The favicon at `public/favicon.svg` uses the same colors — swap it for your own.
+Preview everything at `/-/astro/brand/color/`.
+
+**Brand mark.** Replace **`public/brand-mark.svg`** with your own mark — a **square, full-bleed SVG** (the art fills its own background, corner to corner). It's the single source for both the favicon set and the mark on the OG social cards. After swapping it, run **`npm run favicons`** to regenerate the raster icons (`favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png`) and commit them; the SVG favicon and the OG cards render straight from `brand-mark.svg`, so they update with no extra step. The shipped default is an indigo square with a "Z" — keep the full-bleed square shape so the Apple-touch / Android icons don't get transparent corners.
 
 Type is **self-hosted via [Astro's Fonts API](https://docs.astro.build/en/guides/fonts/)** and wired into Tailwind's `font-sans` / `font-serif` / `font-mono` families through CSS variables — the site is **all-sans**: one sans for headings and body, a mono for code (`font-serif` stays available but unused). The family names live in `src/design-tokens.mjs` (`export const fonts`). To change them, run **`/brand`** — it walks the full swap (the names in `src/design-tokens.mjs`, the provider/axes in `astro.config.mjs`, and the brand specimen). Preview at `/-/astro/brand/typography/`.
 

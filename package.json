@@ -12,6 +12,7 @@
     "prebuild": "npm run build:redirects && npm run build:headers",
     "build:redirects": "node scripts/generate-redirects.ts",
     "build:headers": "node scripts/generate-headers.ts",
+    "favicons": "node scripts/generate-favicons.ts",
     "check:redirects": "node scripts/generate-redirects.ts && (git diff --exit-code -- public/_redirects vercel.json redirects.json || (echo '\\n✖ Redirect artifacts are out of date. Run: npm run build:redirects, then commit the result.' && exit 1))",
     "check:headers": "node scripts/generate-headers.ts && (git diff --exit-code -- public/_headers vercel.json customHeaders.json || (echo '\\n✖ Header artifacts are out of date. Run: npm run build:headers, then commit the result.' && exit 1))",
     "check": "astro check",
