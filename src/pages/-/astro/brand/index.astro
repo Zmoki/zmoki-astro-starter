@@ -11,6 +11,46 @@ const indigo = colors["zmoki-indigo"] as Record<string, string>;
 // indigo accent ramp — so the strip reads as a warm, minimal palette.
 const palettePreview = [cream["100"], stone["900"], stone["500"], indigo["100"], indigo["600"]];
 
+// Top-level brand settings, the files a rebrand starts from before any
+// individual guideline page. Rendered between the hero and the section cards.
+// A summary is a list of parts; a `{ code }` part renders as inline code.
+const foundations: {
+  title: string;
+  file: string;
+  summary: (string | { code: string })[];
+  mark: boolean;
+}[] = [
+  {
+    title: "Brand mark",
+    file: "public/brand-mark.svg",
+    summary: [
+      "One square, full-bleed SVG sets the whole identity. It becomes the nav logo, the favicon set, and the mark on the OG cards. Replace it, then rerun ",
+      { code: "npm run favicons" },
+      ".",
+    ],
+    mark: true,
+  },
+  {
+    title: "Site config",
+    file: "src/site.config.ts",
+    summary: [
+      "Everything personal to the site lives here. The name, domain, nav links, owner, and contact. Right now that is ",
+      `${site.name} at ${new URL(site.domain).host}.`,
+    ],
+    mark: false,
+  },
+  {
+    title: "Design tokens",
+    file: "src/design-tokens.mjs",
+    summary: [
+      "The color scales behind every ",
+      { code: "zmoki-*" },
+      ` utility, plus the fonts (${fonts.sans.name} and ${fonts.mono.name}). Tailwind and these brand pages read the same file, so nothing drifts.`,
+    ],
+    mark: false,
+  },
+];
+
 // Sections of the design system. `href` null = not built yet.
 const sections = [
   {
@@ -73,6 +113,42 @@ const sections = [
       {palettePreview.map((hex) => <span class="flex-1" style={`background-color: ${hex}`} />)}
     </div>
   </header>
+
+  <section class="mb-8">
+    <h2 class="text-2xl font-semibold md:text-3xl">Foundations</h2>
+    <p class="text-zmoki-stone-500 mt-2 max-w-2xl">
+      Before the guideline pages below, the brand is set in three top-level files. A rebrand starts
+      here.
+    </p>
+    <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
+      {
+        foundations.map((item) => (
+          <div class="border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm">
+            {item.mark ? (
+              <img src="/brand-mark.svg" alt="Brand mark" class="h-10 w-10 rounded-lg" />
+            ) : (
+              <span class="bg-zmoki-indigo-600 h-2 w-12 self-start rounded-full" />
+            )}
+            <h3 class="text-xl font-semibold">{item.title}</h3>
+            <code class="bg-zmoki-indigo-50 text-zmoki-indigo-700 self-start rounded px-2 py-1 font-mono text-xs">
+              {item.file}
+            </code>
+            <p class="text-zmoki-stone-500 text-sm">
+              {item.summary.map((part) =>
+                typeof part === "string" ? (
+                  part
+                ) : (
+                  <code class="bg-zmoki-cream-100 text-zmoki-stone-900 rounded px-1 py-0.5 font-mono text-xs">
+                    {part.code}
+                  </code>
+                ),
+              )}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
     {
