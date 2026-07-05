@@ -10,9 +10,9 @@ first, and let it lead the work. This skill orients you across them and helps yo
 improve or adapt a guideline, then bring the implementation into line so the two
 never drift.
 
-The pages are an internal, `noindex` living style guide. They hardcode the name
-**`Zmoki Astro Starter`** and are **not** wired to `src/site.config.ts` — you edit
-them directly.
+The pages are an internal, `noindex` living style guide. They pull the site name
+from **`site.name`** (`src/site.config.ts`), but their content is otherwise **not**
+wired to config — you edit it directly.
 
 ## The guideline pages (source of truth)
 

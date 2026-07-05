@@ -1,5 +1,6 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
+import { site } from "@/site.config";
 
 // A neutral, product-oriented voice — edit it to match your own project.
 // The four pillars: one principle each, with a short gloss and detail.
@@ -81,7 +82,7 @@ const examples = [
 
 // FAQ-style questions worth answering, modelled on the example post.
 const sampleQuestions = [
-  "What does Zmoki Astro Starter do?",
+  `What does ${site.name} do?`,
   "How do I get started?",
   "How much does it cost?",
   "How does it work for teams?",
@@ -154,18 +155,18 @@ const checklist = [
 
 <BrandLayout
   title="Brand — Voice & tone"
-  description="How Zmoki Astro Starter sounds: clear, honest, helpful, and human"
+  description={`How ${site.name} sounds: clear, honest, helpful, and human`}
 >
   <header
     class="border-zmoki-indigo-600 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
   >
     <a href="/-/astro/brand/" class="text-xs tracking-normal opacity-80 hover:opacity-100"
-      >← Zmoki Astro Starter brand</a
+      >← {site.name} brand</a
     >
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Voice &amp; tone</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
-      How Zmoki Astro Starter sounds: clear, honest, helpful, and human. Edit this page to match
-      your own product’s voice.
+      How {site.name} sounds: clear, honest, helpful, and human. Edit this page to match your own product’s
+      voice.
     </p>
   </header>
 
@@ -173,8 +174,8 @@ const checklist = [
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <h2 class="mb-3 text-2xl font-semibold md:text-3xl">Who&rsquo;s speaking</h2>
     <p class="max-w-2xl text-lg opacity-80">
-      Write as the team behind Zmoki Astro Starter, talking directly to the people who use it. One
-      clear, helpful voice — the same whether it’s a blog post, a button label, or an error message.
+      Write as the team behind {site.name}, talking directly to the people who use it. One clear,
+      helpful voice — the same whether it’s a blog post, a button label, or an error message.
       Replace this with your own product’s persona.
     </p>
   </section>

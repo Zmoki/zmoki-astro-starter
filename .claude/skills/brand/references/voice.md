@@ -11,8 +11,8 @@ copy you write here should itself obey the voice you're describing.
 
 > This page ships with an example "house style" (neutral, product-oriented). On a
 > real project it's expected you rewrite it to match the actual brand — this is
-> the main file `SETUP.md` calls out for editing. It hardcodes the name
-> **`Zmoki Astro Starter`** and is **not** wired to `src/site.config.ts`.
+> the main file `SETUP.md` calls out for editing. It pulls the site name from
+> **`site.name`**, but its content is otherwise **not** wired to `src/site.config.ts`.
 
 ## What to edit (the data blocks, top of the file)
 

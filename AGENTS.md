@@ -128,7 +128,7 @@ npm run format
 
 ## Site configuration (`src/site.config.ts`)
 
-The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), the site owner (`organization`), contact email, source repo, copyright year, and the deploy target (`deploy.platform`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages are not wired to it — they hardcode the `Zmoki Astro Starter` name and are edited directly.
+The single source of truth for everything personal to a site: domain, name, description, OG/RSS titles, top-nav links (`nav`), the site owner (`organization`), contact email, source repo, copyright year, and the deploy target (`deploy.platform`, which drives the redirects build). Layouts, the landing page, RSS, and the sitemap all read from it. To rebrand a new site, this is the main file you edit (plus `astro.config.mjs` `site`, the palette in `src/design-tokens.mjs`, and the favicon). The internal `/-/astro/brand/` pages pull the site name from `site.name`, but their content (specimens, voice, house style) is otherwise edited directly rather than driven by the config.
 
 ---
 
@@ -151,7 +151,7 @@ imported from `astro:content` (not the legacy `entry.render()`).
 ## URL structure
 
 ```
-/                        # landing page (hero → features → final CTA)
+/                        # landing page
 /blog/                   # blog list (all posts)
 /blog/{slug}/            # individual post (PostLayout)
 /resources/{slug}/       # resource page (ResourceLayout)
