@@ -4,7 +4,7 @@ import { headerRules, type HeaderRule } from "../src/headers/headers.config.ts";
 
 // Compiles the platform-neutral header rules in src/headers/headers.config.ts
 // into the response-header artifact for the configured hosting platform
-// (site.deploy.platform). headers.config.ts is the source of truth; each emitter
+// (site.platform.deploy). headers.config.ts is the source of truth; each emitter
 // below renders its format. Run via `npm run build:headers`; also runs
 // automatically before `npm run build`.
 
@@ -107,7 +107,7 @@ function warnStaleArtifacts(platform: Platform, warnings: string[]): void {
 }
 
 function main(): void {
-  const platform = site.deploy.platform as Platform;
+  const platform = site.platform.deploy as Platform;
   const emitters: Record<Platform, true> = {
     cloudflare: true,
     netlify: true,

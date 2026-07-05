@@ -9,12 +9,12 @@ URL redirects. Authored once as platform-neutral CSV in `src/redirects/`, compil
 ## Model
 
 - **Source of truth:** `src/redirects/*.csv` — platform-neutral, one file per group (`blog.csv`, `other.csv`, …). Add new files freely; they're merged in filename order.
-- **Generated output:** depends on `site.deploy.platform` (see below) — **never edit by hand.** Overwritten on every build.
+- **Generated output:** depends on `site.platform.deploy` (see below) — **never edit by hand.** Overwritten on every build.
 - **Builder:** `scripts/generate-redirects.ts`, run via `npm run build:redirects`. Also runs automatically before `npm run build` (the `prebuild` npm hook), so CI keeps the output in sync.
 
 ## Platform
 
-The output artifact is chosen by `deploy.platform` in `src/site.config.ts`:
+The output artifact is chosen by `platform.deploy` in `src/site.config.ts`:
 
 | `platform`               | Generated artifact  | Format                                                      |
 | ------------------------ | ------------------- | ----------------------------------------------------------- |

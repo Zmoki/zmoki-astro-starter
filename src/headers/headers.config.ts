@@ -3,7 +3,7 @@
  *
  * Compiled by `scripts/generate-headers.ts` (`npm run build:headers`, also run
  * automatically before `npm run build`) into the artifact for the host set by
- * `site.deploy.platform` in `src/site.config.ts`:
+ * `site.platform.deploy` in `src/site.config.ts`:
  *   "cloudflare" | "netlify" → public/_headers
  *   "vercel"                 → vercel.json (headers[] merged in)
  *   "amplify"                → customHeaders.json (paste into the Amplify console / IaC)
@@ -12,6 +12,8 @@
  * Edit rules here, then run `npm run build:headers` and commit the result.
  * See `.claude/skills/redirects/SKILL.md` (headers section) and `src/headers/README.md`.
  */
+
+import { site } from "../site.config.ts";
 
 // ── Content-Security-Policy ───────────────────────────────────────────────────
 // Directives → arrays of sources, joined into the header string below. Add a
@@ -35,6 +37,11 @@ const POSTHOG_HOST = "https://a.starter.zmoki.xyz";
 // reCAPTCHA, https://hcaptcha.com for hCaptcha).
 const CAPTCHA_HOST = "https://challenges.cloudflare.com";
 
+// Remote image origin (fallback for images that render unoptimized — optimized
+// ones are served same-origin from /_astro). Sourced from `site.platform.imagesCDNHost`,
+// the same value the build uses, so the CSP can't drift. Empty ⇒ not added.
+const IMAGE_CDN_HOST = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
+
 const cspDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": [
@@ -50,6 +57,8 @@ const cspDirectives: Record<string, string[]> = {
   "img-src": [
     "'self'",
     "data:",
+    // remote image origin (fallback for images that render unoptimized); omitted when unset
+    ...(IMAGE_CDN_HOST ? [IMAGE_CDN_HOST] : []),
     "https://www.googletagmanager.com",
     "https://www.google-analytics.com",
   ],

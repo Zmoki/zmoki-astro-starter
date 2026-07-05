@@ -1,0 +1,121 @@
+---
+// The one content-image component. Wraps astro:assets: a committed asset
+// (imported ImageMetadata) is optimized at build; a full remote URL on the
+// configured origin (site.platform.imagesCDNHost) is downloaded + optimized at
+// build. Any other remote URL renders a plain <img> — no bogus srcset repeating
+// the original at every width, no build-time fetch. See the /images skill.
+//
+// Every image emits a schema.org ImageObject license JSON-LD (from
+// site.copyright.images.license + site.organization). A caption (the default
+// slot) additionally wraps it in a <figure> + <figcaption>.
+//
+// A string `src` must be a full URL and needs width + height (Astro can't infer
+// a remote image's dimensions).
+import { Image as AstroImage } from "astro:assets";
+import JsonLd from "@/components/JsonLd.astro";
+import { site } from "@/site.config";
+
+type ImageLayout = "constrained" | "fullWidth" | "fixed";
+
+interface Props {
+  /** An imported asset, or a full remote URL (needs width + height). */
+  src: ImageMetadata | string;
+  alt: string;
+  width?: number;
+  height?: number;
+  layout?: ImageLayout;
+  /** Eager + fetchpriority=high — set on the LCP/hero image only. */
+  priority?: boolean;
+  sizes?: string;
+  /** Override the image's creator (ImageObject) — a Person; defaults to the site organization. */
+  author?: { name: string; url: string };
+  /** Override the license URL (ImageObject); defaults to site.copyright.images.license. */
+  licenseUrl?: string;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  src,
+  alt,
+  width,
+  height,
+  layout = "constrained",
+  priority = false,
+  sizes,
+  author,
+  licenseUrl,
+  class: className,
+  ...rest
+} = Astro.props;
+
+const isString = typeof src === "string";
+const imagesCDNHost = (site.platform.imagesCDNHost || "").replace(/\/+$/, "");
+const willOptimize = !isString || (!!imagesCDNHost && (src as string).startsWith(imagesCDNHost));
+const astroLayout: "constrained" | "fixed" | "full-width" =
+  layout === "fullWidth" ? "full-width" : layout;
+
+// astro:assets' <Image> props are an overloaded union (string XOR ImageMetadata);
+// cast src to string to pick the remote overload (Astro checks typeof at runtime,
+// so a committed asset still optimizes) and assert the required width/height.
+const shared = {
+  src: src as string,
+  alt,
+  width: (width ?? (typeof src === "object" ? src.width : undefined)) as number,
+  height: height as number,
+  loading: (priority ? "eager" : "lazy") as "eager" | "lazy",
+  ...(priority ? ({ fetchpriority: "high" } as const) : {}),
+};
+
+const hasCaption = Astro.slots.has("default");
+const contentUrl = isString
+  ? (src as string)
+  : new URL((src as ImageMetadata).src, Astro.site ?? Astro.url).href;
+// creator defaults to the site Organization; pass `author` to credit a Person.
+const credit = author ?? { name: site.organization.name, url: site.organization.url };
+const imageLd = {
+  "@context": "https://schema.org",
+  "@type": "ImageObject",
+  contentUrl,
+  license: licenseUrl ?? site.copyright.images.license,
+  acquireLicensePage: licenseUrl ?? site.copyright.images.license,
+  creditText: credit.name,
+  copyrightNotice: `© ${site.copyright.year} ${credit.name}`,
+  creator: { "@type": author ? "Person" : "Organization", name: credit.name, url: credit.url },
+};
+
+const captionImgClasses =
+  "border-zmoki-stone-200 max-w-[min(600px,100%)] rounded-xl border shadow-sm";
+---
+
+{
+  hasCaption ? (
+    <figure class="!my-0 flex w-full flex-col items-center">
+      {willOptimize ? (
+        <AstroImage
+          {...shared}
+          layout={astroLayout}
+          {...(sizes ? { sizes } : {})}
+          class:list={[captionImgClasses, className]}
+          {...rest}
+        />
+      ) : (
+        <img {...shared} decoding="async" class:list={[captionImgClasses, className]} {...rest} />
+      )}
+      <figcaption class="text-zmoki-stone-500 !mt-0 max-w-[520px] text-center text-sm">
+        <slot />
+      </figcaption>
+    </figure>
+  ) : willOptimize ? (
+    <AstroImage
+      {...shared}
+      layout={astroLayout}
+      {...(sizes ? { sizes } : {})}
+      class={className}
+      {...rest}
+    />
+  ) : (
+    <img {...shared} decoding="async" class={className} {...rest} />
+  )
+}
+<JsonLd schema={imageLd} />

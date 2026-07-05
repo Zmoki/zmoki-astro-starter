@@ -35,7 +35,7 @@ function resolveCurrentOrigin(astro: AstroGlobal, siteOrigin: URL): URL {
   if (import.meta.env.DEV) {
     return new URL(astro.url.origin);
   }
-  const preview = previewOrigin(site.deploy.platform);
+  const preview = previewOrigin(site.platform.deploy);
   if (preview) {
     try {
       return new URL(preview);

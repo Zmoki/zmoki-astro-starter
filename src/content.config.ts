@@ -9,13 +9,23 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
-    // Optional canonical URL. Set this when the post republishes content whose
-    // canonical source lives elsewhere (e.g. cross-posted from another site) so
-    // search engines credit the original. Drives <link rel="canonical"> and the
-    // schema.org BlogPosting `mainEntityOfPage`. Omit for original content.
+    // Optional cover image — a real, non-text photo (NOT the OG card): the post's
+    // LCP image, the schema.org BlogPosting.image, and the image-sitemap entry —
+    // i.e. the primary image Google Discover reads. Use a well-cropped landscape
+    // ≥1200px wide at 16:9, as a full URL (on `site.platform.imagesCDNHost` → it's
+    // optimized at build). Both fields are required when `cover` is set, so the
+    // primary image is never decorative. No cover ⇒ schema.image falls back to the OG card.
+    cover: z
+      .object({
+        image: z.string(),
+        alt: z.string().min(1),
+      })
+      .optional(),
+    // Optional canonical URL — set for cross-posted content so search engines
+    // credit the original. Drives <link rel="canonical"> + BlogPosting.mainEntityOfPage.
     canonical: z.url().optional(),
-    // Per-post byline author. Drives the post header credit, the "Written by"
-    // bio, the schema.org BlogPosting author, and the OG card credit.
+    // Per-post byline author — drives the header credit, "Written by" bio, the
+    // schema.org BlogPosting author, and the OG card credit.
     author: z.object({
       name: z.string(),
       /** The author's site — linked from the byline. */
