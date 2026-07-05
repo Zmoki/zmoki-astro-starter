@@ -60,18 +60,18 @@ const root = (children: Node[]): Node =>
 function articleCard(entry: OgEntry): Node {
   const header = el(
     "div",
-    { display: "flex", fontSize: 26, color: theme.muted, fontWeight: 700 },
+    { display: "flex", fontSize: 24, color: theme.muted, fontWeight: 700 },
     entry.eyebrow ?? "",
   );
   const body = el("div", { display: "flex", flexDirection: "column" }, [
     el(
       "div",
-      { display: "flex", fontSize: 64, fontWeight: 700, lineHeight: 1.15, color: theme.ink },
+      { display: "flex", fontSize: 56, fontWeight: 700, lineHeight: 1.15, color: theme.ink },
       entry.title,
     ),
     el(
       "div",
-      { display: "flex", marginTop: 28, fontSize: 30, lineHeight: 1.4, color: theme.muted },
+      { display: "flex", marginTop: 28, fontSize: 24, lineHeight: 1.4, color: theme.muted },
       entry.description,
     ),
   ]);
@@ -98,12 +98,12 @@ function siteCard(entry: OgEntry): Node {
   const body = el("div", { display: "flex", flexDirection: "column" }, [
     el(
       "div",
-      { display: "flex", fontSize: 84, fontWeight: 700, lineHeight: 1.1, color: theme.ink },
+      { display: "flex", fontSize: 74, fontWeight: 700, lineHeight: 1.1, color: theme.ink },
       entry.title,
     ),
     el(
       "div",
-      { display: "flex", marginTop: 28, fontSize: 34, lineHeight: 1.4, color: theme.muted },
+      { display: "flex", marginTop: 28, fontSize: 24, lineHeight: 1.4, color: theme.muted },
       entry.description,
     ),
   ]);

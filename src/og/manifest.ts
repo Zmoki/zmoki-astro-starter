@@ -16,7 +16,7 @@ const truncate = (s: string, n: number): string =>
   s.length > n ? `${s.slice(0, n - 1).trimEnd()}…` : s;
 
 const TITLE_MAX = 90;
-const DESC_MAX = 140;
+const DESC_MAX = 160;
 
 /** An entry paired with the site route it belongs to (null for the fallback). */
 interface RoutedEntry {

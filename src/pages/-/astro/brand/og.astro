@@ -1,0 +1,187 @@
+---
+import BrandLayout from "@/layouts/BrandLayout.astro";
+
+// This guide documents the OG / social-share cards. The examples are the REAL
+// generated PNGs (served by /og/<key>.png — the same route BaseLayout points each
+// page's og:image at), so the page can never drift from production. The card
+// look, copy, and layout are owned by src/og/ + the `/og-images` skill; edit the
+// data below (which cards to feature, their anatomy) — not the layout.
+const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-stone-500";
+const codeChip = "bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base";
+
+// The two Satori templates, each shown with a live example card and its anatomy.
+// `src` is a real /og/*.png route rendered on request (dev) / at build (prod).
+const templates = [
+  {
+    name: "site",
+    src: "/og/index.png",
+    alt: "Site OG card — brand mark, name, and tagline",
+    usedFor: "Home, blog index, and the default fallback",
+    tagline: "Brand mark · name · tagline",
+    anatomy: [
+      ["Brand mark", "Accent square with the site initial (72px)"],
+      ["Name", "The site name — 74px, bold"],
+      ["Tagline", "The site description — 24px, muted"],
+      ["Domain", "The bare domain, bottom-left"],
+    ],
+  },
+  {
+    name: "article",
+    src: "/og/blog/1-set-up-your-site.png",
+    alt: "Article OG card — eyebrow, title, description, and brand footer",
+    usedFor: "Every blog post, resource page, and legal page",
+    tagline: "Eyebrow · title · description · brand footer",
+    anatomy: [
+      ["Eyebrow", "Date · author — 24px, muted"],
+      ["Title", "The page title — 56px, bold"],
+      ["Description", "The page description — 24px, muted"],
+      ["Footer", "Brand mark + name on the left, domain on the right"],
+    ],
+  },
+];
+
+// Fixed specs of every card — the same for both templates.
+const specs = [
+  ["Dimensions", "1200 × 630 px (1.91:1)"],
+  ["Format", "PNG"],
+  ["Rendered", "Build-time — Satori (vdom → SVG) → resvg (SVG → PNG)"],
+  ["Committed", "Nothing — emitted to dist/og/ on build; dev renders on request"],
+  ["Title cap", "90 chars (truncated with … — cards have no line-clamp)"],
+  ["Description cap", "140 chars"],
+  ["Colors", "From the brand tokens — a re-skin recolors the cards automatically"],
+];
+---
+
+<BrandLayout
+  title="Brand — OG images"
+  description="Zmoki Astro Starter social-share cards: the two card templates, their anatomy, and where they come from"
+>
+  <header
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
+  >
+    <a href="/-/astro/brand/" class="text-xs font-medium tracking-normal text-white/70"
+      >← Zmoki Astro Starter brand</a
+    >
+    <h1 class="mt-2 text-4xl font-semibold md:text-5xl">OG images</h1>
+    <p class="mt-4 max-w-2xl text-xl md:text-2xl">
+      The social-share cards shown when a page is posted to X, Slack, LinkedIn, or iMessage.
+      Purpose-built and rendered at build time — no browser, no screenshots, nothing committed.
+      Every card reads the brand tokens, so a re-skin recolors them for free.
+    </p>
+  </header>
+
+  <!-- How they work -->
+  <h2 class={sectionLabel}>How they work</h2>
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <p class="text-zmoki-stone-500 mb-4 max-w-2xl">
+      A manifest (<code class={codeChip}>src/og/manifest.ts</code>) is the single source of truth —
+      it enumerates one card per page and carries each card's text. The endpoint{" "}
+      <code class={codeChip}>/og/[...path].png</code> renders each entry with{" "}
+      <strong>Satori</strong> (a React-like vdom → SVG) then <strong>resvg</strong> (SVG → PNG).{
+        " "
+      }
+      <code class={codeChip}>astro build</code> writes them all to{" "}
+      <code class={codeChip}>dist/og/</code>; <code class={codeChip}>astro dev</code> renders the same
+      route on request.
+    </p>
+    <p class="text-zmoki-stone-500 max-w-2xl">
+      Each page's <code class={codeChip}>og:image</code> points at its card by URL. The pattern mirrors
+      the route:
+    </p>
+    <pre
+      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-4 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>/                → /og/index.png
+/blog/           → /og/blog.png
+/blog/&lt;slug&gt;/    → /og/blog/&lt;slug&gt;.png
+/resources/&lt;s&gt;/  → /og/resources/&lt;s&gt;.png
+/legal/&lt;slug&gt;/   → /og/legal/&lt;slug&gt;.png
+(anything else)  → /og/default.png</code></pre>
+  </section>
+
+  <!-- The two templates -->
+  <h2 class={sectionLabel}>Templates</h2>
+  <div class="mb-10 space-y-6">
+    {
+      templates.map((t) => (
+        <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+          <div class="mb-6 flex items-baseline gap-3">
+            <code class="bg-zmoki-indigo-100 text-zmoki-indigo-700 rounded px-2 py-0.5 font-mono text-sm font-medium">
+              {t.name}
+            </code>
+            <span class="text-zmoki-stone-500 text-sm">{t.tagline}</span>
+          </div>
+
+          {/* Live example — the real generated PNG at its true 1.91:1 ratio */}
+          <img
+            src={t.src}
+            alt={t.alt}
+            width="1200"
+            height="630"
+            loading="lazy"
+            class="border-zmoki-stone-200 h-auto w-full rounded-xl border shadow-sm"
+          />
+
+          <div class="mt-6 grid gap-6 sm:grid-cols-2">
+            <div>
+              <p class="text-zmoki-stone-500 mb-2 text-xs font-medium tracking-normal">Used for</p>
+              <p class="text-zmoki-stone-700">{t.usedFor}</p>
+            </div>
+            <div>
+              <p class="text-zmoki-stone-500 mb-2 text-xs font-medium tracking-normal">Anatomy</p>
+              <ul class="space-y-1.5">
+                {t.anatomy.map(([part, desc]) => (
+                  <li class="text-zmoki-stone-700 text-base">
+                    <span class="font-semibold">{part}</span>
+                    <span class="text-zmoki-stone-500"> — {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      ))
+    }
+  </div>
+
+  <!-- Specs -->
+  <h2 class={sectionLabel}>Specs</h2>
+  <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+    <dl class="grid gap-4 sm:grid-cols-2">
+      {
+        specs.map(([term, def]) => (
+          <div>
+            <dt class="text-zmoki-stone-500 text-xs font-medium tracking-normal">{term}</dt>
+            <dd class="text-zmoki-stone-700 mt-1">{def}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </section>
+
+  <!-- Where to change it -->
+  <section
+    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8"
+  >
+    <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Where to change it</h2>
+    <ul class="space-y-2 font-mono text-sm">
+      <li>
+        <span class="text-white">src/og/manifest.ts</span>
+        <span class="text-white/70"> — which pages get a card + each card's text</span>
+      </li>
+      <li>
+        <span class="text-white">src/og/card.ts</span>
+        <span class="text-white/70"> — the article / site layouts (Satori nodes)</span>
+      </li>
+      <li>
+        <span class="text-white">src/og/theme.ts</span>
+        <span class="text-white/70"> — card colors (from tokens) + dimensions</span>
+      </li>
+      <li>
+        <span class="text-white">src/og/fonts.ts</span>
+        <span class="text-white/70"> — the card font (separate from the site fonts)</span>
+      </li>
+    </ul>
+    <p class="mt-4 text-sm text-white/80">
+      Full workflow: the <span class="font-mono">/og-images</span> skill.
+    </p>
+  </section>
+</BrandLayout>

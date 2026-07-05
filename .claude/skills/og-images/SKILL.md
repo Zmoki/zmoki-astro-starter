@@ -40,6 +40,8 @@ Read the PNG to eyeball it. Always finish with a build (below).
 
 Cards read from the design tokens, so a **re-skin does this for you** — run the `/brand` skill and the cards follow. To tune only the cards, edit the token picks in `src/og/theme.ts` (`bg`, `ink`, `muted`, `accent`, …). Every value is passed through `culori`'s `formatHex` (see Gotchas).
 
+**Every text/background pair on a card must meet WCAG AA** — ≥ 4.5:1 for normal text, ≥ 3:1 for large text (the title/name) and the brand-mark letter. The card background is `cream-100` (not white), so re-check contrast against _that_ — don't assume a pair that passes on the site's white cards also passes here. The tight pair is **muted text (`stone-500`) on `cream-100` ≈ 4.5:1** — it sits right at the AA floor, so lightening either the `bg` or `muted` token drops the eyebrow / description / domain below AA first. If a pair fails, darken the token (or enlarge/bold the text) — don't ship it.
+
 ### Change the card font
 
 Edit `src/og/fonts.ts` and drop the new `.woff`/`.ttf` (Satori needs the file, not a CSS `@font-face`) into `src/og/fonts/`, then use its `name` in `card.ts` styles. **This is separate from the site's Google Fonts** — if you swap the brand typeface (`/brand` skill), update these too or the cards won't match.
@@ -79,5 +81,7 @@ npm run check        # types
 npm run lint
 npm run format
 ```
+
+If you changed any card **color or font size**, also confirm every text pair still clears **WCAG AA** against the `cream-100` card background (see "Change the card colors") — the muted-text pair is the one that fails first.
 
 Nothing is committed — the PNGs are build output (`dist/` is gitignored). The only committed OG assets are the font files under `src/og/fonts/`.
