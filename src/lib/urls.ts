@@ -32,7 +32,7 @@ import { previewOrigin } from "./deploy";
 // above): local dev server, then the configured host's preview deploy, else
 // production.
 function resolveCurrentOrigin(astro: AstroGlobal, siteOrigin: URL): URL {
-  if (!import.meta.env.PROD) {
+  if (import.meta.env.DEV) {
     return new URL(astro.url.origin);
   }
   const preview = previewOrigin(site.deploy.platform);
@@ -58,8 +58,6 @@ export interface SiteUrls {
   absoluteUrl(path: string): string;
   /** Resolve a path to an absolute URL on the current-deployment origin (OG images). */
   currentAbsoluteUrl(path: string): string;
-  /** Normalize a path or absolute URL to its root-relative form (pathname + search + hash). */
-  relativeUrl(path: string): string;
 }
 
 export function siteUrls(astro: AstroGlobal): SiteUrls {
@@ -72,9 +70,5 @@ export function siteUrls(astro: AstroGlobal): SiteUrls {
     currentOrigin,
     absoluteUrl: (path) => new URL(path, siteOrigin).toString(),
     currentAbsoluteUrl: (path) => new URL(path, currentOrigin).toString(),
-    relativeUrl: (path) => {
-      const url = new URL(path, siteOrigin);
-      return `${url.pathname}${url.search}${url.hash}`;
-    },
   };
 }
