@@ -1,70 +1,39 @@
 # Brand — voice & tone
 
-Rewrite how the site _sounds_ — the voice pillars, house style, and worked
-examples. Everything lives in one file:
+Rewrite how the site sounds: voice pillars, house style, worked examples. It all lives in `src/pages/-/astro/brand/voice.astro` (renders `/-/astro/brand/voice/`).
 
-**`src/pages/-/astro/brand/voice.astro`** → renders `/-/astro/brand/voice/`.
+The shipped page is an example house style (neutral, product-oriented) that a real site should rewrite. It reads the site name from `site.name`; use `site.name` in new copy the same way.
 
-The page is data-driven: near the top are plain arrays/objects you edit; the
-markup below maps over them. The page is meant to **model its own rules**, so the
-copy you write here should itself obey the voice you're describing.
+## What to edit
 
-> This page ships with an example "house style" (neutral, product-oriented). On a
-> real project it's expected you rewrite it to match the actual brand — this is
-> the main file `SETUP.md` calls out for editing. It reads the site name from
-> **`site.name`** (imported at the top of the file), so you never retype it — use
-> `site.name` in your own copy the same way.
+Data consts at the top of the file; the markup below maps over them.
 
-## What to edit (the data blocks, top of the file)
+| Const             | Drives                     | Shape                                        |
+| ----------------- | -------------------------- | -------------------------------------------- |
+| `pillars`         | The voice principles       | `{ label, summary, detail }`, one per pillar |
+| `mechanics`       | House-style do/don't rules | `{ rule, right, wrong }`                     |
+| `examples`        | Side-by-side rewrites      | `{ context, wrong, right, note }`            |
+| `sampleQuestions` | FAQ-style question models  | strings                                      |
+| `lexicon`         | Use / avoid word lists     | `{ use: [...], avoid: [...] }`               |
+| `microcopy`       | Voice in UI copy           | `{ pattern, example, note }`                 |
+| `checklist`       | Pre-publish self-check     | strings                                      |
 
-| Const             | Drives                      | Shape                                         |
-| ----------------- | --------------------------- | --------------------------------------------- |
-| `pillars`         | The voice principles        | `{ label, summary, detail }` — one per pillar |
-| `mechanics`       | House-style do/don't rules  | `{ rule, right, wrong }`                      |
-| `examples`        | Side-by-side rewrites       | `{ context, wrong, right, note }`             |
-| `sampleQuestions` | FAQ-style question models   | strings                                       |
-| `lexicon`         | Use / avoid word lists      | `{ use: [...], avoid: [...] }`                |
-| `microcopy`       | Voice in UI copy, not prose | `{ context, right, wrong }` (or similar)      |
-| `checklist`       | Pre-publish self-check      | strings                                       |
-
-The section headings that render these live in the markup below the data — the
-`<h1>` is "Voice & tone" and there's a "Who's speaking" intro `<section>`. If you
-add or remove a whole section (not just entries), edit both the data const **and**
-its rendering block.
+Section headings, the `<h1>` and the "Who's speaking" intro are in the markup. To add or remove a whole section, edit both the const and its rendering block.
 
 ## Workflow
 
-1. **Settle the voice first.** If the user hasn't given you the pillars/tone, ask
-   the user for the 3–4 principles and the audience before rewriting —
-   don't invent a brand voice silently.
-2. **Rewrite the data blocks** to match. Keep the `right`/`wrong` pairs genuinely
-   contrastive — the `wrong` should be the generic marketing default, the `right`
-   the voice in practice.
-3. **Practice what you preach.** The page's own prose (intro, section blurbs)
-   should obey the new rules — sentence-case headings, plain words, etc.
-4. **Sync the summary elsewhere:** the Voice & tone card `summary` on
-   `src/pages/-/astro/brand/index.astro` should echo the new tone in a line.
+1. **Settle the voice first.** If the user hasn't given them, ask for the 3–4 principles and the audience. Don't invent a brand voice.
+2. **Rewrite the data.** Keep `right`/`wrong` pairs truly contrastive: `wrong` is the generic marketing default, `right` is the voice in practice.
+3. **Make the page follow its own rules**: its intro and section blurbs should obey the new voice (sentence-case headings, plain words, …).
+4. **Update the Voice & tone card `summary`** in `src/pages/-/astro/brand/index.astro`.
+
+Leave the do/don't accent colors (`zmoki-emerald-700` = do, `zmoki-rose-700` = don't) unless a re-skin changes conventions. No `contentModifiedDate` bump: that rule is for content collections only.
 
 ## Verify
 
-Voice is content, not build config, so the shared `npm run build` is enough to
-prove it compiles. The real check is a read-through:
-
 ```bash
-npm run check   # 0 errors (catches broken markup / TS in the frontmatter)
-npm run build   # must pass
+npm run check
+npm run build
 ```
 
-Then open `/-/astro/brand/voice/` (via `/run`) and read it top to bottom — every
-do/don't and rewrite should still make sense, and the page should _sound_ like the
-voice it prescribes. Note: the `contentModifiedDate` bump rule applies only to
-content collections (blog/resources/legal), **not** these internal brand pages —
-no date bump needed here.
-
-## Notes
-
-- Colors used for the do/don't accents (`zmoki-emerald-700` = do,
-  `zmoki-rose-700` = don't) come from the palette — leave them unless a re-skin
-  changes conventions.
-- This page is `noindex` (internal style guide); it won't appear in search or the
-  sitemap.
+Then open `/-/astro/brand/voice/` via `/run` and read it top to bottom. Every do/don't and rewrite should make sense, and the page should sound like the voice it describes.

@@ -1,62 +1,27 @@
 # Brand — colors (re-skin)
 
-Recolor the site: shift the accent, recolor the canvas/greys, or define a custom
-brand color.
+Shift the accent, recolor the canvas and greys, or add a custom brand color.
 
-> The color guideline is **`/-/astro/brand/color/`** — open it first (`/run`); it
-> renders live from the tokens and states the usage conventions. Work from it, and
-> update its convention copy alongside the tokens so the guideline stays true.
+The guideline is `/-/astro/brand/color/`. Open it first (`/run`); it renders live from the tokens. Update its convention copy along with the tokens.
 
-## The system
-
-All colors are **Tailwind's default palettes namespaced under `zmoki-`** —
-`zmoki-stone`, `zmoki-indigo`, `zmoki-red`, … — each a full `50→950` scale,
-defined in **`src/design-tokens.mjs`** (single source of truth, consumed by
-`tailwind.config.mjs` and the brand reference page). Templates use `zmoki-*`
-utility classes only — **no inline hex**.
-
-The starter is **warm-indigo**: an ivory canvas (**`zmoki-cream`**, a _custom_
-scale), warm greys for ink/borders (**`zmoki-stone`**), and a single **indigo**
-accent (**`zmoki-indigo`**). Every other chromatic group already exists as a
-utility — it's just unused until you reach for it.
-
-Live reference: `/-/astro/brand/color/`.
+Every color is a `zmoki-*` scale (`50`→`950`) defined in `src/design-tokens.mjs`. All of Tailwind's default palettes are already there as `zmoki-<name>`. The starter uses three: `zmoki-cream` (the ivory canvas, a custom scale), `zmoki-stone` (warm greys for ink and borders) and `zmoki-indigo` (the accent).
 
 ## Step 1 — Ask the user
 
-Ask the user to settle two things before editing:
+1. **Which color?** A Tailwind color name (slate, gray, zinc, neutral, stone, red, orange, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose) or a custom hex like `#2f6bff`.
+2. **Scope?** Accent only (links, nav button, hero, CTA, action buttons), or a fuller re-skin that also recolors the `zmoki-cream` canvas and/or `zmoki-stone` greys.
 
-1. **Which color?** A Tailwind color name (slate, gray, zinc, neutral, stone,
-   red, orange, amber, yellow, lime, green, emerald, teal, cyan, sky, blue,
-   indigo, violet, purple, fuchsia, pink, rose) **or** a custom brand color (a hex
-   like `#2f6bff`). Free-text is fine.
-2. **Scope?** Accent only (links, nav button, hero, CTA, action buttons — canvas,
-   body text, borders stay as-is) **or** a fuller re-skin (also recolor the
-   `zmoki-cream` canvas and/or `zmoki-stone` greys).
+## Step 2 — Custom color only: build a scale
 
-## Step 2 — Pick the path
+A Tailwind color name needs no token edits; skip to Step 3.
 
-- **Built-in Tailwind color** (one of the names above) → **Path A**. Nothing to
-  add in `design-tokens.mjs`; the `zmoki-<name>-*` utilities already exist.
-- **Custom color** (a hex, not a Tailwind default) → **Path B**. Build a scale
-  first.
-
-### Path B — build a custom scale
-
-The user prefers **[colorhexa.com](https://www.colorhexa.com/)**. Build a full
-`50→950` scale from their base color:
+For a custom hex, build a full `50`→`950` scale with [colorhexa.com](https://www.colorhexa.com/) (the user's preferred tool):
 
 1. The base hex is `500`.
-2. From colorhexa's **"Shades and Tints"** ramp: lighter tints (toward white) fill
-   `400 300 200 100 50`; darker shades (toward black) fill `600 700 800 900 950`.
-3. **Pick by eye for even, Tailwind-like spacing** — Tailwind's own scales ramp
-   non-linearly, so match that feel rather than fixed 10% stops.
+2. From colorhexa's "Shades and Tints", lighter tints fill `400 300 200 100 50` and darker shades fill `600 700 800 900 950`.
+3. Pick by eye for even, Tailwind-like spacing. Tailwind's scales aren't linear, so don't use fixed 10% steps.
 
-Fetch `https://www.colorhexa.com/<hex-without-#>` (e.g. `.../2f6bff`)
-to read off the shade/tint hexes, or ask the user to paste the scale.
-
-Add it to `customPalettes` in `src/design-tokens.mjs` (the existing `zmoki-cream`
-scale is the worked example):
+Fetch `https://www.colorhexa.com/<hex-without-#>` to read the values, or ask the user to paste the scale. Add it to `customPalettes` in `src/design-tokens.mjs` (`zmoki-cream` is the example):
 
 ```js
 const brand = { 50: "#…", 100: "#…", /* … */ 950: "#…" };
@@ -66,96 +31,55 @@ const customPalettes = {
 };
 ```
 
-It auto-generates `zmoki-brand-*` utilities and auto-appears on
-`/-/astro/brand/color/` (via the `customPaletteNames` export). Use `zmoki-brand`
-as the target group in Step 4.
+This generates `zmoki-brand-*` utilities and adds the scale to `/-/astro/brand/color/` (via `customPaletteNames`).
 
-## Step 3 — Check combinations (WCAG AA)
+## Step 3 — Check contrast (WCAG AA)
 
-Before committing to shades, make sure every text/background pair the palette
-produces meets **at least WCAG AA**. Verify each pair with Figma's checker:
-**<https://www.figma.com/color-contrast-checker/>** (paste the two hexes from
-`src/design-tokens.mjs` / `/-/astro/brand/color/`).
+Check every pair with Figma's checker: <https://www.figma.com/color-contrast-checker/>. Take the hexes from `src/design-tokens.mjs` or the color page.
 
-Thresholds:
+- **Normal text**: at least 4.5:1.
+- **Large text** (24px+, or 18.66px+ bold) and **UI elements** (borders, icons, focus rings): at least 3:1.
 
-- **Normal text** — **≥ 4.5:1**
-- **Large text** (≥ 24px, or ≥ 18.66px bold) and **UI / graphical elements**
-  (borders, icons, focus rings) — **≥ 3:1**
+| Foreground                                   | Background                                     | Min   |
+| -------------------------------------------- | ---------------------------------------------- | ----- |
+| Ink text `zmoki-stone-900`                   | page bg `zmoki-cream-100`, cards `white`       | 4.5:1 |
+| Muted text `zmoki-stone-500`                 | `white` / page bg                              | 4.5:1 |
+| Inverse text `white`                         | accent fills: nav CTA, hero, CTA band, buttons | 4.5:1 |
+| Borders / focus ring (`<target>-500`/`-600`) | `white` / page bg                              | 3:1   |
 
-Pairs to check on every re-skin (`<target>` = the chosen accent group):
-
-| Foreground                                   | Background                                      | Min   |
-| -------------------------------------------- | ----------------------------------------------- | ----- |
-| Ink text `zmoki-stone-900`                   | page bg `zmoki-cream-100`, cards `white`        | 4.5:1 |
-| Muted text `zmoki-stone-500`                 | `white` / page bg                               | 4.5:1 |
-| Inverse text `white`                         | accent fills — nav CTA, hero, CTA band, buttons | 4.5:1 |
-| Borders / focus ring (`<target>-500`/`-600`) | `white` / page bg                               | 3:1   |
-
-Rules:
-
-- A fill that carries **white text** (buttons, CTA, hero) must be dark enough to
-  pass — usually `-600` / `-700`. The mid/light shades of bright hues (yellow,
-  lime, amber, cyan, sky, …) **fail** white-on-fill AA: go darker, or flip to
-  **dark text on a light fill**.
-- If a pair fails AA, **fix the shade — don't ship it.**
-- For custom (colorhexa) scales, check the specific shades you actually use, not
-  just `-500`.
-- Note any pair that lands close to the threshold in the commit/PR.
+- A fill under white text usually needs `-600` or `-700`. The mid and light shades of bright hues (yellow, lime, amber, cyan, sky, …) fail; go darker or use dark text on a light fill.
+- For a custom scale, check the shades you actually use, not just `-500`.
+- If a pair fails, fix the shade. Note any pair close to the threshold in the PR.
 
 ## Step 4 — Apply
 
-Let `<target>` be the chosen accent group (`zmoki-blue`, `zmoki-brand`, …).
+Let `<target>` be the new accent group (`zmoki-blue`, `zmoki-brand`, …).
 
-- **Accent only** — find/replace the accent group site-wide:
+**Accent only**: replace the group across `src/`:
 
-  ```bash
-  grep -rl "zmoki-indigo" src | xargs sed -i '' "s/zmoki-indigo/<target>/g"
-  ```
+```bash
+grep -rl "zmoki-indigo" src | xargs sed -i '' "s/zmoki-indigo/<target>/g"
+```
 
-  This recolors links, nav CTA, hero, closing CTA band, action/copy buttons, and
-  soft accent fills together. In-prose links are driven by the `accent` constant
-  in `tailwind.config.mjs` — update it there too so links recolor.
+Prose links and global link hover don't use utilities; they use the `accent` / `accentHover` constants (`twColors.indigo[600]` / `[700]`) in `tailwind.config.mjs`. Change those too.
 
-- **Fuller re-skin** — also swap the canvas and/or greys the same way:
-  `zmoki-cream` → new canvas scale, `zmoki-stone` → new grey scale. The
-  `ink`/`accent` constants in `tailwind.config.mjs` drive the prose/link CSS that
-  can't reference a utility class — keep them in step with the utilities.
+**Fuller re-skin**: also replace `zmoki-cream` (canvas) and/or `zmoki-stone` (greys) the same way, and keep the `ink` constant in `tailwind.config.mjs` in step.
 
-Notes on `sed` in `zsh`: pass file paths explicitly (unquoted `$VAR` isn't
-word-split); the bracketed filename `src/pages/thank-you/[...slug].astro` must be
-quoted. Confirm the match count looks right before and after.
+Count matches before and after. In zsh, quote paths like `src/pages/thank-you/[...slug].astro`, and don't rely on word-splitting an unquoted `$VAR` of file paths. Recheck Step 3 at the shades you end up with.
 
-Keep inverse text on colored fills readable (`text-white` on dark shades) and
-re-confirm each fill still passes the Step 3 contrast check at the shade you land
-on.
+## Step 5 — Sync docs
 
-## Step 5 — Sync docs & the brand page
-
-- Update **AGENTS.md** ("Color system", "Conventions", "Changing the palette") and
-  **SETUP.md** ("Palette") if the conventions/shades changed.
-- The `/-/astro/brand/color/` page is generated from the tokens — no edit needed
-  for the swatches, but check its intro copy still describes the palette.
-- OG cards recolor automatically (`src/og/theme.ts` reads the tokens) — see
-  **`/og-images`** only if you want card-specific tuning.
+- Update the conventions table in `AGENTS.md` → Styling and `SETUP.md` → Brand if conventions or shades changed.
+- The color page's swatches come from the tokens; check its intro copy still describes the palette.
+- OG cards recolor automatically (`src/og/theme.ts` reads the tokens). Use `/og-images` only for card-specific tuning.
 
 ## Step 6 — Verify
 
-Run the shared verify (format / check / build) from `SKILL.md`, then:
+Run the verify block from `SKILL.md`, then:
 
 ```bash
-# confirm the accent utilities compiled to the new group
+# the accent utilities compiled to the new group
 grep -oE "\.bg-<target>-600\{[^}]*\}" dist/_astro/*.css | head -1
 ```
 
-Open `/-/astro/brand/color/` (via `/run`) and eyeball the palette plus `/` and a
-blog post. Re-confirm the Step 3 pairs at the shades you shipped — at minimum
-ink-on-bg and white-on-CTA.
-
-## Notes
-
-- The re-skin rules (incl. WCAG AA pairs) also live in `AGENTS.md` and `SETUP.md`
-  — keep all in sync if the workflow changes.
-- `zmoki-cream` is a custom scale (not a Tailwind default) — the worked example of
-  adding one. Don't reintroduce semantic role tokens; the system is
-  palette-group-based.
+`/run` and check `/-/astro/brand/color/`, `/` and a blog post. Recheck at least ink-on-bg and white-on-CTA at the shipped shades.

@@ -4,84 +4,81 @@ description: Customize the Open Graph / social-share image cards — layout, col
 
 # OG images
 
-Social-share cards (the image shown when a page is posted to X, Slack, LinkedIn, …). They are **purpose-built cards rendered at build time** by Satori (vdom → SVG) then resvg (SVG → PNG) — no browser, no running server, nothing committed. `astro build` emits them to `dist/og/**/*.png`; `astro dev` renders the same route on request.
+Social-share cards are rendered at build time: Satori (nodes → SVG), then resvg (SVG → PNG). `astro build` writes them to `dist/og/**/*.png` (1200×630); `astro dev` renders the same route on request. Nothing is committed except the card fonts.
 
-## Model
+## Files
 
-Everything lives in `src/og/` plus one endpoint. Edit the file that owns what you're changing:
+| File                               | Owns                                                                                    |
+| ---------------------------------- | --------------------------------------------------------------------------------------- |
+| `src/og/manifest.ts`               | Which pages get a card, and each card's text (`title`, `description`, `eyebrow`, `alt`) |
+| `src/og/card.ts`                   | How cards look: the `article` and `site` layouts                                        |
+| `src/og/theme.ts`                  | Card colors (from design tokens) and `OG_WIDTH` / `OG_HEIGHT`                           |
+| `src/og/fonts.ts` + `fonts/*.woff` | The card font (Noto Sans Latin subset)                                                  |
+| `src/og/types.ts`                  | The `OgEntry` shape and the `OgTemplate` union                                          |
+| `src/pages/og/[...path].png.ts`    | The endpoint: `getStaticPaths` from the manifest → render → PNG                         |
 
-| File                               | Owns                                                                                     |
-| ---------------------------------- | ---------------------------------------------------------------------------------------- |
-| `src/og/manifest.ts`               | **Which** pages get a card + each card's text (`title`, `description`, `eyebrow`, `alt`) |
-| `src/og/card.ts`                   | **How** the cards look — the `article` and `site` layouts (Satori nodes)                 |
-| `src/og/theme.ts`                  | Card colors (from design tokens) + dimensions (`OG_WIDTH`/`OG_HEIGHT`)                   |
-| `src/og/fonts.ts` + `fonts/*.woff` | The card font (Noto Sans subset)                                                         |
-| `src/og/types.ts`                  | `OgEntry` shape + the `OgTemplate` union                                                 |
-| `src/pages/og/[...path].png.ts`    | The endpoint: `getStaticPaths` from the manifest → render → PNG                          |
+The manifest feeds both the endpoint and `BaseLayout.astro` (`og:image` + `og:image:alt` via `getOgImage(pathname)`). A page with no entry gets the `default` card.
 
-The **manifest is the single source of truth**, shared by the endpoint (to render every card) and `BaseLayout.astro` (for each page's `og:image` + `og:image:alt`, via `getOgImage(pathname)`). Pages with no entry fall back to the `default` card.
-
-## Preview loop
-
-There is no separate generate step. To see a change:
+## Preview
 
 ```bash
-# dev: hit the route directly (renders on request)
-npm run dev        # then open /og/index.png, /og/blog/<id>.png, /og/default.png
-# or build: emits every card
-npm run build      # then open dist/og/**/*.png
+npm run dev     # then open /og/index.png, /og/blog/<id>.png, /og/default.png
+npm run build   # then open dist/og/**/*.png
 ```
 
-Read the PNG to eyeball it. Always finish with a build (below).
+Read the PNG to check it. Always finish with a build.
 
 ## Common edits
 
-### Change the card colors
+### Colors
 
-Cards read from the design tokens, so a **re-skin does this for you** — run the `/brand` skill and the cards follow. To tune only the cards, edit the token picks in `src/og/theme.ts` (`bg`, `ink`, `muted`, `accent`, …). Every value is passed through `culori`'s `formatHex` (see Gotchas).
+Cards read the design tokens, so a re-skin via `/brand` recolors them. To tune only the cards, edit the token picks in `src/og/theme.ts` (`bg`, `ink`, `muted`, `accent`, …).
 
-**Every text/background pair on a card must meet WCAG AA** — ≥ 4.5:1 for normal text, ≥ 3:1 for large text (the title/name) and the brand-mark letter. The card background is `cream-100` (not white), so re-check contrast against _that_ — don't assume a pair that passes on the site's white cards also passes here. The tight pair is **muted text (`stone-500`) on `cream-100` ≈ 4.5:1** — it sits right at the AA floor, so lightening either the `bg` or `muted` token drops the eyebrow / description / domain below AA first. If a pair fails, darken the token (or enlarge/bold the text) — don't ship it.
+Every text/background pair must meet WCAG AA: 4.5:1 for normal text, 3:1 for large text (the title/name). Check against the card background, `cream-100`, not white. The tight pair is muted text (`stone-500`) on `cream-100`, at about 4.5:1: lightening `bg` or `muted` drops the eyebrow, description and domain below AA first. If a pair fails, darken the token or enlarge/bold the text.
 
-### Change the card font
+### Font
 
-Edit `src/og/fonts.ts` and drop the new `.woff`/`.ttf` (Satori needs the file, not a CSS `@font-face`) into `src/og/fonts/`, then use its `name` in `card.ts` styles. **This is separate from the site's Google Fonts** — if you swap the brand typeface (`/brand` skill), update these too or the cards won't match.
+Put the new `.woff`/`.ttf` in `src/og/fonts/` (Satori needs the file, not a CSS `@font-face`), load it in `src/og/fonts.ts`, and use its `name` in `card.ts`. The bundled font is a Latin subset; other scripts need a fuller file. This font is separate from the site's self-hosted fonts: a brand typeface swap (`/brand`) must update it too.
 
-### Tweak a card's layout or copy
+### Layout or copy
 
-Edit `articleCard` / `siteCard` in `src/og/card.ts`. They're built with a tiny `el(type, style, children)` helper (React-like Satori nodes — no JSX). To change the _text_ on a card (e.g. the eyebrow format, or the site card's tagline), edit `src/og/manifest.ts` instead.
+Layout: edit `articleCard` / `siteCard` in `src/og/card.ts`, built with the small `el(type, style, children)` helper (no JSX). The brand mark comes from `public/brand-mark.svg`, and the site name and domain from `src/site.config.ts`.
 
-### Add a new template variant
+Text (eyebrow format, site-card tagline, truncation): edit `src/og/manifest.ts`.
+
+### New template variant
 
 1. Add the name to the `OgTemplate` union in `src/og/types.ts`.
 2. Write a `fooCard(entry)` builder in `src/og/card.ts` and route to it in `renderCard`.
-3. In `src/og/manifest.ts`, build entries with `template: "foo"`.
+3. Build entries with `template: "foo"` in `src/og/manifest.ts`.
 
-### Change which pages get a card
+### Which pages get a card
 
-Edit `buildEntries()` in `src/og/manifest.ts`. It mirrors the sitemap (home, blog index, posts, resources, legal, + `default`). Adding a new content collection? Add a `getCollection(...)` block and map it to entries, using a unique `key` (the filename stem under `/og/`, e.g. `key: "notes/<id>"` → `/og/notes/<id>.png`).
+`computeEntries()` in `src/og/manifest.ts` builds the list from three sources:
 
-### Change the image dimensions
+- **Collection pages** (posts, resources, legal) come from `getPageRecords()` in `src/lib/page-collections.ts`, the same registry as the sitemap. A new page section registered there gets cards automatically.
+- **Standalone pages** (home, blog index) come from the `meta` each page exports. A page without `title` + `description` falls back to `default`.
+- **`default`** is listed explicitly.
 
-Edit `OG_WIDTH` / `OG_HEIGHT` in `src/og/theme.ts` **and** the `og:image:width` / `og:image:height` meta in `src/layouts/BaseLayout.astro`. Keep the 1.91:1 ratio (1200×630) unless you have a reason not to.
+An entry's `key` is its filename stem under `/og/` (`"blog/<id>"` → `/og/blog/<id>.png`).
 
-## Gotchas (Satori's rendering is a strict subset)
+### Dimensions
 
-- **Colors must be hex/rgb, not oklch.** Tailwind v4's default palettes are `oklch()` strings, which resvg renders as near-black. `theme.ts` converts every token with `culori`'s `formatHex`; keep that wrapper on any new token.
-- **Every multi-child container needs `display: "flex"`** and an explicit `flexDirection`. Satori has no block layout.
-- **No line-clamp.** Long text overflows the canvas, so the manifest truncates `title`/`description` (`TITLE_MAX` / `DESC_MAX`). Adjust those caps rather than expecting wrapping to save you.
-- **The bundled font is the Latin subset only.** For other scripts, bundle a fuller `.woff` in `src/og/fonts/`.
-- The footer's site name / domain / brand initial come from `src/site.config.ts` — no need to hardcode them in a card.
+Change `OG_WIDTH` / `OG_HEIGHT` in `src/og/theme.ts` and the `og:image:width` / `og:image:height` meta in `src/layouts/BaseLayout.astro`. Keep 1.91:1 unless there's a reason not to.
+
+## Satori gotchas
+
+- **Colors must be hex/rgb, not oklch.** Tailwind v4 palettes are `oklch()`, which resvg renders near-black. `theme.ts` wraps every token in `culori`'s `formatHex`; keep that on new tokens.
+- **Every multi-child container needs `display: "flex"`** and an explicit `flexDirection`. There's no block layout.
+- **No line-clamp.** Long text overflows, so the manifest truncates with `TITLE_MAX` / `DESC_MAX`. Adjust those caps.
 
 ## Verify
 
 ```bash
-npm run build        # all cards emit to dist/og/ — a broken font/color pipeline still "builds" but yields blank/black cards, so...
-# open a couple of dist/og/**.png and confirm colors, font, and text render
-npm run check        # types
+npm run build   # then open a few dist/og/**.png: colors, font and text
+npm run check
 npm run lint
 npm run format
 ```
 
-If you changed any card **color or font size**, also confirm every text pair still clears **WCAG AA** against the `cream-100` card background (see "Change the card colors") — the muted-text pair is the one that fails first.
-
-Nothing is committed — the PNGs are build output (`dist/` is gitignored). The only committed OG assets are the font files under `src/og/fonts/`.
+A broken font or color pipeline still builds but yields blank or black cards, so look at the PNGs. If you changed a card color or font size, recheck the AA pairs above.
