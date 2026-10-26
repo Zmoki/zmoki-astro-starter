@@ -61,7 +61,8 @@ cover:
 
 - Images on the configured origin are optimized in every build, so the origin must be reachable at build time.
 - Images off the origin (or with `imagesCDNHost: ""`) render as plain `<img>` with no build-time fetch, so a down host can't fail the build.
-- Astro caches optimized images and fonts in `node_modules/.astro`. `npm ci` wipes it, so CI restores it with `actions/cache` (`.github/workflows/ci.yml`); deploy hosts use their own build cache.
+- Astro caches optimized images and fonts in `node_modules/.astro/assets` and `node_modules/.astro/fonts`. `npm ci` wipes them, so CI restores both with `actions/cache` (`.github/workflows/ci.yml`; `lighthouse.yml` restores the same cache). Cache only these two: the rest of `node_modules/.astro` is cheap to rebuild.
+- Deploy hosts have their own build cache. Point it at the same two directories, and check they survive the host's install step, since `npm ci` deletes `node_modules`.
 
 ## Verify
 
