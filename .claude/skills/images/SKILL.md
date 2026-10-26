@@ -30,7 +30,7 @@ With `imagesCDNHost: ""`, commit images to `src/images/` and import them.
 
 ## Authoring
 
-**`<Image>`**: `src` is an imported asset or a full remote URL. A remote `src` needs `width` and `height`. `priority` sets eager loading + `fetchpriority=high`; use it on the LCP/hero image only.
+**`<Image>`**: `src` is an imported asset or a full remote URL. A remote `src` without `width` and `height` is measured at build. `priority` sets eager loading + `fetchpriority=high`; use it on the LCP/hero image only.
 
 ```astro
 <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675} priority />
@@ -44,7 +44,7 @@ With `imagesCDNHost: ""`, commit images to `src/images/` and import them.
 - Every image emits a schema.org `ImageObject` license JSON-LD (license, acquireLicensePage, creditText, copyrightNotice, creator) from `site.copyright.images.license` and `site.organization`. Override per image with `author={{ name, url }}` (credits a Person) and/or `licenseUrl="…"`.
 - An image Astro can't optimize (off the origin) renders as a plain `<img>`, and its `contentUrl` is that URL.
 
-**Markdown `![alt](…)`** uses Astro's built-in optimization (WebP only, no license JSON-LD): local files (`./photo.jpg`), and in `.md` files full URLs on a domain in `image.remotePatterns`. In `.mdx`, a remote `![]()` renders as a plain `<img>` with the origin URL, which fails `check:origin`: use `<Image>` there.
+**Markdown `![alt](…)`** works with local files (`./photo.jpg`) and origin URLs. In `.mdx`, every content route maps `img` to `src/components/MarkdownImage.astro` (`src/lib/content-components.ts`): local and origin images go through `<Image>`, any other URL stays a plain `<img>` with no license JSON-LD. In `.md`, Astro optimizes them itself (WebP only, no license JSON-LD). A raw `<img>` tag is never optimized: one pointing at the origin is blocked by the CSP and fails `check:origin`.
 
 ## Post cover and Google Discover
 

@@ -4,7 +4,7 @@
 // <img>, so there is no build-time fetch and no srcset that repeats the original
 // at every width. Every image also emits ImageObject license JSON-LD, whose
 // contentUrl is a rendition, never the origin. See the /images skill.
-import { Picture } from "astro:assets";
+import { Picture, inferRemoteSize } from "astro:assets";
 import JsonLd from "@/components/JsonLd.astro";
 import { isOnImageOrigin, publishedImageUrl } from "@/lib/images";
 import { site } from "@/site.config";
@@ -12,7 +12,7 @@ import { site } from "@/site.config";
 type ImageLayout = "constrained" | "fullWidth" | "fixed";
 
 interface Props {
-  /** An imported asset, or a full remote URL (needs width + height). */
+  /** An imported asset or a full remote URL. An origin URL without a size is measured at build. */
   src: ImageMetadata | string;
   alt: string;
   width?: number;
@@ -44,6 +44,15 @@ const {
 } = Astro.props;
 
 const willOptimize = typeof src !== "string" || isOnImageOrigin(src);
+// Markdown `![]()` (mapped here in src/lib/content-components.ts) gives no size.
+const natural =
+  typeof src === "string" && willOptimize && !(width && height)
+    ? await inferRemoteSize(src)
+    : undefined;
+const finalWidth = width ?? natural?.width ?? (typeof src === "object" ? src.width : undefined);
+const finalHeight =
+  height ??
+  (natural && finalWidth ? Math.round((natural.height * finalWidth) / natural.width) : undefined);
 const astroLayout: "constrained" | "fixed" | "full-width" =
   layout === "fullWidth" ? "full-width" : layout;
 
@@ -53,8 +62,8 @@ const astroLayout: "constrained" | "fixed" | "full-width" =
 const shared = {
   src: src as string,
   alt,
-  width: (width ?? (typeof src === "object" ? src.width : undefined)) as number,
-  height: height as number,
+  width: finalWidth as number,
+  height: finalHeight as number,
   loading: (priority ? "eager" : "lazy") as "eager" | "lazy",
   ...(priority ? ({ fetchpriority: "high" } as const) : {}),
 };
