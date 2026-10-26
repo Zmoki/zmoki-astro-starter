@@ -11,6 +11,9 @@ const parser = new MarkdownIt({
   linkify: true, // Automatically convert URLs to links
   breaks: true, // Convert '\n' in paragraphs into <br>
 });
+// markdown-it 15 (linkify-it 6) stopped linking scheme-less URLs such as
+// www.example.com by default; keep linking them, as markdown-it 14 did.
+parser.linkify.set({ fuzzyLink: true });
 
 /**
  * Strips (single-line) import statements from MDX content.
