@@ -24,6 +24,17 @@ Every PR that changes the starter adds its entry under **Unreleased**, in the sa
 
 ### Security
 
+- **The CSP no longer allows inline scripts.** `script-src` drops `'unsafe-inline'`, so an injected inline script doesn't run. ([#57](https://github.com/Zmoki/zmoki-astro-starter/pull/57), closes [#36](https://github.com/Zmoki/zmoki-astro-starter/issues/36))
+  - Every script is now a bundled `<script>` served from `/_astro`, and `vite.build.assetsInlineLimit: 0` keeps Astro from inlining small ones. Build-time values reach scripts through `data-*` attributes or imports instead of `define:vars`. `post_viewed` now fires from `PostLayout`, which takes a `slug` prop.
+  - Snippets that must run before first paint live in `src/lib/inline-scripts.ts`, and the CSP allows them by hash. Today that's only the GTM loader.
+  - Provider hosts reach the CSP by import from each provider's config module (`analytics/posthog-config.ts`, `analytics/gtm-config.ts`, `captcha/turnstile-config.ts`) instead of being copied into `headers.config.ts`. A provider adds its hosts only while it's configured, so an unused GTM no longer puts Google hosts in the policy.
+
+  **To adopt (breaking if you wrote your own inline scripts):**
+  1. Copy `src/lib/inline-scripts.ts`, the three `*-config.ts` modules and `src/headers/headers.config.ts`; move your own provider constants into the config modules.
+  2. Copy the updated components, layouts and pages: `Analytics`, `Captcha`, `Prose`, `analytics/*`, `captcha/turnstile`, `forms/brevo`, `BaseLayout`, `PostLayout`, `blog/[...slug]` and `thank-you/[...slug]`. Then add `build: { assetsInlineLimit: 0 }` under `vite` in `astro.config.mjs`.
+  3. Rewrite any `<script is:inline>` of your own as a bundled `<script>` (see "Scripts & the CSP" in `AGENTS.md`). JSON-LD blocks and external vendor loaders can stay as they are.
+  4. Run `npm run build:headers` and commit the regenerated artifact. If you use GTM, Custom HTML tags won't run under the new policy; switch them to built-in tags or custom templates.
+
 - `npm audit` goes from 38 findings to 12, clearing the critical ones in `astro`, `dompurify` and `proxy-addr`. A scoped override moves `postcss-selector-parser` under `@tailwindcss/typography` to a fixed release. The 12 left all come only through Lighthouse CI (`@lhci/cli`, already at its latest version), so none of them reach visitors. ([#58](https://github.com/Zmoki/zmoki-astro-starter/pull/58))
 
 ## [1.0.0] - 2026-07-05
