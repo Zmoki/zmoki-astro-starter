@@ -4,8 +4,6 @@ Notable changes to the starter, for sites built from it. A site copied from the 
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions follow [Semantic Versioning](https://semver.org/) as seen by a site built from the starter: a **major** version means you have to change your own code or content to adopt it, a **minor** adds or improves something you can port as-is, and a **patch** is a fix. Your copy's `package.json` `version` is the starter release it began from; compare it with the sections below to see what you're missing.
 
-Every PR that changes the starter adds its entry under **Unreleased**, in the same PR.
-
 ## [Unreleased]
 
 ### Changed
@@ -14,7 +12,7 @@ Every PR that changes the starter adds its entry under **Unreleased**, in the sa
   - MDX 8 hands `.mdx` files to the configured Markdown processor. With `unified()` that needs `@astrojs/markdown-remark` 7.3 or later.
   - The remark/rehype plugins moved from `markdown.remarkPlugins` / `rehypePlugins` / `remarkRehype` into `unified({...})`, which Astro 7.4 requires (the old keys are deprecated).
   - `markdown-it` 15 ships its own types, so `@types/markdown-it` is gone. It also stopped linking scheme-less URLs (`www.example.com`) by default; the RSS feed turns that back on with `parser.linkify.set({ fuzzyLink: true })`.
-  - `astro dev` and `astro preview` now run as background daemons: stop them with `astro dev stop` / `astro preview stop`. If the port is taken they pick another one, so read the printed URL.
+  - When started from an agent or other non-interactive shell, `astro dev` and `astro preview` now run in the background: stop them with `astro dev stop` / `astro preview stop`. If the port is taken they pick another one, so read the printed URL.
 
   **To adopt:** copy the `dependencies`, `devDependencies` and `overrides` from `package.json`, run `npm install`, then apply the `markdown` block from `astro.config.mjs` and the `fuzzyLink` line from `src/pages/rss.xml.ts`. Check that a rendered post still has its code-block Copy buttons.
 
