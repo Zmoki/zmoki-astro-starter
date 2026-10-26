@@ -6,6 +6,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-10-26
+
 ### Changed
 
 - Satori 0.63 for OG cards. It sizes boxes as content-box, like browsers, so the card root now sets `boxSizing: border-box`. ([#62](https://github.com/Zmoki/zmoki-astro-starter/pull/62))
@@ -38,5 +40,6 @@ The starter as of [#35](https://github.com/Zmoki/zmoki-astro-starter/pull/35):
 - CI checks for format, types, lint, generated files, JSON-LD, links, sitemap and Lighthouse.
 - Task playbooks for AI agents in `.claude/skills/`.
 
-[Unreleased]: https://github.com/Zmoki/zmoki-astro-starter/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Zmoki/zmoki-astro-starter/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/Zmoki/zmoki-astro-starter/compare/v1.0.0...v2.0.0
 [1.0.0]: https://github.com/Zmoki/zmoki-astro-starter/releases/tag/v1.0.0
