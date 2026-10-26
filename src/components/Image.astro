@@ -79,34 +79,32 @@ const captionImgClasses =
   "border-zmoki-stone-200 max-w-[min(600px,100%)] rounded-xl border shadow-sm";
 ---
 
-{
-  hasCaption ? (
-    <figure class="!my-0 flex w-full flex-col items-center">
-      {willOptimize ? (
-        <AstroImage
-          {...shared}
-          layout={astroLayout}
-          {...(sizes ? { sizes } : {})}
-          class:list={[captionImgClasses, className]}
-          {...rest}
-        />
-      ) : (
-        <img {...shared} decoding="async" class:list={[captionImgClasses, className]} {...rest} />
-      )}
-      <figcaption class="text-zmoki-stone-500 !mt-0 max-w-[520px] text-center text-sm">
-        <slot />
-      </figcaption>
-    </figure>
-  ) : willOptimize ? (
-    <AstroImage
-      {...shared}
-      layout={astroLayout}
-      {...(sizes ? { sizes } : {})}
-      class={className}
-      {...rest}
-    />
-  ) : (
-    <img {...shared} decoding="async" class={className} {...rest} />
-  )
-}
+{hasCaption ? (
+  <figure class="!my-0 flex w-full flex-col items-center">
+    {willOptimize ? (
+      <AstroImage
+        {...shared}
+        layout={astroLayout}
+        {...(sizes ? { sizes } : {})}
+        class:list={[captionImgClasses, className]}
+        {...rest}
+      />
+    ) : (
+      <img {...shared} decoding="async" class:list={[captionImgClasses, className]} {...rest} />
+    )}
+    <figcaption class="text-zmoki-stone-500 !mt-0 max-w-[520px] text-center text-sm">
+      <slot />
+    </figcaption>
+  </figure>
+) : willOptimize ? (
+  <AstroImage
+    {...shared}
+    layout={astroLayout}
+    {...(sizes ? { sizes } : {})}
+    class={className}
+    {...rest}
+  />
+) : (
+  <img {...shared} decoding="async" class={className} {...rest} />
+)}
 <JsonLd schema={imageLd} />

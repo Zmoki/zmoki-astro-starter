@@ -22,119 +22,107 @@ const families = (names: string[]) =>
 ---
 
 <BrandLayout title="Brand — Color" description={`${site.name} brand color palette and tokens`}>
-  <header
-    class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
-  >
-    <a href="/-/astro/brand/" class="text-zmoki-indigo-100 text-xs font-medium tracking-normal"
-      >← {site.name} brand</a
-    >
+  <header class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10">
+    <a href="/-/astro/brand/" class="text-zmoki-indigo-100 text-xs font-medium tracking-normal">
+      ← {site.name} brand
+    </a>
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Color</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
-      The palette is Tailwind's default colors, namespaced under the <code class="font-mono"
-        >zmoki-</code
-      > prefix — every group available as <code class="font-mono">zmoki-slate</code>,
-      <code class="font-mono">zmoki-indigo</code>, <code class="font-mono">zmoki-stone</code>, and
-      so on, each a full 50→950 scale. The system is <strong>warm and minimal</strong>: an ivory
-      canvas (<code class="font-mono">zmoki-cream</code>), soft white cards, and a single
-      <code class="font-mono">zmoki-indigo</code> accent — the other ramps wait until you want more color.
-      No inline hex — only the utility classes.
+      The palette is Tailwind's default colors, namespaced under the{" "}
+      <code class="font-mono">zmoki-</code> prefix — every group available as{" "}
+      <code class="font-mono">zmoki-slate</code>,<code class="font-mono">zmoki-indigo</code>,{" "}
+      <code class="font-mono">zmoki-stone</code>, and so on, each a full 50→950 scale. The system is{" "}
+      <strong>warm and minimal</strong>: an ivory canvas (<code class="font-mono">zmoki-cream</code>
+      ), soft white cards, and a single
+      <code class="font-mono">zmoki-indigo</code> accent — the other ramps wait until you want more
+      color. No inline hex — only the utility classes.
     </p>
   </header>
 
   <h2 class="mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Neutrals</h2>
   <div class="space-y-3">
-    {
-      families(greyNames).map((family) => (
-        <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
-          <div class="flex items-center justify-between gap-4 px-5 pt-4">
-            <h3 class="text-lg font-semibold">{family.name}</h3>
-            <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
-          </div>
-          <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
-            {family.shades.map(({ shade, hex }) => (
-              <div>
-                <div class="h-12" style={`background-color: ${hex}`} />
-                <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
-                <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))
-    }
+    {families(greyNames).map((family) => (
+      <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <div class="flex items-center justify-between gap-4 px-5 pt-4">
+          <h3 class="text-lg font-semibold">{family.name}</h3>
+          <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
+        </div>
+        <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
+          {family.shades.map(({ shade, hex }) => (
+            <div>
+              <div class="h-12" style={`background-color: ${hex}`} />
+              <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
+              <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
   </div>
 
   <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Colors</h2>
   <div class="space-y-3">
-    {
-      families(colorNames).map((family) => (
-        <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
-          <div class="flex items-center justify-between gap-4 px-5 pt-4">
-            <h3 class="text-lg font-semibold">{family.name}</h3>
-            <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
-          </div>
-          <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
-            {family.shades.map(({ shade, hex }) => (
-              <div>
-                <div class="h-12" style={`background-color: ${hex}`} />
-                <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
-                <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-      ))
-    }
-  </div>
-
-  {
-    customNames.length > 0 && (
-      <>
-        <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">
-          Custom
-        </h2>
-        <div class="space-y-3">
-          {families(customNames).map((family) => (
-            <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
-              <div class="flex items-center justify-between gap-4 px-5 pt-4">
-                <h3 class="text-lg font-semibold">{family.name}</h3>
-                <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
-              </div>
-              <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
-                {family.shades.map(({ shade, hex }) => (
-                  <div>
-                    <div class="h-12" style={`background-color: ${hex}`} />
-                    <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
-                    <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+    {families(colorNames).map((family) => (
+      <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
+        <div class="flex items-center justify-between gap-4 px-5 pt-4">
+          <h3 class="text-lg font-semibold">{family.name}</h3>
+          <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
+        </div>
+        <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
+          {family.shades.map(({ shade, hex }) => (
+            <div>
+              <div class="h-12" style={`background-color: ${hex}`} />
+              <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
+              <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
+            </div>
           ))}
         </div>
-      </>
-    )
-  }
+      </section>
+    ))}
+  </div>
 
-  <section
-    class="border-zmoki-stone-200 text-zmoki-stone-900 mt-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-  >
+  {customNames.length > 0 && (
+    <>
+      <h2 class="mt-10 mb-4 px-1 font-mono text-sm tracking-normal uppercase opacity-60">Custom</h2>
+      <div class="space-y-3">
+        {families(customNames).map((family) => (
+          <section class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm">
+            <div class="flex items-center justify-between gap-4 px-5 pt-4">
+              <h3 class="text-lg font-semibold">{family.name}</h3>
+              <p class="font-mono text-xs tracking-normal uppercase opacity-60">{family.key}</p>
+            </div>
+            <div class="grid grid-cols-6 gap-px p-4 sm:grid-cols-11">
+              {family.shades.map(({ shade, hex }) => (
+                <div>
+                  <div class="h-12" style={`background-color: ${hex}`} />
+                  <p class="mt-1 font-mono text-[10px] leading-tight">{shade}</p>
+                  <p class="font-mono text-[10px] leading-tight uppercase opacity-50">{hex}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </>
+  )}
+
+  <section class="border-zmoki-stone-200 text-zmoki-stone-900 mt-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
     <p class="text-zmoki-stone-500 mb-4">
-      Reference any palette as a Tailwind utility with the <code
-        class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-</code
-      > prefix and a shade. The system's accent is <code
-        class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-indigo</code
-      > on a warm <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base"
-        >zmoki-cream</code
-      > canvas.
+      Reference any palette as a Tailwind utility with the{" "}
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-</code>{" "}
+      prefix and a shade. The system's accent is{" "}
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-indigo</code>{" "}
+      on a warm{" "}
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono text-base">zmoki-cream</code>{" "}
+      canvas.
     </p>
     <ul class="space-y-2 font-mono text-sm">
       <li>
         <span class="text-zmoki-indigo-600">bg-zmoki-indigo-600 / text-white</span>
-        <span class="text-zmoki-stone-500"
-          >— accent: links, buttons, CTAs (hover zmoki-indigo-700, focus ring zmoki-indigo-500)</span
-        >
+        <span class="text-zmoki-stone-500">
+          — accent: links, buttons, CTAs (hover zmoki-indigo-700, focus ring zmoki-indigo-500)
+        </span>
       </li>
       <li>
         <span class="text-zmoki-indigo-600">bg-zmoki-cream-100</span>
@@ -149,41 +137,48 @@ const families = (names: string[]) =>
         <span class="text-zmoki-stone-500">— muted & secondary text</span>
       </li>
       <li>
-        <span class="text-zmoki-indigo-600"
-          >bg-white + border border-zmoki-stone-200 + shadow-sm</span
-        >
-        <span class="text-zmoki-stone-500"
-          >— cards & panels (soft border, subtle shadow, rounded)</span
-        >
+        <span class="text-zmoki-indigo-600">
+          bg-white + border border-zmoki-stone-200 + shadow-sm
+        </span>
+        <span class="text-zmoki-stone-500">
+          — cards & panels (soft border, subtle shadow, rounded)
+        </span>
       </li>
     </ul>
     <p class="border-zmoki-stone-200 text-zmoki-stone-500 mt-5 border-t pt-4 text-sm">
-      <strong class="text-zmoki-stone-900">Re-skinning?</strong> To recolor the whole site, find/replace
-      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">zmoki-indigo</code> with another
-      Tailwind group. For a brand color that isn't in Tailwind, build a 50→950 scale from your base on
+      <strong class="text-zmoki-stone-900">Re-skinning?</strong> To recolor the whole site,
+      find/replace
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">zmoki-indigo</code> with
+      another Tailwind group. For a brand color that isn't in Tailwind, build a 50→950 scale from
+      your base on
       <a
         href="https://www.colorhexa.com/"
         data-external="true"
-        class="text-zmoki-indigo-600 font-medium underline">colorhexa.com</a
-      > ("Shades and Tints"), add it to <code
-        class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">customPalettes</code
-      > in <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono"
-        >src/design-tokens.mjs</code
-      > (the <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">zmoki-cream</code> scale
+        class="text-zmoki-indigo-600 font-medium underline"
+      >
+        colorhexa.com
+      </a>{" "}
+      ("Shades and Tints"), add it to{" "}
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">customPalettes</code> in{" "}
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">src/design-tokens.mjs</code>{" "}
+      (the <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">zmoki-cream</code> scale
       is the worked example), and it appears here automatically.
     </p>
     <p class="text-zmoki-stone-500 mt-4 text-sm">
-      <strong class="text-zmoki-stone-900">Combinations must pass WCAG AA</strong> — every text/background
-      pair needs ≥ 4.5:1 (≥ 3:1 for large text, borders, and focus rings). Fills carrying white text (CTA,
-      buttons, hero) usually need a <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono"
-        >-600</code
-      >/<code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">-700</code> shade to qualify.
+      <strong class="text-zmoki-stone-900">Combinations must pass WCAG AA</strong> — every
+      text/background pair needs ≥ 4.5:1 (≥ 3:1 for large text, borders, and focus rings). Fills
+      carrying white text (CTA, buttons, hero) usually need a{" "}
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">-600</code>/
+      <code class="bg-zmoki-stone-100 rounded px-1.5 py-0.5 font-mono">-700</code> shade to qualify.
       Check pairs with the
       <a
         href="https://www.figma.com/color-contrast-checker/"
         data-external="true"
-        class="text-zmoki-indigo-600 font-medium underline">Figma contrast checker</a
-      >.
+        class="text-zmoki-indigo-600 font-medium underline"
+      >
+        Figma contrast checker
+      </a>
+      .
     </p>
   </section>
 </BrandLayout>

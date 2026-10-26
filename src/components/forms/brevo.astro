@@ -29,7 +29,9 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
   </section>
 
   <section class="flex min-w-[300px] flex-1 flex-col gap-4 md:pt-2">
-    <label for="EMAIL" class="text-xl font-medium">Email</label>
+    <label for="EMAIL" class="text-xl font-medium">
+      Email
+    </label>
     <input
       type="email"
       id="EMAIL"
@@ -50,19 +52,29 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
         class="border-zmoki-stone-400 text-zmoki-indigo-600 focus:ring-zmoki-indigo-500 mt-1 h-4 w-4 rounded"
       />
       <label for="consent" class="text-zmoki-stone-500 text-xs">
-        By checking this box, I acknowledge that I have read, understood, and agree to the <a
+        By checking this box, I acknowledge that I have read, understood, and agree to the{" "}
+        <a
           href="/legal/terms/"
           class="text-zmoki-indigo-600 underline underline-offset-2"
-          target="_blank">Terms of Service</a
-        > and <a
+          target="_blank"
+        >
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a
           href="/legal/privacy/"
           class="text-zmoki-indigo-600 underline underline-offset-2"
-          target="_blank">Privacy Policy</a
-        >.
+          target="_blank"
+        >
+          Privacy Policy
+        </a>
+        .
       </label>
     </div>
 
-    <Button type="submit"><Fragment set:html={buttonText} /></Button>
+    <Button type="submit">
+      <Fragment set:html={buttonText} />
+    </Button>
 
     <!-- Brevo's honeypot and locale fields -->
     <input type="text" name="email_address_check" value="" style="display: none;" />

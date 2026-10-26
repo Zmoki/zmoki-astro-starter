@@ -12,12 +12,10 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
   title="Brand — Components"
   description={`${site.name} reusable components: cards, links, buttons, panels, and meta labels`}
 >
-  <header
-    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
-  >
-    <a href="/-/astro/brand/" class="text-xs font-medium tracking-normal text-white/70"
-      >← {site.name} brand</a
-    >
+  <header class="border-zmoki-indigo-100 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10">
+    <a href="/-/astro/brand/" class="text-xs font-medium tracking-normal text-white/70">
+      ← {site.name} brand
+    </a>
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Components</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
       The reusable building blocks and their conventions — nav, footer, hero, cards, links, buttons,
@@ -30,18 +28,23 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       The base surface for everything:
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >border border-zmoki-stone-200</code
-      > +
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >bg-white shadow-sm</code
-      >. A card is defined by a soft stone border plus a subtle shadow, with rounded corners.
-      Compose them into a
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >grid</code
-      > + <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >gap-4</code
-      >.
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        border border-zmoki-stone-200
+      </code>{" "}
+      +
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        bg-white shadow-sm
+      </code>
+      . A card is defined by a soft stone border plus a subtle shadow, with rounded corners. Compose
+      them into a
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        grid
+      </code>{" "}
+      +{" "}
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        gap-4
+      </code>
+      .
     </p>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <div class="border-zmoki-stone-200 rounded-xl border bg-white p-6 shadow-sm">
@@ -54,46 +57,55 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
         <h3 class="text-xl font-semibold">Wide card</h3>
         <p class="text-zmoki-stone-500 mt-2 text-base">
           Spans two columns — just cards of different
-          <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono"
-            >col-span</code
-          > widths in one grid.
+          <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono">
+            col-span
+          </code>{" "}
+          widths in one grid.
         </p>
       </div>
     </div>
-    <pre
-      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;div class="rounded-xl border border-zmoki-stone-200 bg-white p-6 shadow-sm"&gt;…&lt;/div&gt;</code></pre>
+    <pre class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;div class="rounded-xl border border-zmoki-stone-200 bg-white p-6 shadow-sm"&gt;…&lt;/div&gt;</code></pre>
   </section>
 
   <h2 class={sectionLabel}>Links</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       Links carry the indigo accent, with a clean underline. In prose, the
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >data-*</code
-      > attributes are added automatically by the rehype pipeline.
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        data-*
+      </code>{" "}
+      attributes are added automatically by the rehype pipeline.
     </p>
     <ul class="space-y-4 text-xl">
       <li>
-        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">Internal link</a>
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">
+          Internal link
+        </a>
         <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal">default</span>
       </li>
       <li>
-        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">External link</a>
-        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal"
-          >[data-external]</span
-        >
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">
+          External link
+        </a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal">
+          [data-external]
+        </span>
       </li>
       <li>
-        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">Resource link</a>
-        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal"
-          >[data-resource]</span
-        >
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">
+          Resource link
+        </a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal">
+          [data-resource]
+        </span>
       </li>
       <li>
-        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">Anchor link</a>
-        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal"
-          >[data-anchor]</span
-        >
+        <a href="#" class="text-zmoki-indigo-600 underline underline-offset-2">
+          Anchor link
+        </a>
+        <span class="text-zmoki-stone-500 ml-3 text-sm font-medium tracking-normal">
+          [data-anchor]
+        </span>
       </li>
     </ul>
   </section>
@@ -102,58 +114,73 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       One reusable
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >Button.astro</code
-      >, built from pure Tailwind utilities. It renders a
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >&lt;button&gt;</code
-      >, or an
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >&lt;a&gt;</code
-      > when given an <code
-        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">href</code
-      > (a button-like link). Three <code
-        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >variant</code
-      >s — <strong>primary</strong> (indigo fill), <strong>secondary</strong> (white + soft stone border),
-      and <strong>inverse</strong> (white, for use on an indigo band) — in two <code
-        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">size</code
-      >s (<code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >md</code
-      > / <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >lg</code
-      >).
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        Button.astro
+      </code>
+      , built from pure Tailwind utilities. It renders a
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        &lt;button&gt;
+      </code>
+      , or an
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        &lt;a&gt;
+      </code>{" "}
+      when given an{" "}
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        href
+      </code>{" "}
+      (a button-like link). Three{" "}
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        variant
+      </code>
+      s — <strong>primary</strong> (indigo fill), <strong>secondary</strong> (white + soft stone
+      border), and <strong>inverse</strong> (white, for use on an indigo band) — in two{" "}
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        size
+      </code>
+      s (
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        md
+      </code>{" "}
+      /{" "}
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        lg
+      </code>
+      ).
     </p>
     <div class="flex flex-wrap items-center gap-4">
       <Button>Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button size="lg">Primary · lg</Button>
-      <Button href="#" variant="secondary" size="lg">Link · lg</Button>
+      <Button href="#" variant="secondary" size="lg">
+        Link · lg
+      </Button>
     </div>
     <div class="bg-zmoki-indigo-600 mt-4 flex flex-wrap items-center gap-4 rounded-xl p-4">
       <Button variant="inverse">Inverse</Button>
-      <Button href="#" variant="inverse" size="lg">Inverse link · lg</Button>
+      <Button href="#" variant="inverse" size="lg">
+        Inverse link · lg
+      </Button>
     </div>
-    <pre
-      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;Button href="/signup" variant="primary" size="lg"&gt;Get started&lt;/Button&gt;</code></pre>
+    <pre class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;Button href="/signup" variant="primary" size="lg"&gt;Get started&lt;/Button&gt;</code></pre>
   </section>
 
   <h2 class={sectionLabel}>Navigation &amp; footer</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       The top nav and footer wrap every page (BaseLayout). A soft bottom border under the nav and a
-      soft top border above the footer (<code
-        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >border-b / border-t border-zmoki-stone-200</code
-      >), the brand mark (<code
-        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >public/brand-mark.svg</code
-      >) linking home, medium-weight links, and a rounded indigo CTA pill.
+      soft top border above the footer (
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        border-b / border-t border-zmoki-stone-200
+      </code>
+      ), the brand mark (
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        public/brand-mark.svg
+      </code>
+      ) linking home, medium-weight links, and a rounded indigo CTA pill.
     </p>
     <div class="border-zmoki-stone-200 overflow-hidden rounded-xl border shadow-sm">
-      <div
-        class="border-zmoki-stone-200 flex items-center justify-between gap-4 border-b bg-white px-4 py-3"
-      >
+      <div class="border-zmoki-stone-200 flex items-center justify-between gap-4 border-b bg-white px-4 py-3">
         <img
           src="/brand-mark.svg"
           alt={site.name}
@@ -164,20 +191,18 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
         <div class="flex items-center gap-4">
           <span class="text-zmoki-stone-500 hidden text-sm font-medium sm:inline">Features</span>
           <span class="text-zmoki-stone-500 hidden text-sm font-medium sm:inline">Blog</span>
-          <span class="bg-zmoki-indigo-600 rounded-lg px-3 py-1.5 text-sm font-medium text-white"
-            >Get started</span
-          >
+          <span class="bg-zmoki-indigo-600 rounded-lg px-3 py-1.5 text-sm font-medium text-white">
+            Get started
+          </span>
         </div>
       </div>
-      <div
-        class="bg-zmoki-cream-100 text-zmoki-stone-500 px-4 py-10 text-center text-xs font-medium"
-      >
+      <div class="bg-zmoki-cream-100 text-zmoki-stone-500 px-4 py-10 text-center text-xs font-medium">
         page content
       </div>
-      <div
-        class="border-zmoki-stone-200 text-zmoki-stone-500 flex items-center justify-between gap-4 border-t bg-white px-4 py-3 text-xs"
-      >
-        <span>© {site.name} {site.copyright.year}</span>
+      <div class="border-zmoki-stone-200 text-zmoki-stone-500 flex items-center justify-between gap-4 border-t bg-white px-4 py-3 text-xs">
+        <span>
+          © {site.name} {site.copyright.year}
+        </span>
         <span>Privacy · Terms · Source</span>
       </div>
     </div>
@@ -187,23 +212,23 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       The home page stacks three blocks: a centered hero with CTAs, a soft feature grid, and an
-      indigo closing CTA band. <code
-        class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >PostCard</code
-      > is the blog-list item.
+      indigo closing CTA band.{" "}
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        PostCard
+      </code>{" "}
+      is the blog-list item.
     </p>
     <div class="space-y-4">
       <div class="border-zmoki-stone-200 rounded-xl border bg-white p-6 text-center shadow-sm">
         <p class="text-2xl font-bold">Build something people want</p>
         <p class="text-zmoki-stone-500 mt-2 text-sm">A one-line pitch.</p>
         <div class="mt-4 flex flex-wrap justify-center gap-3">
-          <span class="bg-zmoki-indigo-600 rounded-lg px-4 py-2 text-xs font-medium text-white"
-            >Get started</span
-          >
-          <span
-            class="border-zmoki-stone-300 text-zmoki-stone-900 rounded-lg border bg-white px-4 py-2 text-xs font-medium"
-            >Read the blog</span
-          >
+          <span class="bg-zmoki-indigo-600 rounded-lg px-4 py-2 text-xs font-medium text-white">
+            Get started
+          </span>
+          <span class="border-zmoki-stone-300 text-zmoki-stone-900 rounded-lg border bg-white px-4 py-2 text-xs font-medium">
+            Read the blog
+          </span>
         </div>
       </div>
       <div class="grid gap-4 sm:grid-cols-2">
@@ -213,14 +238,11 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
             Title plus one line, in a soft-bordered card.
           </p>
         </div>
-        <div
-          class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-xl border p-6 text-center text-white shadow-sm"
-        >
+        <div class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-xl border p-6 text-center text-white shadow-sm">
           <p class="font-bold">Ready to get started?</p>
-          <span
-            class="text-zmoki-indigo-700 hover:bg-zmoki-indigo-50 mt-3 inline-block rounded-lg bg-white px-4 py-2 text-xs font-medium transition-colors"
-            >Get in touch</span
-          >
+          <span class="text-zmoki-indigo-700 hover:bg-zmoki-indigo-50 mt-3 inline-block rounded-lg bg-white px-4 py-2 text-xs font-medium transition-colors">
+            Get in touch
+          </span>
         </div>
       </div>
     </div>
@@ -231,9 +253,10 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
       Clean sans, normal case, muted stone — used for dates, Previous / Next nav, section eyebrows,
       and the footer. Rendered in
-      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base"
-        >text-zmoki-stone-500</code
-      >.
+      <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base">
+        text-zmoki-stone-500
+      </code>
+      .
     </p>
     <div class="space-y-4">
       <p class="text-zmoki-stone-500 text-xs font-medium tracking-normal">
@@ -245,16 +268,14 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     </div>
   </section>
 
-  <section
-    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8">
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Conventions</h2>
     <ul class="space-y-2 font-mono text-sm">
       <li>
         <span class="text-white">border border-zmoki-stone-200 + bg-white shadow-sm</span>
-        <span class="text-white/70"
-          >— every card and panel (soft border, subtle shadow, rounded)</span
-        >
+        <span class="text-white/70">
+          — every card and panel (soft border, subtle shadow, rounded)
+        </span>
       </li>
       <li>
         <span class="text-white">text-zmoki-indigo-600 underline underline-offset-2</span>

@@ -97,31 +97,21 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={ogImage.alt} />
-    {
-      isPageArticle && (
-        <meta property="article:published_time" content={publishDate.toISOString()} />
-      )
-    }
-    {
-      isPageArticle && (
-        <meta property="article:modified_time" content={contentModifiedDate.toISOString()} />
-      )
-    }
+    {isPageArticle && (
+      <meta property="article:published_time" content={publishDate.toISOString()} />
+    )}
+    {isPageArticle && (
+      <meta property="article:modified_time" content={contentModifiedDate.toISOString()} />
+    )}
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:image" content={pageImageUrl} />
     <meta property="twitter:image:alt" content={ogImage.alt} />
 
     <Analytics />
   </head>
-  <body
-    class="bg-zmoki-cream-100 text-zmoki-stone-900 flex min-h-full flex-col font-sans text-lg leading-normal tracking-tight xl:text-xl"
-  >
-    <header
-      class="border-zmoki-stone-200 bg-zmoki-cream-100/80 sticky top-0 z-40 border-b backdrop-blur-md"
-    >
-      <nav
-        class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 lg:px-8"
-      >
+  <body class="bg-zmoki-cream-100 text-zmoki-stone-900 flex min-h-full flex-col font-sans text-lg leading-normal tracking-tight xl:text-xl">
+    <header class="border-zmoki-stone-200 bg-zmoki-cream-100/80 sticky top-0 z-40 border-b backdrop-blur-md">
+      <nav class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 lg:px-8">
         <a href="/" class="flex items-center" aria-label={`${site.name} — home`}>
           <img
             src="/brand-mark.svg"
@@ -133,18 +123,16 @@ const ownerSiteLabel = new URL(site.organization.url).host;
         </a>
         <div class="flex items-center gap-4 md:gap-6">
           <ul class="hidden items-center gap-6 md:flex">
-            {
-              site.nav.map((item) => (
-                <li>
-                  <a
-                    href={item.href}
-                    class="text-zmoki-stone-600 hover:text-zmoki-stone-900 text-sm font-medium transition-colors"
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))
-            }
+            {site.nav.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-zmoki-stone-600 hover:text-zmoki-stone-900 text-sm font-medium transition-colors"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
           </ul>
           <Button href={site.social.github}>Get started</Button>
         </div>
@@ -169,9 +157,7 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     </script>
 
     <footer class="border-zmoki-stone-200 border-t bg-white">
-      <div
-        class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8"
-      >
+      <div class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8">
         <p>
           &copy; {site.copyright.year} · {site.organization.name} ·{" "}
           <a href={site.organization.url}>{ownerSiteLabel}</a>

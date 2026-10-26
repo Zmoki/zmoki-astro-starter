@@ -16,56 +16,59 @@ const buttonClass =
   title="Brand — Forms"
   description={`${site.name} form components, states, and patterns`}
 >
-  <header
-    class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-900 mb-8 rounded-2xl border px-6 py-10 shadow-sm md:px-10"
-  >
+  <header class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-900 mb-8 rounded-2xl border px-6 py-10 shadow-sm md:px-10">
     <a
       href="/-/astro/brand/"
       class="text-zmoki-indigo-600 hover:text-zmoki-indigo-700 text-xs underline underline-offset-2"
-      >← {site.name} brand</a
     >
+      ← {site.name} brand
+    </a>
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">Forms</h1>
     <p class="text-zmoki-stone-700 mt-4 max-w-2xl text-xl md:text-2xl">
-      Inputs, labels, and the action button. The newsletter signup (<code
-        class="rounded bg-white px-1.5 py-0.5 text-base">Form</code
-      >) is the canonical example — every pattern below comes from it.
+      Inputs, labels, and the action button. The newsletter signup (
+      <code class="rounded bg-white px-1.5 py-0.5 text-base">Form</code>) is the canonical example —
+      every pattern below comes from it.
     </p>
   </header>
 
   <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Inputs & labels</h2>
-  <section
-    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-700">
       Labels are plain sans, sitting above the field. Inputs use a thin warm-stone border, rounded
       corners, and an indigo focus ring. Placeholders are muted, never used in place of a label.
     </p>
     <div class="grid gap-6 sm:grid-cols-2">
       <div class="flex flex-col gap-2">
-        <label for="demo-email" class={labelClass}>Email</label>
+        <label for="demo-email" class={labelClass}>
+          Email
+        </label>
         <input type="email" id="demo-email" placeholder="your@email.com" class={inputClass} />
       </div>
       <div class="flex flex-col gap-2">
-        <label for="demo-name" class={labelClass}>Name</label>
+        <label for="demo-name" class={labelClass}>
+          Name
+        </label>
         <input type="text" id="demo-name" placeholder="Ada Lovelace" class={inputClass} />
       </div>
       <div class="flex flex-col gap-2 sm:col-span-2">
-        <label for="demo-message" class={labelClass}>Message</label>
+        <label for="demo-message" class={labelClass}>
+          Message
+        </label>
         <textarea id="demo-message" rows="3" placeholder="Say hello…" class={inputClass}></textarea>
       </div>
     </div>
   </section>
 
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Focus states</h2>
-  <section
-    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-700">
-      Focus is the <span class="font-mono">zmoki-indigo-500</span> ring — a soft 2px ring plus a matching
-      border. Tab into or click the field below to see it.
+      Focus is the <span class="font-mono">zmoki-indigo-500</span> ring — a soft 2px ring plus a
+      matching border. Tab into or click the field below to see it.
     </p>
     <div class="max-w-sm">
-      <label for="demo-focus" class={`${labelClass} mb-2 block`}>Try focusing</label>
+      <label for="demo-focus" class={`${labelClass} mb-2 block`}>
+        Try focusing
+      </label>
       <input type="text" id="demo-focus" placeholder="Click or tab here" class={inputClass} />
     </div>
     <ul class="text-zmoki-stone-500 space-y-1 font-mono text-sm">
@@ -76,17 +79,19 @@ const buttonClass =
   </section>
 
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Submit button</h2>
-  <section
-    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-700">
       The action button is rounded and filled with
-      <span class="font-mono">zmoki-indigo-600</span> (the indigo accent), sans and semibold, with a subtle
-      hover shift. It is the same button used for resource downloads and copy actions.
+      <span class="font-mono">zmoki-indigo-600</span> (the indigo accent), sans and semibold, with a
+      subtle hover shift. It is the same button used for resource downloads and copy actions.
     </p>
     <div class="flex flex-wrap items-center gap-4">
-      <button type="button" class={buttonClass}>Subscribe</button>
-      <button type="button" class={buttonClass}>Download</button>
+      <button type="button" class={buttonClass}>
+        Subscribe
+      </button>
+      <button type="button" class={buttonClass}>
+        Download
+      </button>
       <button type="button" disabled class={`${buttonClass} cursor-not-allowed opacity-40`}>
         Disabled
       </button>
@@ -94,18 +99,14 @@ const buttonClass =
   </section>
 
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Consent & captcha</h2>
-  <section
-    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-700">
-      A required consent checkbox (<span class="font-mono">zmoki-indigo-500</span> focus ring) and the
-      captcha block (provider-agnostic; Cloudflare Turnstile by default). The captcha renders at full
-      width; here it is a placeholder.
+      A required consent checkbox (<span class="font-mono">zmoki-indigo-500</span> focus ring) and
+      the captcha block (provider-agnostic; Cloudflare Turnstile by default). The captcha renders at
+      full width; here it is a placeholder.
     </p>
 
-    <div
-      class="border-zmoki-stone-300 text-zmoki-stone-500 flex h-16 w-full max-w-sm items-center justify-center rounded-lg border border-dashed bg-white text-xs"
-    >
+    <div class="border-zmoki-stone-300 text-zmoki-stone-500 flex h-16 w-full max-w-sm items-center justify-center rounded-lg border border-dashed bg-white text-xs">
       Captcha widget (Turnstile by default)
     </div>
 
@@ -116,12 +117,15 @@ const buttonClass =
         class="border-zmoki-stone-400 text-zmoki-indigo-600 focus:ring-zmoki-indigo-500 mt-1 h-4 w-4 rounded"
       />
       <label for="demo-consent" class="text-zmoki-stone-700 text-xs">
-        By checking this box, I acknowledge that I have read, understood, and agree to the <a
-          href="/legal/terms/"
-          class="text-zmoki-indigo-600 underline underline-offset-2">Terms of Service</a
-        > and <a href="/legal/privacy/" class="text-zmoki-indigo-600 underline underline-offset-2"
-          >Privacy Policy</a
-        >.
+        By checking this box, I acknowledge that I have read, understood, and agree to the{" "}
+        <a href="/legal/terms/" class="text-zmoki-indigo-600 underline underline-offset-2">
+          Terms of Service
+        </a>{" "}
+        and{" "}
+        <a href="/legal/privacy/" class="text-zmoki-indigo-600 underline underline-offset-2">
+          Privacy Policy
+        </a>
+        .
       </label>
     </div>
   </section>
@@ -129,9 +133,7 @@ const buttonClass =
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">
     Validation & error states
   </h2>
-  <section
-    class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-700">
       Errors switch the border and ring to <span class="font-mono">zmoki-red-500</span>, with a
       message below the field. Submit the demo with an empty or invalid email to see it live.
@@ -139,7 +141,9 @@ const buttonClass =
 
     <!-- Static reference: error state -->
     <div class="max-w-sm">
-      <label for="demo-error" class={`${labelClass} mb-2 block`}>Email</label>
+      <label for="demo-error" class={`${labelClass} mb-2 block`}>
+        Email
+      </label>
       <input
         type="email"
         id="demo-error"
@@ -152,7 +156,9 @@ const buttonClass =
 
     <!-- Live mini-form -->
     <form id="demo-validate" novalidate class="border-zmoki-stone-200 max-w-sm border-t pt-6">
-      <label for="demo-validate-email" class={`${labelClass} mb-2 block`}>Live validation</label>
+      <label for="demo-validate-email" class={`${labelClass} mb-2 block`}>
+        Live validation
+      </label>
       <input
         type="email"
         id="demo-validate-email"
@@ -163,21 +169,21 @@ const buttonClass =
         class={inputClass}
       />
       <p id="demo-validate-msg" class="mt-2 hidden text-xs"></p>
-      <button type="submit" class={`${buttonClass} mt-4`}>Subscribe</button>
+      <button type="submit" class={`${buttonClass} mt-4`}>
+        Subscribe
+      </button>
     </form>
   </section>
 
-  <section
-    class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-10 rounded-2xl border p-6 shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-10 rounded-2xl border p-6 shadow-sm md:p-8">
     <h2 class="text-zmoki-stone-900 mb-4 text-2xl font-semibold md:text-3xl">Usage</h2>
     <p class="mb-4">
       Copy these utility strings straight onto inputs and buttons. The focus ring is the indigo
-      accent (<code class="rounded bg-white px-1.5 py-0.5 font-mono text-base"
-        >zmoki-indigo-500</code
-      >); the error state switches border and ring to <code
-        class="rounded bg-white px-1.5 py-0.5 font-mono text-base">zmoki-red-500</code
-      > with an inline message below the field.
+      accent (
+      <code class="rounded bg-white px-1.5 py-0.5 font-mono text-base">zmoki-indigo-500</code>); the
+      error state switches border and ring to{" "}
+      <code class="rounded bg-white px-1.5 py-0.5 font-mono text-base">zmoki-red-500</code> with an
+      inline message below the field.
     </p>
     <ul class="space-y-3 font-mono text-sm">
       <li>
@@ -186,10 +192,10 @@ const buttonClass =
       </li>
       <li>
         <span class="text-zmoki-stone-900 font-semibold">input</span>
-        <span class="text-zmoki-stone-500"
-          >— rounded-lg border border-zmoki-stone-300 p-2 focus:border-zmoki-indigo-500 focus:ring-2
-          focus:ring-zmoki-indigo-500/30</span
-        >
+        <span class="text-zmoki-stone-500">
+          — rounded-lg border border-zmoki-stone-300 p-2 focus:border-zmoki-indigo-500 focus:ring-2
+          focus:ring-zmoki-indigo-500/30
+        </span>
       </li>
       <li>
         <span class="text-zmoki-stone-900 font-semibold">input (error)</span>
@@ -197,17 +203,16 @@ const buttonClass =
       </li>
       <li>
         <span class="text-zmoki-stone-900 font-semibold">button</span>
-        <span class="text-zmoki-stone-500"
-          >— rounded-lg bg-zmoki-indigo-600 px-4 py-2 font-semibold text-white transition-colors
-          hover:bg-zmoki-indigo-700</span
-        >
+        <span class="text-zmoki-stone-500">
+          — rounded-lg bg-zmoki-indigo-600 px-4 py-2 font-semibold text-white transition-colors
+          hover:bg-zmoki-indigo-700
+        </span>
       </li>
       <li>
         <span class="text-zmoki-stone-900 font-semibold">checkbox</span>
-        <span class="text-zmoki-stone-500"
-          >— h-4 w-4 rounded border-zmoki-stone-400 text-zmoki-indigo-600
-          focus:ring-zmoki-indigo-500</span
-        >
+        <span class="text-zmoki-stone-500">
+          — h-4 w-4 rounded border-zmoki-stone-400 text-zmoki-indigo-600 focus:ring-zmoki-indigo-500
+        </span>
       </li>
     </ul>
   </section>

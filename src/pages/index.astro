@@ -248,10 +248,12 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
         </p>
         <p class="text-zmoki-stone-600 mt-4 text-lg">
           An Astro starter for personal and project sites. The technical SEO is done and guarded by
-          CI, every vendor is swappable, and the brand guideline lives inside the site. <code
-            class="bg-zmoki-stone-200/70 rounded px-1.5 py-0.5 font-mono text-base">AGENTS.md</code
-          > explains the codebase to Claude Code, Codex, Cursor, or any AI coding agent, so you can ask
-          for changes in plain words.
+          CI, every vendor is swappable, and the brand guideline lives inside the site.{" "}
+          <code class="bg-zmoki-stone-200/70 rounded px-1.5 py-0.5 font-mono text-base">
+            AGENTS.md
+          </code>{" "}
+          explains the codebase to Claude Code, Codex, Cursor, or any AI coding agent, so you can
+          ask for changes in plain words.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-4">
           <Button href={site.social.github} size="lg" class="pl-5">
@@ -262,19 +264,19 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
             />
             Get started
           </Button>
-          <Button href="/blog/" variant="secondary" size="lg">Read the blog →</Button>
+          <Button href="/blog/" variant="secondary" size="lg">
+            Read the blog →
+          </Button>
         </div>
         <p class="text-zmoki-stone-500 mt-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
-          {
-            trustChips.map((chip, i) => (
-              <>
-                {i > 0 && <span aria-hidden="true">·</span>}
-                <span>
-                  {chip.label} <span class="text-zmoki-green-700 font-semibold">{chip.value}</span>
-                </span>
-              </>
-            ))
-          }
+          {trustChips.map((chip, i) => (
+            <>
+              {i > 0 && <span aria-hidden="true">·</span>}
+              <span>
+                {chip.label} <span class="text-zmoki-green-700 font-semibold">{chip.value}</span>
+              </span>
+            </>
+          ))}
         </p>
       </div>
       <div class="border-zmoki-stone-200 overflow-hidden rounded-2xl border shadow-lg">
@@ -285,8 +287,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
           <span class="h-3 w-3 rounded-full bg-[#28c840]" aria-hidden="true"></span>
           <span class="text-zmoki-stone-400 ml-3 font-mono text-xs">Terminal</span>
         </div>
-        <pre
-          class="bg-zmoki-stone-900 text-zmoki-cream-100 overflow-x-auto p-6 font-mono text-sm leading-7"><code><span class="text-zmoki-stone-500">$</span> npm create astro@latest my-site <span class="text-zmoki-stone-500">\</span>
+        <pre class="bg-zmoki-stone-900 text-zmoki-cream-100 overflow-x-auto p-6 font-mono text-sm leading-7"><code><span class="text-zmoki-stone-500">$</span> npm create astro@latest my-site <span class="text-zmoki-stone-500">\</span>
     -- --template Zmoki/zmoki-astro-starter
 <span class="text-zmoki-stone-500">$</span> cd my-site
 <span class="text-zmoki-stone-500">$</span> claude
@@ -312,48 +313,42 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
           posts. The crawlers get everything they ask for.
         </p>
       </div>
-      <div
-        class="divide-zmoki-indigo-800/60 border-zmoki-indigo-800/60 mt-12 grid grid-cols-1 divide-y rounded-2xl border sm:grid-cols-3 sm:divide-x sm:divide-y-0"
-      >
-        {
-          seoScores.map((score) => {
-            const Tag = score.href ? "a" : "div";
-            return (
-              <Tag href={score.href} class="flex flex-col items-center px-6 py-8 text-center">
-                <span class="text-zmoki-green-400 text-5xl font-bold">{score.value}</span>
-                <span class="mt-3 text-base font-semibold text-white">{score.label}</span>
-                <span class="text-zmoki-indigo-200 mt-1 text-base">{score.note}</span>
-              </Tag>
-            );
-          })
-        }
+      <div class="divide-zmoki-indigo-800/60 border-zmoki-indigo-800/60 mt-12 grid grid-cols-1 divide-y rounded-2xl border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+        {seoScores.map((score) => {
+          const Tag = score.href ? "a" : "div";
+          return (
+            <Tag href={score.href} class="flex flex-col items-center px-6 py-8 text-center">
+              <span class="text-zmoki-green-400 text-5xl font-bold">{score.value}</span>
+              <span class="mt-3 text-base font-semibold text-white">{score.label}</span>
+              <span class="text-zmoki-indigo-200 mt-1 text-base">{score.note}</span>
+            </Tag>
+          );
+        })}
       </div>
       <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {
-          seoGroups.map((group) => (
-            <div class="bg-zmoki-cream-100 rounded-2xl shadow-sm">
-              <h3 class="text-zmoki-indigo-700 border-zmoki-stone-200 border-b px-6 py-5 text-sm font-semibold tracking-wide uppercase">
-                {group.title}
-              </h3>
-              <ul class="divide-zmoki-stone-200 divide-y">
-                {group.items.map((item) => (
-                  <li class="px-6 py-7">
-                    <h4 class="text-zmoki-stone-900 text-2xl font-semibold">{item.title}</h4>
-                    <p
-                      class="text-zmoki-stone-600 [&_code]:bg-zmoki-stone-200 [&_code]:text-zmoki-stone-900 mt-2 text-base [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm"
-                      set:html={item.text}
-                    />
-                    <p class="mt-4">
-                      <code class="text-zmoki-green-300 bg-zmoki-indigo-950 block rounded-lg px-3 py-2 font-mono text-xs [overflow-wrap:anywhere]">
-                        {item.chip}
-                      </code>
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
+        {seoGroups.map((group) => (
+          <div class="bg-zmoki-cream-100 rounded-2xl shadow-sm">
+            <h3 class="text-zmoki-indigo-700 border-zmoki-stone-200 border-b px-6 py-5 text-sm font-semibold tracking-wide uppercase">
+              {group.title}
+            </h3>
+            <ul class="divide-zmoki-stone-200 divide-y">
+              {group.items.map((item) => (
+                <li class="px-6 py-7">
+                  <h4 class="text-zmoki-stone-900 text-2xl font-semibold">{item.title}</h4>
+                  <p
+                    class="text-zmoki-stone-600 [&_code]:bg-zmoki-stone-200 [&_code]:text-zmoki-stone-900 mt-2 text-base [&_code]:rounded [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm"
+                    set:html={item.text}
+                  />
+                  <p class="mt-4">
+                    <code class="text-zmoki-green-300 bg-zmoki-indigo-950 block rounded-lg px-3 py-2 font-mono text-xs [overflow-wrap:anywhere]">
+                      {item.chip}
+                    </code>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -369,62 +364,59 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
           <span class="text-zmoki-indigo-600">No vendor lock-in</span>, anywhere it matters
         </h2>
         <p class="text-zmoki-stone-600 mx-auto mt-4 max-w-2xl text-lg">
-          Every integration point ships with a <strong class="text-zmoki-stone-900 font-semibold"
-            >working default</strong
-          > and a clean seam to <strong class="text-zmoki-stone-900 font-semibold"
-            >swap it out</strong
-          >. Pick your own host, analytics vendor, form backend, captcha, or image CDN without
-          touching the rest of the codebase.
+          Every integration point ships with a{" "}
+          <strong class="text-zmoki-stone-900 font-semibold">working default</strong> and a clean
+          seam to <strong class="text-zmoki-stone-900 font-semibold">swap it out</strong>. Pick your
+          own host, analytics vendor, form backend, captcha, or image CDN without touching the rest
+          of the codebase.
         </p>
       </div>
       <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {
-          platformAgnostic.map((item) => (
-            <div class="border-zmoki-stone-200 flex h-full flex-col rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
-              <h3 class="text-2xl font-semibold">{item.title}</h3>
-              <p
-                class="text-zmoki-stone-600 [&_code]:bg-zmoki-stone-100 [&_code]:text-zmoki-stone-900 mt-3 text-base [&_code]:rounded [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm"
-                set:html={item.text}
-              />
-              <div class="mt-auto flex flex-wrap items-center gap-3 pt-8">
-                {item.pills.map((pill, i) => {
-                  const Separator = item.mode === "swap" ? ArrowRightLeft : Plus;
-                  return (
-                    <>
-                      {i > 0 && (
-                        <Separator size={16} class="text-zmoki-stone-400" aria-hidden="true" />
-                      )}
-                      <span
-                        class="flex items-center [&>svg]:h-auto [&>svg]:w-8"
-                        role="img"
-                        aria-label={pill.label}
-                        title={pill.label}
-                        set:html={pill.icon}
-                      />
-                    </>
-                  );
-                })}
-                {item.sparkles && (
+        {platformAgnostic.map((item) => (
+          <div class="border-zmoki-stone-200 flex h-full flex-col rounded-2xl border bg-white p-8 shadow-sm transition-shadow hover:shadow-md">
+            <h3 class="text-2xl font-semibold">{item.title}</h3>
+            <p
+              class="text-zmoki-stone-600 [&_code]:bg-zmoki-stone-100 [&_code]:text-zmoki-stone-900 mt-3 text-base [&_code]:rounded [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-sm"
+              set:html={item.text}
+            />
+            <div class="mt-auto flex flex-wrap items-center gap-3 pt-8">
+              {item.pills.map((pill, i) => {
+                const Separator = item.mode === "swap" ? ArrowRightLeft : Plus;
+                return (
                   <>
-                    {item.mode === "swap" ? (
-                      <ArrowRightLeft size={16} class="text-zmoki-stone-400" aria-hidden="true" />
-                    ) : (
-                      <Plus size={16} class="text-zmoki-stone-400" aria-hidden="true" />
+                    {i > 0 && (
+                      <Separator size={16} class="text-zmoki-stone-400" aria-hidden="true" />
                     )}
                     <span
-                      class="text-zmoki-green-600 flex items-center"
+                      class="flex items-center [&>svg]:h-auto [&>svg]:w-8"
                       role="img"
-                      aria-label="Add your own"
-                      title="Add your own"
-                    >
-                      <Sparkles size={32} aria-hidden="true" />
-                    </span>
+                      aria-label={pill.label}
+                      title={pill.label}
+                      set:html={pill.icon}
+                    />
                   </>
-                )}
-              </div>
+                );
+              })}
+              {item.sparkles && (
+                <>
+                  {item.mode === "swap" ? (
+                    <ArrowRightLeft size={16} class="text-zmoki-stone-400" aria-hidden="true" />
+                  ) : (
+                    <Plus size={16} class="text-zmoki-stone-400" aria-hidden="true" />
+                  )}
+                  <span
+                    class="text-zmoki-green-600 flex items-center"
+                    role="img"
+                    aria-label="Add your own"
+                    title="Add your own"
+                  >
+                    <Sparkles size={32} aria-hidden="true" />
+                  </span>
+                </>
+              )}
             </div>
-          ))
-        }
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -440,45 +432,44 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
       </h2>
       <p class="text-zmoki-stone-600 mx-auto mt-4 max-w-2xl text-lg">
         Every page scores 100 on all four Lighthouse categories, on both desktop and mobile.
-        Reproduce it yourself with <code
-          class="bg-zmoki-stone-200 text-zmoki-stone-900 rounded px-1.5 py-0.5 font-mono text-base"
-          >npm run lhci:mobile</code
-        >.
+        Reproduce it yourself with{" "}
+        <code class="bg-zmoki-stone-200 text-zmoki-stone-900 rounded px-1.5 py-0.5 font-mono text-base">
+          npm run lhci:mobile
+        </code>
+        .
       </p>
       <div class="mt-12 grid grid-cols-2 gap-6 md:grid-cols-4">
-        {
-          lighthouse.map((label) => (
-            <div class="border-zmoki-stone-200 flex flex-col items-center rounded-2xl border bg-white p-6 shadow-sm">
-              <div class="relative h-24 w-24">
-                <svg class="h-24 w-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle
-                    class="text-zmoki-green-100"
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="8"
-                  />
-                  <circle
-                    class="text-zmoki-green-600"
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="8"
-                    stroke-linecap="round"
-                  />
-                </svg>
-                <span class="text-zmoki-green-700 absolute inset-0 flex items-center justify-center text-2xl font-bold">
-                  100
-                </span>
-              </div>
-              <div class="text-zmoki-stone-900 mt-4 text-2xl font-semibold">{label}</div>
+        {lighthouse.map((label) => (
+          <div class="border-zmoki-stone-200 flex flex-col items-center rounded-2xl border bg-white p-6 shadow-sm">
+            <div class="relative h-24 w-24">
+              <svg class="h-24 w-24 -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
+                <circle
+                  class="text-zmoki-green-100"
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="8"
+                />
+                <circle
+                  class="text-zmoki-green-600"
+                  cx="50"
+                  cy="50"
+                  r="42"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="8"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span class="text-zmoki-green-700 absolute inset-0 flex items-center justify-center text-2xl font-bold">
+                100
+              </span>
             </div>
-          ))
-        }
+            <div class="text-zmoki-stone-900 mt-4 text-2xl font-semibold">{label}</div>
+          </div>
+        ))}
       </div>
     </div>
   </section>
@@ -501,31 +492,29 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
               itself uses. Change a token and the guideline and the site move together.
             </p>
             <p class="text-zmoki-stone-600 mt-4 text-lg">
-              The <code class="rounded bg-white px-1.5 py-0.5 font-mono text-base">/brand</code> skill
-              lets Claude Code or any agent evolve it end to end. Recolor the palette, swap fonts, rewrite
-              the voice, and keep the guideline and the implementation in sync.
+              The <code class="rounded bg-white px-1.5 py-0.5 font-mono text-base">/brand</code>{" "}
+              skill lets Claude Code or any agent evolve it end to end. Recolor the palette, swap
+              fonts, rewrite the voice, and keep the guideline and the implementation in sync.
             </p>
             <div class="mt-8">
-              <Button href="/-/astro/brand/" size="lg" rel="nofollow"
-                >Open the brand system →</Button
-              >
+              <Button href="/-/astro/brand/" size="lg" rel="nofollow">
+                Open the brand system →
+              </Button>
             </div>
           </div>
           <ul class="grid gap-3 sm:grid-cols-2">
-            {
-              brandPages.map((page) => (
-                <li>
-                  <a
-                    href={page.href}
-                    rel="nofollow"
-                    class="border-zmoki-stone-200 flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
-                  >
-                    <span class="font-semibold">{page.title}</span>
-                    <span class="text-zmoki-stone-500 mt-1 text-sm">{page.summary}</span>
-                  </a>
-                </li>
-              ))
-            }
+            {brandPages.map((page) => (
+              <li>
+                <a
+                  href={page.href}
+                  rel="nofollow"
+                  class="border-zmoki-stone-200 flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                >
+                  <span class="font-semibold">{page.title}</span>
+                  <span class="text-zmoki-stone-500 mt-1 text-sm">{page.summary}</span>
+                </a>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -534,9 +523,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
 
   <!-- Final CTA -->
   <section id="cta" class="scroll-mt-20 px-4 pt-4 pb-20">
-    <div
-      class="bg-zmoki-indigo-950 mx-auto max-w-6xl rounded-3xl px-6 py-16 text-center text-white shadow-sm md:py-20"
-    >
+    <div class="bg-zmoki-indigo-950 mx-auto max-w-6xl rounded-3xl px-6 py-16 text-center text-white shadow-sm md:py-20">
       <h2 class="text-3xl font-semibold md:text-4xl">Ready to get started?</h2>
       <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">
         Grab the template, tell your AI agent what you want, and deploy.
@@ -549,19 +536,15 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
         />
         Use this template
       </Button>
-      <p
-        class="text-zmoki-indigo-300 mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm"
-      >
-        {
-          trustChips.map((chip, i) => (
-            <>
-              {i > 0 && <span aria-hidden="true">·</span>}
-              <span>
-                {chip.label} <span class="text-zmoki-green-400 font-semibold">{chip.value}</span>
-              </span>
-            </>
-          ))
-        }
+      <p class="text-zmoki-indigo-300 mt-8 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
+        {trustChips.map((chip, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true">·</span>}
+            <span>
+              {chip.label} <span class="text-zmoki-green-400 font-semibold">{chip.value}</span>
+            </span>
+          </>
+        ))}
       </p>
     </div>
   </section>

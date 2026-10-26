@@ -6,9 +6,7 @@ const { data, id } = Astro.props as CollectionEntry<"blog">;
 const { title, description, contentModifiedDate } = data;
 ---
 
-<article
-  class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md"
->
+<article class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md">
   <a href={`/blog/${id}/`} class="flex h-full w-full flex-col gap-2 p-6 text-xl md:p-8">
     <h2 class="text-zmoki-stone-900 pb-2 text-2xl leading-normal font-semibold xl:text-3xl">
       <span set:html={title} />
