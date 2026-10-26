@@ -5,8 +5,9 @@ import { meta as homeMeta } from "@/pages/index.astro";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 import { isNoindex } from "@/lib/robots";
 import { isNoindexPath } from "@/lib/noindex";
+import { publishedImageUrl } from "@/lib/images";
 
-/** `path` has a trailing slash and no leading slash. `imageLoc` is the cover image. */
+/** `path` has a trailing slash and no leading slash. `imageLoc` is the cover's published URL. */
 type SitemapEntry = { path: string; lastmod: Date; imageLoc?: string };
 
 // Image URLs can carry `&` (query params), which must be `&amp;` in valid XML.
@@ -19,13 +20,15 @@ export const GET: APIRoute = async ({ site }) => {
   const records = await getPageRecords();
 
   // Drops content-level noindex. Path-level noindex is filtered from the whole list below.
-  const collectionEntries: SitemapEntry[] = records
-    .filter((record) => !isNoindex(record.robots))
-    .map((record) => ({
-      path: record.path,
-      lastmod: record.contentModifiedDate,
-      imageLoc: record.imageLoc,
-    }));
+  const collectionEntries: SitemapEntry[] = await Promise.all(
+    records
+      .filter((record) => !isNoindex(record.robots))
+      .map(async (record) => ({
+        path: record.path,
+        lastmod: record.contentModifiedDate,
+        imageLoc: record.imageLoc && (await publishedImageUrl(record.imageLoc)),
+      })),
+  );
 
   // Home and the blog index list recent posts, so their <lastmod> is the newest
   // of their own dates and any post's.
@@ -41,8 +44,8 @@ export const GET: APIRoute = async ({ site }) => {
     ),
   );
 
-  // <image:loc> helps Google tie a CDN-hosted cover to the page. It is the only
-  // image-sitemap tag Google still reads.
+  // <image:loc> ties the cover to the page. It is the only image-sitemap tag
+  // Google still reads.
   const sitemapUrl = ({ path, lastmod, imageLoc }: SitemapEntry) => `
   <url>
     <loc>${site}${path}</loc>

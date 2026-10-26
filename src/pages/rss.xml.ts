@@ -3,6 +3,7 @@ import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
 import { site } from "@/site.config";
 import { getPostsNewestFirst } from "@/lib/page-collections";
+import { isOnImageOrigin, publishedImageUrl } from "@/lib/images";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 
 // HTML must stay enabled for the placeholders convertMdxComponentsToHtml emits.
@@ -28,6 +29,16 @@ function convertRelativeUrlsToAbsolute(html: string, siteUrl: string): string {
     return `src="${siteUrl}${path}"`;
   });
 
+  return html;
+}
+
+/** Points Markdown images on the origin at their published renditions. */
+async function publishOriginImages(html: string): Promise<string> {
+  const srcs = new Set([...html.matchAll(/<img\b[^>]*?\bsrc="([^"]+)"/gi)].map((m) => m[1]));
+  for (const src of srcs) {
+    const url = src.replaceAll("&amp;", "&"); // markdown-it escapes & in attributes
+    if (isOnImageOrigin(url)) html = html.replaceAll(src, await publishedImageUrl(url));
+  }
   return html;
 }
 
@@ -73,6 +84,7 @@ export async function GET(context: { site: URL | undefined }) {
       processedContent = convertMdxComponentsToHtml(processedContent);
       let contentHtml = parser.render(processedContent);
       contentHtml = convertRelativeUrlsToAbsolute(contentHtml, siteUrl);
+      contentHtml = await publishOriginImages(contentHtml);
 
       // The post's OG card is its feed image.
       const ogImageUrl = `${siteUrl}/og/blog/${post.id}.png`;

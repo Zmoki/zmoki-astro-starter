@@ -8,6 +8,7 @@ import JsonLd from "@/components/JsonLd.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
+import { publishedImageUrl } from "@/lib/images";
 
 export interface Props {
   /** The post id, sent with the post_viewed event. */
@@ -44,7 +45,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 // image. og:image stays the OG card. See the /structured-data skill.
 const urls = siteUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
-const schemaImage = cover?.image ?? urls.absoluteUrl(ogImage.path);
+const schemaImage = cover ? await publishedImageUrl(cover.image) : urls.absoluteUrl(ogImage.path);
 const blogPostingLd = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",

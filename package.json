@@ -19,6 +19,7 @@
     "check:sd": "node scripts/check-structured-data.ts",
     "check:links": "node scripts/check-links.ts",
     "check:sitemap": "node scripts/check-sitemap.ts",
+    "check:origin": "node scripts/check-origin.ts",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
