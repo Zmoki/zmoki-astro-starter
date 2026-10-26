@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# A new push to a PR cancels its run in flight. Each main commit is its own group,
+# so main runs every commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -37,13 +43,17 @@ jobs:
       - name: Headers drift check
         run: npm run check:headers
 
-      # `npm ci` wipes node_modules, so restore Astro's cache of optimized images
-      # and fonts. Its entries are keyed by content hash, so a stale cache is safe.
+      # `npm ci` wipes node_modules, so restore Astro's optimized images and fonts,
+      # the only slow parts to regenerate. Entries are keyed by content hash, so a
+      # stale cache is safe; the content store is left out and rebuilt each run.
       # github.sha saves a fresh cache each run; restore-keys pick the latest one.
-      - name: Cache Astro build artifacts
+      # lighthouse.yml restores it with the same paths (they're part of the key).
+      - name: Cache Astro images and fonts
         uses: actions/cache@v6
         with:
-          path: node_modules/.astro
+          path: |
+            node_modules/.astro/assets
+            node_modules/.astro/fonts
           key: astro-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: |
             astro-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-

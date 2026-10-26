@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# A new push to a PR cancels its run in flight. Each main commit is its own group,
+# so main runs every commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 permissions:
   pull-requests: write
 
@@ -24,6 +30,18 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # Restore-only, so this workflow and ci.yml don't race to save the same key.
+      - name: Restore Astro images and fonts
+        uses: actions/cache/restore@v6
+        with:
+          path: |
+            node_modules/.astro/assets
+            node_modules/.astro/fonts
+          key: astro-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            astro-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+            astro-${{ runner.os }}-
 
       - name: Build site
         run: npm run build
