@@ -1,7 +1,5 @@
-// Static OG image endpoint. astro build calls getStaticPaths() to enumerate every
-// card from the manifest and GET() to render each one — Satori (vdom → SVG) then
-// resvg (SVG → PNG). Output lands in dist/og/**/*.png at build time; nothing is
-// committed to git. In `astro dev` the same route renders on request.
+// One PNG per OG manifest entry: Satori renders SVG, resvg turns it into PNG.
+// See the /og-images skill.
 import type { APIRoute, GetStaticPaths } from "astro";
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
@@ -30,9 +28,7 @@ export const GET: APIRoute = async ({ props }) => {
   return new Response(new Uint8Array(png), {
     headers: {
       "Content-Type": "image/png",
-      // Long-lived immutable in prod (cards are build output); no caching under
-      // `astro dev` so edits to the card templates show on reload instead of
-      // serving a stale PNG from the browser cache.
+      // No caching in dev, so card template edits show on reload.
       "Cache-Control": import.meta.env.PROD ? "public, max-age=31536000, immutable" : "no-store",
     },
   });

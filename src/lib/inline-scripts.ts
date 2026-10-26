@@ -1,23 +1,15 @@
-// The only inline scripts the site ships: snippets that must run before first
-// paint or as early as possible, so they can't wait for a bundled (deferred)
-// module script. Everything else is a bundled `<script>` served from /_astro,
-// which the CSP's 'self' already covers.
+// The only inline scripts the site ships: snippets that must run before a
+// bundled (deferred) script could. headers.config.ts hashes these same strings
+// into the CSP `script-src`, so after changing one run `npm run build:headers`.
+// See "Scripts & the CSP" in AGENTS.md.
 //
-// Each snippet is an exported string. The component renders it with
-// `<script is:inline set:html={…} />`, and src/headers/headers.config.ts hashes
-// the same strings into `script-src` ('sha256-…'), so markup and policy can't
-// drift. Change a snippet → `npm run build:headers` → commit the artifact
-// (CI's `check:headers` fails otherwise).
-//
-// This module is imported by plain-node scripts too (via headers.config.ts), so
-// it uses relative `.ts` imports only — no `@/` alias, no `astro:*` modules.
+// Plain-node scripts load this via headers.config.ts: relative `.ts` imports
+// only, no `@/` alias, no `astro:*` modules.
 
 import { GTM_CONTAINER_ID } from "../components/analytics/gtm-config.ts";
 
-// Google Tag Manager loader + the track/identify facade (see gtm.astro). GTM
-// asks for its snippet high in <head> so the container starts loading at once;
-// the facade then maps every track() call to a dataLayer push. Empty when GTM
-// is unconfigured.
+// GTM loader plus the track/identify facade (see gtm.astro). It goes high in
+// <head> so the container starts loading at once. Empty when GTM is unconfigured.
 export const gtmLoader = GTM_CONTAINER_ID
   ? `(function (w, d, s, l, i) {
   w[l] = w[l] || [];

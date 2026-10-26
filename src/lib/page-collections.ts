@@ -3,20 +3,17 @@ import { site } from "@/site.config";
 
 type PageCollectionName = "blog" | "resources" | "legal";
 
-/** A resource is a real page (`type: "page"`), not a bare external link. Shared
- *  by the resources route and the registry so the rule lives once. */
+/** A resource with its own page (`type: "page"`), not a bare external link. */
 export const isResourcePage = (entry: CollectionEntry<"resources">): boolean =>
   entry.data.type === "page";
 
-/** Blog posts newest-first (`order`: higher = newer) — the one ordering rule,
- *  shared by the blog index, prev/next navigation, and the RSS feed. */
+/** Blog posts newest first (`order`: higher = newer). Used by the blog index, prev/next nav and RSS. */
 export async function getPostsNewestFirst(): Promise<CollectionEntry<"blog">[]> {
   const posts = await getCollection("blog");
   return posts.sort((a, b) => b.data.order - a.data.order);
 }
 
-/** The common fields every page collection exposes, projected once so consumers
- *  (sitemap, OG manifest) don't reach into per-collection schemas. */
+/** The fields every page collection exposes, normalized for the sitemap and OG manifest. */
 export interface PageRecord {
   /** URL path, trailing slash, no leading slash: "blog/1-set-up-your-site/". */
   path: string;
@@ -61,11 +58,9 @@ function definePageCollection<K extends PageCollectionName>(config: {
   };
 }
 
-// Single source of truth for the one-page-per-entry collections. The sitemap and
-// OG manifest both iterate this, so a new section is one entry here (CI's
-// check:sitemap fails the build if an indexable page is missing). Adding a
-// section: define it in content.config.ts, create its [...slug].astro route,
-// then register it here.
+// The one-page-per-entry collections, iterated by the sitemap and OG manifest.
+// To add a section: define it in content.config.ts, add its [...slug].astro
+// route, then register it here (CI's check:sitemap fails if you forget).
 const pageCollections = [
   definePageCollection({
     collection: "blog",
@@ -77,7 +72,7 @@ const pageCollections = [
   definePageCollection({ collection: "legal", basePath: "legal/" }),
 ];
 
-/** Every collection-driven page, normalized — consumed by the sitemap + OG manifest. */
+/** Every collection-driven page, for the sitemap and OG manifest. */
 export async function getPageRecords(): Promise<PageRecord[]> {
   const groups = await Promise.all(pageCollections.map((pc) => pc.records()));
   return groups.flat();

@@ -1,14 +1,14 @@
-// Google Tag Manager provider config. A plain TS module (not the .astro
-// component) so the loader snippet (src/lib/inline-scripts.ts) and the CSP
-// (src/headers/headers.config.ts) import the same values.
+// Google Tag Manager config. A plain TS module so the loader snippet
+// (src/lib/inline-scripts.ts) and the CSP (src/headers/headers.config.ts) read
+// the same values.
 
-// Committed, not an env var. Empty by default (GTM is unused on this site).
+// Set to your GTM-XXXXXXX id to turn GTM on.
 export const GTM_CONTAINER_ID = "";
 
 export const gtmConfigured = !!GTM_CONTAINER_ID;
 
-// CSP sources by directive: the container script, plus the GA4 hits a typical
-// container sends. Tags you add in GTM may need more. Empty when unconfigured.
+// The container script plus the GA4 hits a typical container sends. Tags you
+// add in GTM may need more hosts.
 export const GTM_CSP: Record<string, string[]> = gtmConfigured
   ? {
       "script-src": ["https://www.googletagmanager.com"],

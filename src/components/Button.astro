@@ -1,8 +1,6 @@
 ---
-// Reusable button, composed from Tailwind utilities. Renders an <a> when `href`
-// is given (a button-like link) or a <button> otherwise. Extra classes passed
-// via `class` are appended, and any other attributes (e.g. `target`, `data-*`,
-// `aria-*`) pass straight through.
+// Renders an <a> when `href` is set, else a <button>. `class` is appended and
+// other attributes pass through.
 interface Props {
   href?: string;
   variant?: "primary" | "secondary" | "inverse";

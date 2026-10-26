@@ -1,7 +1,4 @@
-// Card colors for the OG image templates, pulled from the same design tokens as
-// the rest of the site (src/design-tokens.mjs). Because these read straight from
-// the tokens, a palette change / re-skin (the `/brand` skill) recolors the
-// generated OG cards too — no separate place to keep in sync.
+// OG card colors, read from src/design-tokens.mjs so a re-skin recolors the cards too.
 import { formatHex } from "culori";
 import { colors } from "@/design-tokens.mjs";
 
@@ -10,10 +7,8 @@ const cream = colors["zmoki-cream"] as Scale;
 const stone = colors["zmoki-stone"] as Scale;
 const indigo = colors["zmoki-indigo"] as Scale;
 
-// Tailwind v4's default palettes are oklch() strings, which the SVG rasterizer
-// (resvg) does not render reliably. Convert every token to hex up front so the
-// cards are format-agnostic — works whether a re-skin lands on an oklch built-in
-// palette or a hex custom one. formatHex passes existing hex through unchanged.
+// resvg doesn't render oklch() (Tailwind v4's default palettes) reliably, so
+// convert every token to hex. Hex values pass through unchanged.
 const hex = (c: string): string => formatHex(c) ?? c;
 
 export const theme = {

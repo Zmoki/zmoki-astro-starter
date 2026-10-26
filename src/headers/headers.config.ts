@@ -1,16 +1,12 @@
 /**
- * Platform-neutral HTTP response headers — the single source of truth.
- *
- * Compiled by `scripts/generate-headers.ts` (`npm run build:headers`, also run
- * automatically before `npm run build`) into the artifact for the host set by
- * `site.platform.deploy` in `src/site.config.ts`:
+ * HTTP response headers for every host. `npm run build:headers` (also run before
+ * `npm run build`) compiles them for `site.platform.deploy`:
  *   "cloudflare" | "netlify" → public/_headers
  *   "vercel"                 → vercel.json (headers[] merged in)
- *   "amplify"                → customHeaders.json (paste into the Amplify console / IaC)
+ *   "amplify"                → customHeaders.json (paste into the Amplify console)
  *
- * The generated artifact is committed; CI's `npm run check:headers` fails on drift.
- * Edit rules here, then run `npm run build:headers` and commit the result.
- * See `.claude/skills/redirects/SKILL.md` (headers section) and `src/headers/README.md`.
+ * Commit the generated file: CI's `check:headers` fails if it drifts from this one.
+ * See src/headers/README.md.
  */
 
 import { createHash } from "node:crypto";
@@ -21,25 +17,19 @@ import { GTM_CSP } from "../components/analytics/gtm-config.ts";
 import { TURNSTILE_CSP } from "../components/captcha/turnstile-config.ts";
 
 // ── Content-Security-Policy ───────────────────────────────────────────────────
-// Directives → arrays of sources, joined into the header string below.
+// script-src has no 'unsafe-inline': bundled scripts are 'self', and the inline
+// snippets in src/lib/inline-scripts.ts are allowed by hash.
 //
-// script-src has no 'unsafe-inline': bundled scripts are same-origin files
-// ('self'), and the few inline snippets in src/lib/inline-scripts.ts are
-// allowed by hash. JSON-LD blocks are data, not scripts, so CSP ignores them.
-//
-// Provider hosts are imported from each provider's config module, never copied
-// here: a provider contributes its hosts only while it's configured, so
-// dropping a vendor drops its hosts. To add one, export a `<NAME>_CSP` record
-// from its config module and add it to `providerSources` below.
+// Provider hosts are imported, never copied here, so an unconfigured provider
+// adds none. To add a provider, export a `<NAME>_CSP` record from its config
+// module and add it to `providerSources`.
 
 // Hash of each inline snippet, exactly as rendered (set:html emits it verbatim).
 const inlineScriptHashes = inlineScripts.map(
   (snippet) => `'sha256-${createHash("sha256").update(snippet, "utf8").digest("base64")}'`,
 );
 
-// Remote image origin (fallback for images that render unoptimized — optimized
-// ones are served same-origin from /_astro). Sourced from `site.platform.imagesCDNHost`,
-// the same value the build uses, so the CSP can't drift. Empty ⇒ not added.
+// For images that render unoptimized; optimized ones are same-origin under /_astro.
 const IMAGE_CDN_HOST = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
 
 const baseDirectives: Record<string, string[]> = {
@@ -54,7 +44,7 @@ const baseDirectives: Record<string, string[]> = {
   "img-src": [
     "'self'",
     "data:",
-    // remote image origin (fallback for images that render unoptimized); omitted when unset
+    // the image origin, if set
     ...(IMAGE_CDN_HOST ? [IMAGE_CDN_HOST] : []),
   ],
   "media-src": ["'self'"],
@@ -115,7 +105,6 @@ const permissionsPolicy = [
 export interface HeaderRule {
   /** Path pattern the headers apply to (host glob syntax, e.g. `/*`, `/-/astro/*`). */
   source: string;
-  /** Header name → value. */
   headers: Record<string, string>;
 }
 
@@ -133,11 +122,8 @@ export const headerRules: HeaderRule[] = [
   {
     source: "/*",
     headers: {
-      // Standard security headers — kept here (not only at the CDN/zone level) so
-      // the template is A-grade on every host. NOTE: if your CDN or DNS layer
-      // (e.g. a Cloudflare zone managed in Terraform) also sets HSTS /
-      // X-Content-Type-Options / Referrer-Policy, drop them there so responses
-      // don't carry duplicates.
+      // Set here so every host gets them. If your CDN also sets HSTS,
+      // X-Content-Type-Options or Referrer-Policy, drop them there to avoid duplicates.
       "X-Content-Type-Options": "nosniff",
       "X-Frame-Options": "DENY", // legacy; CSP frame-ancestors 'none' is the modern equivalent
       "Referrer-Policy": "strict-origin-when-cross-origin",

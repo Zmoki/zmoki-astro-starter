@@ -1,20 +1,11 @@
-// Font data for Satori. Satori rasterizes text to SVG paths itself, so it needs
-// the actual font files (not the Google Fonts CSS the site loads at runtime).
-//
-// We bundle the Noto Sans Latin subset (Regular + Bold) as .woff under ./fonts —
-// ~17KB each, committed so generation works offline and in CI with no network or
-// node_modules path resolution. They came from `@fontsource/noto-sans` (kept as a
-// devDependency); to refresh them, re-copy files/noto-sans-latin-{400,700}-normal.woff.
-//
-// NOTE: this is the OG card font, separate from the site's Google Fonts. If you
-// swap the brand font (the `/brand` skill), update these too so the
-// social cards match.
+// Satori draws text itself, so it needs the font files. These are committed
+// copies of `@fontsource/noto-sans` files/noto-sans-latin-{400,700}-normal.woff,
+// separate from the site's web fonts: if you swap the brand font, update them too.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Font } from "satori";
 
-// Resolve from the project root (cwd is the project root in both `astro dev` and
-// `astro build`) rather than import.meta.url, which Vite rewrites when bundling.
+// Resolve from cwd (the project root), not import.meta.url, which Vite rewrites.
 const load = (file: string): Buffer => readFileSync(join(process.cwd(), "src/og/fonts", file));
 
 export const fonts: Font[] = [

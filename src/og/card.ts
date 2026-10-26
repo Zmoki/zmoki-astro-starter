@@ -1,8 +1,5 @@
-// Satori card templates. Satori takes a small React-like vdom of
-// { type, props: { style, children } } nodes — we build that directly with `el`
-// (no JSX config needed). Every container with multiple children sets an explicit
-// `display: flex`, as Satori requires. Colors come from ./theme (the design tokens),
-// so cards re-skin with the site.
+// Satori card templates, built as vdom nodes with `el` (no JSX).
+// Satori requires `display: flex` on every container with more than one child.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
@@ -19,10 +16,8 @@ const el = (type: string, style: Record<string, unknown>, children?: unknown): N
 
 const domain = site.domain.replace(/^https?:\/\//, "").replace(/\/$/, "");
 
-// The brand mark is the site's own public/brand-mark.svg (the same source the
-// favicons render from), so the social cards always match the icon. Rasterize it
-// once to a PNG data URI here — Satori embeds it as an <img>. (cwd is the project
-// root in both `astro dev` and `astro build`, matching src/og/fonts.ts.)
+// Rasterized once from public/brand-mark.svg, the favicons' source, so cards
+// match the icon. cwd is the project root in both `astro dev` and `astro build`.
 const brandMarkSvg = readFileSync(join(process.cwd(), "public/brand-mark.svg"));
 const brandMarkPng = new Resvg(brandMarkSvg, { fitTo: { mode: "width", value: 200 } })
   .render()

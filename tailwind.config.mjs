@@ -2,32 +2,20 @@ import { colors as brandColors, fonts } from "./src/design-tokens.mjs";
 import twColors from "tailwindcss/colors";
 import plugin from "tailwindcss/plugin";
 
-// Headings (h1–h6 + wordmark) share the body sans family — one clean typeface
-// across the whole site (modern B2B, no serif contrast).
-// The font CSS variables are defined by Astro's Fonts API (see astro.config.mjs)
-// and already expand to the web font + its optimized fallback. Family names +
-// variables are the single source in src/design-tokens.mjs.
+// Headings use the body sans. The variable already includes the optimized fallback.
 const headingFontStack = `var(${fonts.sans.variable})`;
 
-// Warm near-black ink for text, headings, and prose. Sourced from the Tailwind
-// stone palette (also available as `zmoki-stone-900`) so it sits warm against
-// the cream background rather than a cold neutral.
+// Warm near-black text (`zmoki-stone-900`).
 const ink = twColors.stone[900];
 
-// The bright accent — links, buttons, focus rings, CTAs. `zmoki-indigo-600`.
+// Accent for links, buttons and focus rings (`zmoki-indigo-600`).
 const accent = twColors.indigo[600];
 const accentHover = twColors.indigo[700];
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
-  // Note: the copy-button classes injected by the rehype plugin are kept via
-  // `@source inline(...)` in src/styles/global.css — Tailwind v4 dropped the
-  // JS `safelist` option.
   theme: {
-    // Soft + bright: Tailwind's default `borderRadius` and `boxShadow` scales are
-    // left intact (rounded corners + subtle elevation shadows), so cards read as
-    // soft panels — border for definition, shadow for lift — not hard outlines.
     extend: {
       typography: () => ({
         DEFAULT: {
@@ -39,13 +27,10 @@ export default {
             "h1, h2, h3, h4, h5, h6": {
               fontFamily: headingFontStack,
             },
-            // Tailwind Typography wraps inline <code> in literal backtick
-            // characters via ::before/::after — drop them so inline code reads
-            // as clean monospace, not `quoted`.
+            // Drop the backticks Typography adds around inline <code>.
             "code::before": { content: '""' },
             "code::after": { content: '""' },
-            // Links: indigo accent with a clean, thin underline that thickens on
-            // hover — no brutalist dotted/dashed borders.
+            // Thin underline that thickens on hover.
             a: {
               color: accent,
               "text-decoration": "underline",
@@ -68,38 +53,26 @@ export default {
           },
         },
       }),
-      // Brand type families — utilities font-sans / font-serif / font-mono.
-      // These also feed the prose layer. The Noto families are self-hosted via
-      // Astro's Fonts API (astro.config.mjs); the CSS variables already include
-      // their optimized fallbacks. The site is all-sans; `font-serif` stays
-      // available but is unused.
+      // `font-serif` is available but unused.
       fontFamily: {
         sans: [`var(${fonts.sans.variable})`],
         serif: ["Noto Serif", "Georgia", "serif"],
         mono: [`var(${fonts.mono.variable})`],
       },
-      // Brand color tokens live in src/design-tokens.mjs (single source
-      // of truth, also consumed by the /-/astro/brand/ reference page).
       colors: brandColors,
     },
   },
   plugins: [
     require("@tailwindcss/typography"),
-    // Global link interaction, driven by the brand tokens. Lives in the base
-    // layer so every page inherits identical behavior — no per-layout class
-    // strings to copy or forget (this used to be a `[&_a]` body class on
-    // BaseLayout only, which is why brand pages had dead links).
+    // Base-layer defaults, so every layout gets the same headings and links.
     plugin(({ addBase }) => {
       addBase({
         "h1, h2, h3, h4, h5, h6": {
           fontFamily: headingFontStack,
         },
-        // Global link feedback: a gentle indigo shift on hover for otherwise
-        // unstyled links. Wrapped in `:where()` so the rule carries ZERO
-        // specificity — any explicit text color on a link (e.g. `text-white`
-        // on a button, or `text-zmoki-stone-600` on a nav item) wins cleanly.
-        // Without this, `a:hover` (a pseudo-class, specificity 0,1,1) beats a
-        // plain `.text-white` utility (0,1,0) and turns button labels indigo.
+        // `:where()` gives the hover zero specificity, so a link's own color
+        // utility (e.g. `text-white` on a button) wins. Plain `a:hover` would
+        // beat it and turn button labels indigo.
         a: {
           "text-decoration": "none",
           transition: "color 200ms",

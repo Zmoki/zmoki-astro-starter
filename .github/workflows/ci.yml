@@ -37,12 +37,9 @@ jobs:
       - name: Headers drift check
         run: npm run check:headers
 
-      # Persist Astro's build cache across runs. `npm ci` wipes node_modules, so
-      # this restores node_modules/.astro — where Astro caches optimized images
-      # (assets/) and downloaded fonts — so unchanged images aren't re-downloaded
-      # or re-processed. Entries are keyed by source content hash internally, so a
-      # partially-stale cache is always safe. github.sha in the key saves a fresh
-      # cache each run; restore-keys fall back to the most recent prior one.
+      # `npm ci` wipes node_modules, so restore Astro's cache of optimized images
+      # and fonts. Its entries are keyed by content hash, so a stale cache is safe.
+      # github.sha saves a fresh cache each run; restore-keys pick the latest one.
       - name: Cache Astro build artifacts
         uses: actions/cache@v6
         with:
@@ -55,8 +52,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Analytics/captcha default off; turn them on for main so this build
-          # reflects what production actually ships (off for PRs).
+          # On for main so this build matches production; off for PRs.
           PUBLIC_ANALYTICS_ENABLED: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
           PUBLIC_CAPTCHA_ENABLED: ${{ github.ref == 'refs/heads/main' && 'true' || 'false' }}
 

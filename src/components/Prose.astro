@@ -1,13 +1,9 @@
 ---
-// The content-card panel for rendered Markdown/MDX (post body, resource + legal
-// pages, thank-you copy): the shared prose+card styling in one place, plus the
-// copy-to-clipboard behavior for code blocks.
+// Card panel for rendered Markdown/MDX. Pass `class` for the prose size and
+// padding, which vary per page.
 //
-// The copy button is injected into *all* rendered content by the
-// rehypeCodeBlockCopy plugin, so its wiring lives here rather than in one layout
-// — that way every page that renders prose (not just blog posts) gets working
-// copy buttons. Pass `class` for the per-use bits that vary: the prose size
-// (`prose-xl`), the `prose-2xl` breakpoint, and large-screen padding.
+// rehypeCodeBlockCopy adds a Copy button to all rendered content, so the button
+// wiring lives here rather than in one layout.
 export interface Props {
   class?: string;
 }
@@ -23,9 +19,7 @@ const base =
 </div>
 
 <script>
-  // Bundled, so it runs once per page however many Prose panels render: binds
-  // every code-block Copy button that rehypeCodeBlockCopy injected. The copy is
-  // tracked via the vendor-neutral facade.
+  // Bundled, so it runs once per page and binds the buttons in every panel.
   document.querySelectorAll<HTMLButtonElement>('[data-copy-button="true"]').forEach((btn) => {
     btn.addEventListener("click", async () => {
       const wrapper = btn.closest(".relative");

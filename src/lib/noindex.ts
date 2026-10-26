@@ -1,10 +1,8 @@
-// Relative imports (not `@/`) so the plain-node CI scripts can load this too —
-// check-sitemap.ts imports isNoindexPath rather than re-deriving it. Mirrors deploy.ts.
+// Relative imports (not `@/`) so plain-node check-sitemap.ts can import this.
 import { headerRules } from "../headers/headers.config.ts";
 import { isNoindex } from "./robots.ts";
 
-// Header path globs whose `X-Robots-Tag` is noindex — from the same source the
-// deploy artifact is built from, so a noindex path stays out of the sitemap too.
+// Paths whose header rule sets a noindex `X-Robots-Tag`, so they stay out of the sitemap too.
 const noindexPatterns = headerRules
   .filter((rule) =>
     Object.entries(rule.headers).some(

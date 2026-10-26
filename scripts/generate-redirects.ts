@@ -2,14 +2,9 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { site } from "../src/site.config.ts";
 
-// Compiles the CSV files in src/redirects/ into the redirect artifact for the
-// configured hosting platform (site.platform.deploy). The CSVs are the
-// platform-neutral source of truth; each emitter below renders their format.
-//
-// Each CSV has the columns: source,destination,code — one redirect per row.
-// Blank lines and lines starting with "#" are ignored. `code` is optional
-// (defaults to 301). Run via `npm run build:redirects`; also runs automatically
-// before `npm run build`.
+// Compiles src/redirects/*.csv into the redirect file for site.platform.deploy.
+// Also runs before `npm run build`. CSV columns: source,destination,code (code
+// defaults to 301); "#" lines are comments. See the /redirects skill.
 
 const REDIRECTS_DIR = "src/redirects";
 const VALID_CODES = new Set(["200", "301", "302", "303", "307", "308"]);
@@ -28,8 +23,7 @@ interface FileSection {
   rows: Redirect[];
 }
 
-// Per-platform ceiling on the number of redirects the artifact may hold.
-// null = no meaningful hard cap (bound by file size / soft guidance instead).
+// Max redirects per platform; null = no hard cap.
 const PLATFORM_LIMITS: Record<Platform, { max: number; note: string } | null> = {
   cloudflare: {
     max: 2100,
@@ -119,10 +113,8 @@ function parseRedirectsCsv(fileName: string, content: string, errors: string[]):
 }
 
 // ── Emitters ────────────────────────────────────────────────────────────────
-// Each returns the path it wrote so the caller can report and warn about stale
-// artifacts from other platforms.
 
-// Cloudflare Pages and Netlify share the exact `_redirects` format.
+// Cloudflare Pages and Netlify share the `_redirects` format.
 function emitRedirectsFile(sections: FileSection[], platform: Platform): EmitResult {
   const output = "public/_redirects";
   const header = [
@@ -139,8 +131,8 @@ function emitRedirectsFile(sections: FileSection[], platform: Platform): EmitRes
   return { output, count: sections.reduce((n, s) => n + s.rows.length, 0) };
 }
 
-// Vercel: merge a `redirects` array into vercel.json, preserving other config.
-// Vercel redirects are 3xx only; a 200 (proxy/rewrite) belongs in `rewrites`.
+// Merge into vercel.json, keeping other keys. Vercel redirects are 3xx only;
+// a 200 (proxy/rewrite) belongs in `rewrites`.
 function emitVercelJson(rows: Redirect[], warnings: string[]): EmitResult {
   const output = "vercel.json";
   const VERCEL_CODES = new Set(["301", "302", "307", "308"]);
@@ -170,8 +162,7 @@ function emitVercelJson(rows: Redirect[], warnings: string[]): EmitResult {
   return { output, count: redirects.length };
 }
 
-// AWS Amplify: emit redirects.json ([{ source, target, status }]) to paste into
-// the Amplify console or manage via IaC. Amplify has no committed-file convention.
+// Amplify has no committed-file convention: paste the output into its console or IaC.
 function emitAmplifyJson(rows: Redirect[]): EmitResult {
   const output = "redirects.json";
   const entries = rows.map((r) => ({ source: r.source, target: r.destination, status: r.code }));
@@ -179,8 +170,7 @@ function emitAmplifyJson(rows: Redirect[]): EmitResult {
   return { output, count: entries.length };
 }
 
-// Warn as the redirect count nears the platform's cap; return a fatal message if
-// it exceeds it (the caller fails the build). Platforms with no hard cap pass.
+// Warns near the cap; returns an error message past it.
 function checkPlatformLimit(platform: Platform, count: number, warnings: string[]): string | null {
   const limit = PLATFORM_LIMITS[platform];
   if (!limit) return null;
@@ -195,9 +185,7 @@ function checkPlatformLimit(platform: Platform, count: number, warnings: string[
   return null;
 }
 
-// Warn if artifacts from other platforms are still lying around after a switch.
-// Only flags files that exist *solely* to hold redirects (not vercel.json, which
-// legitimately holds other config).
+// Warn about files left from a previous platform (not vercel.json, which holds other config).
 function warnStaleArtifacts(platform: Platform, warnings: string[]): void {
   const redirectsOnlyForCf = platform === "cloudflare" || platform === "netlify";
   if (!redirectsOnlyForCf && existsSync("public/_redirects")) {

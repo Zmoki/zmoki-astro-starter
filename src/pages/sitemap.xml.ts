@@ -6,8 +6,7 @@ import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 import { isNoindex } from "@/lib/robots";
 import { isNoindexPath } from "@/lib/noindex";
 
-/** One sitemap URL: path (trailing slash, no leading slash) + <lastmod>, and an
- *  optional cover image URL for the image-sitemap. */
+/** `path` has a trailing slash and no leading slash. `imageLoc` is the cover image. */
 type SitemapEntry = { path: string; lastmod: Date; imageLoc?: string };
 
 // Image URLs can carry `&` (query params), which must be `&amp;` in valid XML.
@@ -15,12 +14,11 @@ const xmlEscape = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 export const GET: APIRoute = async ({ site }) => {
-  // Read page metas at runtime, not at module top level (page↔manifest cycle).
+  // Read inside GET, not at module top level: the pages and the OG manifest import each other.
   const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
   const records = await getPageRecords();
 
-  // Collection URLs, dropping content-level noindex (`robots`). Path-level
-  // noindex is applied to the whole list below.
+  // Drops content-level noindex. Path-level noindex is filtered from the whole list below.
   const collectionEntries: SitemapEntry[] = records
     .filter((record) => !isNoindex(record.robots))
     .map((record) => ({
@@ -29,8 +27,8 @@ export const GET: APIRoute = async ({ site }) => {
       imageLoc: record.imageLoc,
     }));
 
-  // Shared <lastmod> for the standalone pages: newest of their own dates and the
-  // most recently modified post (home + blog index surface recent content).
+  // Home and the blog index list recent posts, so their <lastmod> is the newest
+  // of their own dates and any post's.
   const standaloneLatestDate = new Date(
     Math.max(
       ...standalonePages
@@ -43,9 +41,8 @@ export const GET: APIRoute = async ({ site }) => {
     ),
   );
 
-  // A <url>, optionally carrying an image-sitemap <image:loc> for the page's
-  // cover — helps Google bind a CDN-hosted image to the page (post-2022 the
-  // image extension is just <image:loc>).
+  // <image:loc> helps Google tie a CDN-hosted cover to the page. It is the only
+  // image-sitemap tag Google still reads.
   const sitemapUrl = ({ path, lastmod, imageLoc }: SitemapEntry) => `
   <url>
     <loc>${site}${path}</loc>
@@ -60,8 +57,7 @@ export const GET: APIRoute = async ({ site }) => {
   </url>
   `;
 
-  // Standalone pages take that shared <lastmod>; the whole list is then filtered
-  // through isNoindexPath (header X-Robots-Tag rules).
+  // isNoindexPath applies the X-Robots-Tag header rules.
   const urls: SitemapEntry[] = [
     ...standalonePages.map((page) => ({ path: page.path, lastmod: standaloneLatestDate })),
     ...collectionEntries,

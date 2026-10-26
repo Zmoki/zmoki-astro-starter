@@ -5,9 +5,8 @@ import { site } from "@/site.config";
 import { fonts } from "@/design-tokens.mjs";
 import { commitHash } from "@/lib/version";
 import { ArrowRightLeft, Plus, Sparkles } from "@lucide/astro";
-// Brand marks come from @thesvg/icons: each module exposes the raw SVG string
-// as `.svg` (default variant) plus `.variants`. Where the default is drawn for
-// a dark background, we pick the light-background variant instead.
+// Each @thesvg/icons module has a default `.svg` plus `.variants`. Where the
+// default is drawn for a dark background, the pills use a light variant.
 import claudeCode from "@thesvg/icons/claude-code";
 import cursor from "@thesvg/icons/cursor";
 import codex from "@thesvg/icons/codex";
@@ -22,7 +21,7 @@ import formspree from "@thesvg/icons/formspree";
 import github from "@thesvg/icons/github";
 import cloudflare from "@thesvg/icons/cloudflare";
 import recaptcha from "@thesvg/icons/recaptcha";
-// This page's metadata — also read by its OG card and the sitemap.
+// Also read by the OG card and the sitemap.
 export const meta = {
   path: "",
   ogKey: "index",
@@ -33,13 +32,12 @@ export const meta = {
   contentModifiedDate: new Date("2026-07-05"),
 } satisfies StandalonePageMeta;
 
-// securityheaders.com report for the deployed site. Update the grade below if it
-// changes (the scan is live). See public/_headers → src/headers/headers.config.ts.
+// The scan is live: update the grade if the report changes.
 const securityReport =
   "https://securityheaders.com/?q=https%3A%2F%2Fstarter.zmoki.xyz%2F&followRedirects=on";
 const securityGrade = "A";
 
-// Proof first: the scores this starter actually holds. Update if they change.
+// Real scores for the deployed starter. Update them if they change.
 const seoScores = [
   { value: "100", label: "Ahrefs site health", note: "Excellent" },
   {
@@ -56,15 +54,14 @@ const seoScores = [
   },
 ];
 
-// The one-line proof strip used in the hero and the closing CTA.
+// Shown in the hero and the closing CTA.
 const trustChips = [
   { label: "Ahrefs site health", value: "100" },
   { label: "Security headers", value: "A" },
   { label: "Lighthouse", value: "4×100" },
 ];
 
-// The technical SEO work that is already done and guarded by CI. Each item
-// ends with a receipt: the real artifact this build emits, not a mockup.
+// Each `chip` is real output of this build, not a mockup.
 const seoGroups = [
   {
     title: "Indexing",
@@ -131,10 +128,8 @@ const seoGroups = [
 // A pill is a brand mark: raw SVG markup plus its accessible name.
 type Pill = { label: string; icon: string };
 
-// Every integration point ships with a working default and a swap-out seam.
-// `mode` drives the icon strip: "swap" renders ⇄ between the marks (pick one,
-// switch anytime), "extend" renders + between them (providers stack). Cards
-// with `sparkles` end the strip with a "bring your own" sparkles tile.
+// `mode` sets the separator between marks: "swap" shows ⇄ (pick one), "extend"
+// shows + (providers stack). `sparkles` adds a "bring your own" tile at the end.
 const platformAgnostic: {
   title: string;
   text: string;
@@ -204,7 +199,6 @@ const platformAgnostic: {
   },
 ];
 
-// The internal style guide under /-/astro/brand/ — a living design system.
 const brandPages = [
   {
     title: "Color",
@@ -238,8 +232,8 @@ const brandPages = [
   },
 ];
 
-// Lighthouse categories — the starter scores a perfect 100 on all four, desktop
-// and mobile, on every page. Reproduce with `npm run lhci:desktop` / `:mobile`.
+// Every page scores 100 in each category on desktop and mobile. Check with
+// `npm run lhci:desktop` and `npm run lhci:mobile`.
 const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
 ---
 
@@ -284,7 +278,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
         </p>
       </div>
       <div class="border-zmoki-stone-200 overflow-hidden rounded-2xl border shadow-lg">
-        <!-- macOS traffic-light colors — intentional host-chrome literals, not brand tokens -->
+        <!-- macOS traffic-light colors: host-chrome literals, not brand tokens -->
         <div class="bg-zmoki-stone-800 flex items-center gap-2 px-4 py-3">
           <span class="h-3 w-3 rounded-full bg-[#ff5f57]" aria-hidden="true"></span>
           <span class="h-3 w-3 rounded-full bg-[#febc2e]" aria-hidden="true"></span>

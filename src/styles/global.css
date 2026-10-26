@@ -1,20 +1,12 @@
 @import "tailwindcss";
 
-/* The brand fonts are self-hosted via Astro's Fonts API — family names + CSS
-   variables live in src/design-tokens.mjs, wired up in astro.config.mjs, and
-   injected by the <Font> components in the layouts. Astro generates the
-   optimized metrics-matched fallback automatically, so no hand-tuned @font-face
-   is needed here. */
+/* No @font-face here: Astro's Fonts API self-hosts the fonts (see design-tokens.mjs). */
 
-/* Keep the existing Tailwind v3-style JS config — theme tokens (cream/stone/
-   indigo), prose overrides, the typography and base-layer plugins — working
-   under Tailwind v4 via the compat directive. */
+/* Loads the v3-style JS config (tokens, prose overrides, plugins) under Tailwind v4. */
 @config "../../tailwind.config.mjs";
 
-/* The copy-button classes are injected by a rehype plugin in astro.config.mjs,
-   which the class scanner doesn't cover. Tailwind v4 has no JS `safelist`, so
-   register them here so they're always generated. Keep in sync with the button
-   markup in astro.config.mjs. */
+/* The copy button's classes come from a rehype plugin in astro.config.mjs, which
+   the class scanner misses. Keep in sync with that markup. */
 @source inline(
   "relative absolute top-2 right-2 rounded-lg bg-zmoki-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-zmoki-indigo-700 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500 focus:ring-offset-2 transition-colors duration-200"
 );

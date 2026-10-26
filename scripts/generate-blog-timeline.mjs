@@ -2,11 +2,12 @@ import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
 
+// Writes blog-timeline.csv: each post's publish, modified and git-commit dates.
+
 const BLOG_DIR = "src/content/blog";
 const SITE_URL = "https://starter.zmoki.xyz";
 const OUTPUT_FILE = "blog-timeline.csv";
 
-// Parse frontmatter from MDX file
 function parseFrontmatter(content) {
   const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n/;
   const match = content.match(frontmatterRegex);
@@ -18,7 +19,7 @@ function parseFrontmatter(content) {
   const frontmatterText = match[1];
   const frontmatter = {};
 
-  // Simple YAML parser for our use case (key: value pairs)
+  // Only flat `key: value` pairs, which is all the dates need.
   frontmatterText.split("\n").forEach((line) => {
     const trimmed = line.trim();
     if (trimmed && !trimmed.startsWith("#")) {
@@ -27,7 +28,6 @@ function parseFrontmatter(content) {
         const key = trimmed.substring(0, colonIndex).trim();
         let value = trimmed.substring(colonIndex + 1).trim();
 
-        // Remove quotes if present
         if (
           (value.startsWith('"') && value.endsWith('"')) ||
           (value.startsWith("'") && value.endsWith("'"))
@@ -43,10 +43,8 @@ function parseFrontmatter(content) {
   return frontmatter;
 }
 
-// Get git commit dates for a file
 function getGitCommitDates(filePath) {
   try {
-    // Get all commit dates for this file
     const gitLog = execSync(`git log --format="%ai" -- "${filePath}"`, {
       encoding: "utf-8",
       cwd: process.cwd(),
@@ -57,18 +55,16 @@ function getGitCommitDates(filePath) {
       .split("\n")
       .filter((line) => line.trim())
       .map((dateStr) => {
-        // Parse ISO 8601 format: "2025-11-15 10:30:45 +0300"
         const date = new Date(dateStr.trim());
-        return date.toISOString().split("T")[0]; // Return YYYY-MM-DD
+        return date.toISOString().split("T")[0];
       })
-      .filter((date, index, self) => self.indexOf(date) === index); // Remove duplicates
+      .filter((date, index, self) => self.indexOf(date) === index);
   } catch (error) {
     console.warn(`Warning: Could not get git history for ${filePath}:`, error.message);
     return [];
   }
 }
 
-// Generate CSV row
 function csvEscape(value) {
   if (value.includes(",") || value.includes('"') || value.includes("\n")) {
     return `"${value.replace(/"/g, '""')}"`;
@@ -76,7 +72,6 @@ function csvEscape(value) {
   return value;
 }
 
-// Main function
 function main() {
   console.log("🚀 Generating blog posts timeline...");
 
@@ -101,7 +96,6 @@ function main() {
     const slug = file.replace(/\.(mdx|md)$/, "");
     const fullUrl = `${SITE_URL}/blog/${slug}/`;
 
-    // Add publishDate entry
     if (frontmatter.publishDate) {
       const publishDate = new Date(frontmatter.publishDate).toISOString().split("T")[0];
       timelineEntries.push({
@@ -111,7 +105,6 @@ function main() {
       });
     }
 
-    // Add contentModifiedDate entry if different from publishDate
     if (frontmatter.contentModifiedDate) {
       const modifiedDate = new Date(frontmatter.contentModifiedDate).toISOString().split("T")[0];
       const publishDate = frontmatter.publishDate
@@ -127,10 +120,9 @@ function main() {
       }
     }
 
-    // Get git commit dates
     const gitDates = getGitCommitDates(filePath);
     for (const gitDate of gitDates) {
-      // Only add git dates that aren't already covered by frontmatter dates
+      // Skip dates the frontmatter already covers.
       const isPublishDate =
         frontmatter.publishDate &&
         new Date(frontmatter.publishDate).toISOString().split("T")[0] === gitDate;
@@ -148,14 +140,12 @@ function main() {
     }
   }
 
-  // Sort by date (chronologically)
   timelineEntries.sort((a, b) => {
     const dateA = new Date(a.date);
     const dateB = new Date(b.date);
     return dateA - dateB;
   });
 
-  // Generate CSV
   const csvHeader = "date,full url,changes\n";
   const csvRows = timelineEntries
     .map((entry) => `${csvEscape(entry.date)},${csvEscape(entry.url)},${csvEscape(entry.change)}`)
@@ -163,7 +153,6 @@ function main() {
 
   const csvContent = csvHeader + csvRows;
 
-  // Write to file
   writeFileSync(OUTPUT_FILE, csvContent, "utf-8");
 
   console.log(`✅ Timeline generated: ${OUTPUT_FILE}`);

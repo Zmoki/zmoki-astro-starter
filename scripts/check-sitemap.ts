@@ -4,19 +4,13 @@ import { DIST_DIR, htmlFiles, routeForFile } from "./lib/dist-files.ts";
 import { isNoindexPath } from "../src/lib/noindex.ts";
 import { isNoindex } from "../src/lib/robots.ts";
 
-// CI guard: after `npm run build`, checks dist/ so the sitemap matches what the
-// site publishes. (1) coverage — every built indexable page is in sitemap.xml
-// (catches an unregistered section, or a standalone page not wired in);
-// (2) no <loc> points at a noindex page; (3) every <loc> resolves to a built
-// file. A page is noindex via its <meta robots> or an X-Robots-Tag rule.
-// Assumes Astro's default directory build format (guarded by a fail-fast below);
-// standalone-page metadata completeness is checked at build time in
-// src/og/manifest.ts (a node script can't import an .astro page).
+// CI guard over dist/ (run after `npm run build`): every indexable page is in
+// sitemap.xml, no <loc> points at a noindex page, and every <loc> resolves to a
+// built file. A page is noindex via its <meta robots> or an X-Robots-Tag rule.
 
 const SITEMAP = join(DIST_DIR, "sitemap.xml");
 
-// Match the <meta robots> tag order-independently, then pull its content, so
-// this doesn't break if BaseLayout's tag shape changes.
+// Find the tag, then its content, so attribute order doesn't matter.
 const ROBOTS_META_RE = /<meta\b[^>]*\bname=["']robots["'][^>]*>/i;
 const CONTENT_ATTR_RE = /\bcontent=["']([^"']*)["']/i;
 const htmlIsNoindex = (html: string): boolean => {
@@ -48,8 +42,7 @@ function main(): void {
 
   const sitemap = new Set(sitemapRoutes());
 
-  // One walk over dist/: each built page's route → its <meta robots> noindex,
-  // so nothing below re-reads a file.
+  // One pass over dist/: route → whether its <meta robots> is noindex.
   const metaNoindex = new Map<string, boolean>();
   const builtDirRoutes: string[] = [];
   for (const file of htmlFiles()) {

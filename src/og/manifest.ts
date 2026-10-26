@@ -1,8 +1,6 @@
-// The OG image manifest: one entry per generated card, shared by the endpoint
-// (src/pages/og/[...path].png.ts) and BaseLayout (og:image + alt). Collection
-// cards come from the page-collections registry (self-registering per section);
-// standalone cards (home, blog index) read each page's exported `meta`; a
-// `default` fallback covers pages without their own card.
+// One entry per OG card, shared by the endpoint and BaseLayout (og:image + alt).
+// Collection pages come from page-collections, standalone pages from their
+// exported `meta`, and every other page gets the `default` card.
 import { site } from "@/site.config";
 import { formatShortDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
@@ -48,7 +46,7 @@ const siteEntry = (key: string, title: string, description: string): OgEntry => 
 
 const DEFAULT_ENTRY: OgEntry = siteEntry("default", site.name, site.description);
 
-// Memoized — BaseLayout resolves an OG image for every page, so this runs once.
+// Memoized: BaseLayout asks for an OG image on every page.
 let entriesPromise: Promise<RoutedEntry[]> | null = null;
 
 function buildEntries(): Promise<RoutedEntry[]> {
@@ -58,8 +56,8 @@ function buildEntries(): Promise<RoutedEntry[]> {
 async function computeEntries(): Promise<RoutedEntry[]> {
   const records = await getPageRecords();
 
-  // Read page metas at runtime (not at module top level — import cycle). This is
-  // also the build-time "incomplete metadata" check: title/description together.
+  // Read here, not at module top level, to avoid an import cycle. Doubles as the
+  // build-time check that title and description are set together.
   const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
   for (const page of standalonePages) {
     if ((page.title === undefined) !== (page.description === undefined)) {
@@ -70,8 +68,7 @@ async function computeEntries(): Promise<RoutedEntry[]> {
   }
 
   return [
-    // Standalone cards (home, blog index) from each page's `meta`; a page that
-    // sets no title/description falls back to the default card.
+    // A standalone page with no title/description uses the default card.
     ...standalonePages.flatMap((page) =>
       page.title !== undefined && page.description !== undefined
         ? [

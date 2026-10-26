@@ -1,20 +1,9 @@
 ---
-// Google Tag Manager provider. Gated by Analytics.astro (the dispatcher), which
-// renders this only when GTM_CONTAINER_ID (GTM-XXXXXXX, in gtm-config.ts) is set.
+// Google Tag Manager. A tracked event becomes dataLayer.push({ event, ...props });
+// match `event` with a "Custom Event" trigger in GTM.
 //
-// GTM is a tag hub: it loads its container and exposes `window.dataLayer`, into
-// which we push events. Whatever tags you wire up inside the GTM UI (GA4, Ads,
-// etc.) then read from that dataLayer — so GTM is how you plug in *any*
-// Google-side tool without touching this template again.
-//
-// Beyond loading the container, the snippet registers the vendor-neutral
-// `window.track(event, props)` facade (see Analytics.astro) by *chaining* onto
-// any previously-defined `track`, so events fan out to every active provider.
-// A tracked event becomes a `dataLayer.push({ event, ...props })` — the `event`
-// key is what you match on with a "Custom Event" trigger in GTM.
-//
-// The snippet lives in src/lib/inline-scripts.ts, which the CSP hashes — it is
-// the one provider that runs inline, because GTM wants to start in <head>.
+// The only provider that runs inline, because GTM wants to start in <head>. The
+// snippet lives in src/lib/inline-scripts.ts, which the CSP hashes.
 import { gtmLoader } from "@/lib/inline-scripts";
 ---
 

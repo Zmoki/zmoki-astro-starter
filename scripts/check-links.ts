@@ -4,32 +4,10 @@ import { site } from "../src/site.config.ts";
 import { PREVIEW_HOST_SUFFIX, previewOrigin } from "../src/lib/deploy.ts";
 import { DIST_DIR, htmlFiles, routeForFile } from "./lib/dist-files.ts";
 
-// CI guard for internal links. Two checks over the built site in dist/:
-//
-// 1. No broken internal links. Every internal `<a href>` must point at a path
-//    that has a corresponding built file — otherwise it would 404 in production.
-//
-// 2. Internal links must be relative. An `<a href>` written as an *absolute* URL
-//    back to our own site — the production origin (site.domain) or a preview
-//    deployment for the configured host (e.g. a Cloudflare Pages
-//    `*.pages.dev` branch preview) — is a bug: it pins the link to one
-//    environment, so on a preview deploy it jumps users to production (or a
-//    stale ephemeral preview) instead of staying on the current deploy. Use a
-//    root-relative path (`/blog/…`) instead.
-//
-// Both are *offline* checks: they read the emitted files in dist/, so they need
-// no running server and are fully deterministic (unlike hitting the network,
-// which would also drag in flaky external hosts).
-//
-// What counts as "internal" for check 1: root-relative (`/…`) and page-relative
-// links. Skipped: off-site http(s) links, `mailto:`/`tel:`, `data:`, and pure
-// `#fragment` links (no navigation).
-//
-// Resolution mirrors Astro's directory build format (`/blog/foo/` →
-// dist/blog/foo/index.html). A path is considered live if any candidate file
-// exists, or if it matches a redirect source in dist/_redirects (301 → 200).
-//
-// Run after `npm run build` (needs dist/). Wired into CI and `npm run check:links`.
+// CI guard over the built site in dist/ (run after `npm run build`):
+// 1. Every relative `<a href>` resolves to a built file or a redirect source.
+// 2. No `<a href>` hard-codes our own origin (production or a preview deploy).
+//    That would send a preview's visitors to production; use `/path` instead.
 
 const A_HREF_RE = /<a\s[^>]*?href=["']([^"']*)["'][^>]*>/gi;
 
@@ -59,7 +37,7 @@ function redirectSources(): Set<string> {
 /** True if a route resolves to a built file under dist/ (directory-format aware). */
 function resolves(pathname: string): boolean {
   const decoded = decodeURIComponent(pathname);
-  const clean = decoded.replace(/\/+$/, ""); // drop trailing slashes for candidate building
+  const clean = decoded.replace(/\/+$/, "");
   const candidates = [
     join(DIST_DIR, decoded), // exact file, e.g. /rss.xml, /404.html
     join(DIST_DIR, decoded, "index.html"), // /blog/foo/ → dist/blog/foo/index.html
@@ -83,21 +61,17 @@ function main(): void {
   const previewSuffix = PREVIEW_HOST_SUFFIX[site.platform.deploy];
   const redirects = redirectSources();
 
-  // The exact origin of *this* build's preview deploy, if we're running inside
-  // one — resolved by the same env-var logic that points OG images at the
-  // current preview (src/lib/deploy.ts, shared with src/lib/urls.ts).
+  // This build's preview origin, if it is one.
   const currentPreview = previewOrigin(site.platform.deploy);
   const previewHost = currentPreview ? safeHost(currentPreview) : null;
 
-  // A host is "ours" if it's production, this build's preview, or any host that
-  // matches the platform's preview-URL suffix (so a committed `*.pages.dev` link
-  // still fails in CI on main, where no preview env is set).
+  // The suffix match makes a committed `*.pages.dev` link fail even on main,
+  // where no preview env is set.
   const isSelfHost = (host: string): boolean =>
     host === prodHost || host === previewHost || host.endsWith(previewSuffix);
 
-  // Map of broken (404) target → set of pages that link to it.
+  // Target → pages linking to it.
   const broken = new Map<string, Set<string>>();
-  // Map of absolute self-link (should be relative) → set of pages using it.
   const absolute = new Map<string, Set<string>>();
   let linkCount = 0;
 
@@ -109,27 +83,25 @@ function main(): void {
       if (!raw || raw.startsWith("#")) continue; // empty or same-page fragment
       if (/^(mailto:|tel:|data:|javascript:)/i.test(raw)) continue;
 
-      // Resolve against the current page's URL; drops any ?query and #fragment.
-      // (A protocol-relative `//host/…` inherits the page's scheme here.)
+      // A protocol-relative `//host/…` inherits the page's scheme here.
       let url: URL;
       try {
         url = new URL(raw, `${origin}${fromRoute}`);
       } catch {
-        continue; // unparseable href — not our concern here
+        continue;
       }
 
-      // Check 2: an href *authored* as an absolute (or protocol-relative) URL.
-      // If it targets our own site, it should have been a relative path.
+      // Check 2: an absolute href to our own site.
       const authoredAbsolute = /^(https?:)?\/\//i.test(raw);
       if (authoredAbsolute) {
         if (isSelfHost(url.host)) {
           if (!absolute.has(raw)) absolute.set(raw, new Set());
           absolute.get(raw)!.add(fromRoute);
         }
-        continue; // absolute self-link flagged above; anything else is off-site
+        continue;
       }
 
-      // Check 1: relative internal link → must resolve to a built file.
+      // Check 1: a relative link must resolve.
       linkCount++;
       const pathname = url.pathname;
       const normalized = pathname.replace(/\/$/, "") || "/";

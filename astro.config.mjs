@@ -8,8 +8,7 @@ import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
 import { visit } from "unist-util-visit";
 
-// Authorize the content-image origin (site.platform.imagesCDNHost) for build-time
-// optimization (image.remotePatterns below). Empty ⇒ no remote optimization.
+// The image origin's hostname, authorized for build-time optimization below.
 const imagesCDNHost = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
 let imageHostname = "";
 if (imagesCDNHost) {
@@ -22,12 +21,11 @@ if (imagesCDNHost) {
   }
 }
 
-// Rehype plugin to add IDs to definition list terms
+// Give each <dt> a slug id so glossary terms can be linked to.
 function rehypeDefinitionListIds() {
   return (tree) => {
     visit(tree, "element", (node) => {
       if (node.tagName === "dt") {
-        // Generate slug from term text
         const text = node.children
           .map((child) => {
             if (child.type === "text") return child.value;
@@ -48,7 +46,6 @@ function rehypeDefinitionListIds() {
             .replace(/\s+/g, "-")
             .trim();
 
-          // Add ID to the definition term
           node.properties = {
             ...node.properties,
             id: slug,
@@ -59,7 +56,7 @@ function rehypeDefinitionListIds() {
   };
 }
 
-// Rehype plugin to add target="_blank" to external links
+// Open external links in a new tab, and add the data-* attributes prose styles key on.
 function rehypeExternalLinks() {
   return (tree) => {
     visit(tree, "element", (node) => {
@@ -76,7 +73,7 @@ function rehypeExternalLinks() {
               ...node.properties,
               target: "_blank",
               "data-external": "true",
-              rel: "noopener noreferrer", // Security best practice for external links
+              rel: "noopener noreferrer",
             };
           }
           if (href.startsWith("/resources/")) {
@@ -97,22 +94,19 @@ function rehypeExternalLinks() {
   };
 }
 
-// Rehype plugin to add copy button to code blocks
+// Add a Copy button to each code block; Prose.astro wires up the click.
+// Its classes are also listed in src/styles/global.css: keep them in sync.
 function rehypeCodeBlockCopy() {
   return (tree) => {
-    // Recursive function to transform the tree
     function transformNode(node) {
-      // Transform children first
       if (node.children) {
         node.children = node.children.map((child) => {
-          // Check if this child is a <pre> element with a <code> child
           if (child.type === "element" && child.tagName === "pre") {
             const codeNode = child.children?.find(
               (c) => c.type === "element" && c.tagName === "code",
             );
 
             if (codeNode) {
-              // Create wrapper div
               const wrapper = {
                 type: "element",
                 tagName: "div",
@@ -122,8 +116,7 @@ function rehypeCodeBlockCopy() {
                 children: [],
               };
 
-              // Create copy button
-              // Code will be extracted from DOM at runtime to preserve all formatting
+              // The click handler copies from the DOM, so formatting is preserved.
               const copyButton = {
                 type: "element",
                 tagName: "button",
@@ -142,7 +135,6 @@ function rehypeCodeBlockCopy() {
                 ],
               };
 
-              // Add <pre> and button to wrapper
               wrapper.children.push(child);
               wrapper.children.push(copyButton);
 
@@ -150,7 +142,6 @@ function rehypeCodeBlockCopy() {
             }
           }
 
-          // Recursively transform other nodes
           return transformNode(child);
         });
       }
@@ -158,7 +149,6 @@ function rehypeCodeBlockCopy() {
       return node;
     }
 
-    // Transform the tree
     transformNode(tree);
   };
 }
@@ -167,19 +157,14 @@ function rehypeCodeBlockCopy() {
 export default defineConfig({
   integrations: [mdx()],
   site: site.domain,
-  // `layout: "constrained"` makes optimized images (<Image> and Markdown `![]()`)
-  // responsive by default; `remotePatterns` authorizes the image origin for
-  // build-time optimization. Unset origin ⇒ remote images render unoptimized.
+  // `constrained` makes optimized images responsive by default. Without an image
+  // origin, remote images render unoptimized.
   image: {
     layout: "constrained",
     ...(imageHostname ? { remotePatterns: [{ protocol: "https", hostname: imageHostname }] } : {}),
   },
-  // Self-hosted fonts via Astro's Fonts API: downloaded + subsetted at build,
-  // served same-origin from /_astro/fonts, with automatic optimized fallback
-  // metrics (zero CLS) and preload links. The site is all-sans — a body/heading
-  // sans (weights 400–700 incl. italic) and a monospace for code. The family
-  // names + CSS variables are the single source in src/design-tokens.mjs; only
-  // the provider / weights / styles / subsets are set here.
+  // Self-hosted at build. Names and CSS variables come from src/design-tokens.mjs;
+  // set the provider, weights and subsets here.
   fonts: [
     {
       provider: fontProviders.google(),
@@ -205,24 +190,19 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
-    // Never inline a bundled <script> into the HTML: the CSP's script-src has no
-    // 'unsafe-inline', so every script must be a same-origin file ('self') or a
-    // hashed snippet from src/lib/inline-scripts.ts.
+    // Never inline bundled scripts into the HTML: the CSP has no 'unsafe-inline'.
     build: { assetsInlineLimit: 0 },
   },
   markdown: {
-    // Astro 7 defaults to the Sätteri processor; opt back into the unified
-    // (remark/rehype) pipeline so the custom plugins keep working. The plugins
-    // are passed to unified() itself (markdown.*Plugins is deprecated), and
-    // @astrojs/mdx uses the same processor for .mdx files.
+    // Astro 7's default Sätteri processor doesn't run remark/rehype plugins.
+    // Pass plugins to unified() itself (markdown.*Plugins is deprecated); .mdx uses it too.
     processor: unified({
       remarkPlugins: [remarkDefinitionList],
       remarkRehype: { handlers: defListHastHandlers },
       rehypePlugins: [rehypeDefinitionListIds, rehypeExternalLinks, rehypeCodeBlockCopy],
     }),
     shikiConfig: {
-      // Dark theme: light tokens on a dark background clear WCAG AA (the light
-      // `catppuccin-latte` failed contrast on several token colors).
+      // A dark theme for WCAG AA contrast; `catppuccin-latte` fails on several token colors.
       theme: "catppuccin-mocha",
     },
   },

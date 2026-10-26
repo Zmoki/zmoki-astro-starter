@@ -3,13 +3,9 @@ import BrandLayout from "@/layouts/BrandLayout.astro";
 import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 
-// Each entry documents one reusable building block with a live example and
-// the canonical Tailwind recipe. The page mirrors the real markup used in
-// BaseLayout / PostLayout / Form so it can never drift from production.
+// The examples copy markup from BaseLayout, PostLayout and Form by hand, so
+// update them when those change.
 const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-stone-500";
-
-// Mirrors the real footer copyright (see BaseLayout): a start–current range,
-// or just the start year until a year has passed.
 ---
 
 <BrandLayout
@@ -30,7 +26,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     </p>
   </header>
 
-  <!-- Cards / panels -->
   <h2 class={sectionLabel}>Cards &amp; panels</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
@@ -69,7 +64,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
       class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;div class="rounded-xl border border-zmoki-stone-200 bg-white p-6 shadow-sm"&gt;…&lt;/div&gt;</code></pre>
   </section>
 
-  <!-- Links -->
   <h2 class={sectionLabel}>Links</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
@@ -104,7 +98,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     </ul>
   </section>
 
-  <!-- Buttons -->
   <h2 class={sectionLabel}>Buttons</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
@@ -145,7 +138,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
       class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-6 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>&lt;Button href="/signup" variant="primary" size="lg"&gt;Get started&lt;/Button&gt;</code></pre>
   </section>
 
-  <!-- Navigation & footer -->
   <h2 class={sectionLabel}>Navigation &amp; footer</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
@@ -191,7 +183,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     </div>
   </section>
 
-  <!-- Landing blocks -->
   <h2 class={sectionLabel}>Landing blocks</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
@@ -235,7 +226,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     </div>
   </section>
 
-  <!-- Meta labels -->
   <h2 class={sectionLabel}>Meta labels</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-6 max-w-2xl">
@@ -255,7 +245,6 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
     </div>
   </section>
 
-  <!-- Usage -->
   <section
     class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8"
   >

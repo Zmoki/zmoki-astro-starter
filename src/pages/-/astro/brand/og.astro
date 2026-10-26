@@ -1,16 +1,12 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
 
-// This guide documents the OG / social-share cards. The examples are the REAL
-// generated PNGs (served by /og/<key>.png — the same route BaseLayout points each
-// page's og:image at), so the page can never drift from production. The card
-// look, copy, and layout are owned by src/og/ + the `/og-images` skill; edit the
-// data below (which cards to feature, their anatomy) — not the layout.
+// The examples are the real /og/*.png cards, so this page can't drift from
+// production. Card design lives in src/og/ (see the /og-images skill); here, edit
+// only the data below.
 const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-stone-500";
 const codeChip = "bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1 font-mono text-base";
 
-// The two Satori templates, each shown with a live example card and its anatomy.
-// `src` is a real /og/*.png route rendered on request (dev) / at build (prod).
 const templates = [
   {
     name: "site",
@@ -40,7 +36,7 @@ const templates = [
   },
 ];
 
-// Fixed specs of every card — the same for both templates.
+// Shared by both templates.
 const specs = [
   ["Dimensions", "1200 × 630 px (1.91:1)"],
   ["Format", "PNG"],
@@ -70,7 +66,6 @@ const specs = [
     </p>
   </header>
 
-  <!-- How they work -->
   <h2 class={sectionLabel}>How they work</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <p class="text-zmoki-stone-500 mb-4 max-w-2xl">
@@ -97,7 +92,6 @@ const specs = [
 (anything else)  → /og/default.png</code></pre>
   </section>
 
-  <!-- The two templates -->
   <h2 class={sectionLabel}>Templates</h2>
   <div class="mb-10 space-y-6">
     {
@@ -110,7 +104,6 @@ const specs = [
             <span class="text-zmoki-stone-500 text-sm">{t.tagline}</span>
           </div>
 
-          {/* Live example — the real generated PNG at its true 1.91:1 ratio */}
           <img
             src={t.src}
             alt={t.alt}
@@ -142,7 +135,6 @@ const specs = [
     }
   </div>
 
-  <!-- Specs -->
   <h2 class={sectionLabel}>Specs</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <dl class="grid gap-4 sm:grid-cols-2">
@@ -157,7 +149,6 @@ const specs = [
     </dl>
   </section>
 
-  <!-- Where to change it -->
   <section
     class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8"
   >

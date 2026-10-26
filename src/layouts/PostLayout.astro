@@ -10,7 +10,7 @@ import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
 
 export interface Props {
-  /** The post's id — reported with the post_viewed event. */
+  /** The post id, sent with the post_viewed event. */
   slug: string;
   title: string;
   description?: string;
@@ -18,7 +18,7 @@ export interface Props {
   contentModifiedDate: Date;
   author: CollectionEntry<"blog">["data"]["author"];
   cover?: CollectionEntry<"blog">["data"]["cover"];
-  /** Overrides the canonical URL — set for cross-posted content. See the blog schema. */
+  /** Canonical URL override for cross-posted content. See the blog schema. */
   canonical?: string;
   prevPost?: CollectionEntry<"blog"> | null;
   nextPost?: CollectionEntry<"blog"> | null;
@@ -40,11 +40,8 @@ const {
 } = Astro.props;
 const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 
-// BlogPosting structured data → Google rich result. Absolute URLs come from the
-// shared siteUrls() helper, so the SD can't drift from the meta tags. `image`
-// prefers the post's real cover photo — the primary-image signal Google Discover
-// reads — falling back to the OG card (which stays og:image for social). See the
-// /structured-data skill.
+// `image` prefers the cover photo, which Google Discover reads as the primary
+// image. og:image stays the OG card. See the /structured-data skill.
 const urls = siteUrls(Astro);
 const ogImage = await getOgImage(Astro.url.pathname);
 const schemaImage = cover?.image ?? urls.absoluteUrl(ogImage.path);
@@ -80,7 +77,6 @@ const blogPostingLd = {
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4" data-post-slug={slug} data-post-title={title}>
-    <!-- Post Header -->
     <header
       class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
     >
@@ -110,7 +106,7 @@ const blogPostingLd = {
       </p>
     </header>
 
-    <!-- Cover image — the post's primary image for Discover (below the header). -->
+    <!-- Cover photo: the primary image for Google Discover -->
     {
       cover && (
         <Image
@@ -125,12 +121,10 @@ const blogPostingLd = {
       )
     }
 
-    <!-- Post Content -->
     <Prose class="prose-xl xl:prose-2xl xl:px-28 xl:py-16">
       <slot />
     </Prose>
 
-    <!-- About Author -->
     <aside
       class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white lg:p-20"
     >
@@ -144,9 +138,7 @@ const blogPostingLd = {
       </p>
     </aside>
 
-    <!-- Navigation -->
     <nav class="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-      <!-- Previous Post -->
       {
         prevPost && (
           <a
@@ -163,7 +155,6 @@ const blogPostingLd = {
         )
       }
 
-      <!-- Next Post -->
       {
         nextPost && (
           <a
@@ -183,8 +174,6 @@ const blogPostingLd = {
   </article>
 
   <script>
-    // Post view + post-navigation tracking. (Code-block copy behavior lives in
-    // <Prose>.) The post's slug and title come from the <article>'s data-*.
     const article = document.querySelector<HTMLElement>("article[data-post-slug]");
     if (article) {
       window.track?.("post_viewed", {

@@ -24,9 +24,8 @@ export async function getStaticPaths() {
 
 const { name, url, asset } = Astro.props;
 
-// Show 3 random posts. `sort(() => Math.random() - 0.5)` is a biased shuffle, so
-// use Fisher-Yates on a copy (the collection array is otherwise shared). Note the
-// pick is fixed at build time — this is a static page, not per-visit random.
+// 3 random posts, picked once at build time. Fisher-Yates on a copy, because the
+// collection array is shared.
 const allFeedPosts: CollectionEntry<"blog">[] = await getCollection("blog");
 const shuffled = [...allFeedPosts];
 for (let i = shuffled.length - 1; i > 0; i--) {
@@ -95,7 +94,6 @@ const randomFeedPosts = shuffled.slice(0, 3);
 </BaseLayout>
 
 <script>
-  // The resource comes from the page section's data-resource-name/-url.
   const page = document.querySelector<HTMLElement>("[data-resource-name][data-resource-url]");
   if (page) {
     window.track?.("resource_download_confirmed", {

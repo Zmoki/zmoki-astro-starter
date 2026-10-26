@@ -1,9 +1,6 @@
 /**
- * Single source of truth for everything personal to this site.
- *
- * To spin up a new site from this starter, this is the main file you edit.
- * Most strings below surface in metadata, the layout chrome, and the RSS feed.
- * See SETUP.md for the full checklist.
+ * Everything personal to this site: the main file to edit when starting a new
+ * site from this starter. See SETUP.md for the full checklist.
  */
 export const site = {
   /** Production URL, no trailing slash. Also set as `site` in astro.config.mjs. */
@@ -24,12 +21,7 @@ export const site = {
     { label: "SEO Checklist", href: "/resources/new-website-seo-checklist/" },
   ],
 
-  /**
-   * The site owner / publishing entity. Site-wide identity (per-page), as
-   * opposed to a post's byline author, which lives per-post in the blog
-   * collection (see src/content.config.ts). Shown in the footer copyright and
-   * used as the image-credit creator on post images.
-   */
+  /** The site owner. A post's author is set separately, in its frontmatter. */
   organization: {
     /** Shown in the footer copyright and as the content-image credit. */
     name: "Zarema Khalilova",
@@ -51,29 +43,25 @@ export const site = {
   copyright: {
     /** First year shown in the footer copyright range. */
     year: 2026,
-    /** Content-image licensing (schema.org ImageObject emitted for each image). */
     images: {
-      /**
-       * License URL for content images — the `license` + `acquireLicensePage`
-       * on each image's schema.org ImageObject. Point it at your terms /
-       * licensing page. Absolute URL.
-       */
+      /** Absolute URL of your terms or licensing page, used in each image's schema.org ImageObject. */
       license: "https://starter.zmoki.xyz/legal/terms/",
     },
   },
 
-  /** Hosting config — both decoupled and committed (see SETUP.md §6, /images skill). */
+  /** Hosting (see SETUP.md → "Deploy"). */
   platform: {
     /**
-     * Deploy host — selects the redirect/header artifact format:
+     * Deploy host. Picks the format of the generated redirect and header files:
      *   "cloudflare" | "netlify" → public/_redirects + public/_headers
-     *   "vercel"                 → vercel.json · "amplify" → redirects.json + customHeaders.json
+     *   "vercel"                 → vercel.json
+     *   "amplify"                → redirects.json + customHeaders.json
      */
     deploy: "cloudflare",
     /**
-     * Remote origin for content-image originals (e.g. an R2 bucket on a custom
-     * domain). Images on it are optimized at build and served by the deploy host;
-     * also the CSP img-src source. A full URL, or "" to keep images in src/images.
+     * Where content-image originals live (e.g. an R2 bucket on a custom domain);
+     * they're optimized at build. A full URL, or "" to keep images in src/images.
+     * See the /images skill.
      */
     imagesCDNHost: "https://images.zmoki.xyz",
   },

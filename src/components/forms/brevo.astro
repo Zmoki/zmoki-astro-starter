@@ -1,10 +1,6 @@
 ---
-// Brevo email-capture provider (the built-in resource-gate form). Selected by
-// Form.astro (the dispatcher). Renders a native HTML form that POSTs to Brevo's
-// hosted endpoint; Brevo validates the captcha token, stores the contact, emails
-// the lead-magnet asset, and redirects to the thank-you page (all configured on
-// the Brevo form). The <Captcha /> and the resource_gate_* analytics are the
-// shared, vendor-neutral bits.
+// Brevo form: a native POST to Brevo's hosted endpoint. Captcha checks, the
+// asset email and the thank-you redirect are all configured on the Brevo form.
 export interface Props {
   formId: string;
   buttonText?: string;
@@ -14,14 +10,12 @@ export interface Props {
 import Button from "@/components/Button.astro";
 import Captcha from "@/components/Captcha.astro";
 
-// Brevo account ID for the email signup forms.
 const BREVO_ACCOUNT_ID = "75687697";
 
 const defaultButtonText = "Subscribe";
 const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.props;
 ---
 
-<!-- Main form -->
 <form
   id="brevo-form"
   data-resource-slug={resourceSlug}
@@ -34,7 +28,6 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
   </section>
 
   <section class="flex min-w-[300px] flex-1 flex-col gap-4 md:pt-2">
-    <!-- Email input -->
     <label for="EMAIL" class="text-xl font-medium">Email</label>
     <input
       type="email"
@@ -45,10 +38,8 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
       class="border-zmoki-stone-300 focus:border-zmoki-indigo-500 focus:ring-zmoki-indigo-500/30 w-full rounded-lg border p-2 text-lg focus:ring-2 focus:outline-none"
     />
 
-    <!-- Captcha (provider-agnostic; see src/components/Captcha.astro) -->
     <Captcha />
 
-    <!-- Legal consent checkbox -->
     <div class="flex w-full items-start gap-2">
       <input
         type="checkbox"
@@ -70,17 +61,15 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
       </label>
     </div>
 
-    <!-- Submit button -->
     <Button type="submit"><Fragment set:html={buttonText} /></Button>
 
-    <!-- Hidden inputs -->
+    <!-- Brevo's honeypot and locale fields -->
     <input type="text" name="email_address_check" value="" style="display: none;" />
     <input type="hidden" name="locale" value="en" />
   </section>
 </form>
 
 <script>
-  // The resource slug comes from the form's data-resource-slug.
   const form = document.getElementById("brevo-form");
   if (form) {
     const formId = form.getAttribute("action") ?? "";

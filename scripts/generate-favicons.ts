@@ -3,30 +3,19 @@ import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import sharp from "sharp";
 
-// Rasterizes the site's brand mark into the raster favicon set — the single
-// command behind every non-SVG icon. The source of truth is public/brand-mark.svg
-// (a square, full-bleed SVG); this script does NOT invent the art, it only renders
-// that file at the sizes each platform wants. Rerun (`npm run favicons`) whenever
-// you replace brand-mark.svg. The SVG icon itself is served straight from
-// /brand-mark.svg (see the <link>s in BaseLayout / BrandLayout), so it isn't
-// re-emitted here; and the OG cards rasterize the same file (src/og/card.ts).
-//
-// Outputs, all committed under public/:
-//   favicon.ico          — legacy fallback (16/32/48, PNG-encoded entries)
-//   apple-touch-icon.png — 180×180, iOS home screen
-//   icon-192.png         — PWA / Android
-//   icon-512.png         — PWA / Android + install splash
+// Renders public/brand-mark.svg into the raster favicons, committed under
+// public/. Rerun `npm run favicons` whenever you replace brand-mark.svg.
+// The SVG icon is served as-is from /brand-mark.svg.
 
 const publicDir = join(dirname(fileURLToPath(import.meta.url)), "..", "public");
 const source = readFileSync(join(publicDir, "brand-mark.svg"));
 
-// Rasterize the brand mark to a square PNG of the given size. libvips renders the
-// SVG at the target resolution (not upscaled), so every size stays crisp.
+// libvips renders the SVG at the target size (not upscaled), so every size stays crisp.
 const rasterize = (size: number): Promise<Buffer> =>
   sharp(source).resize(size, size).png().toBuffer();
 
-// Pack PNG buffers into an ICO container (each entry is a PNG-encoded image —
-// supported by every browser that reads .ico). Avoids an extra dependency.
+// Pack PNGs into an ICO container by hand to avoid a dependency. Every browser
+// that reads .ico supports PNG-encoded entries.
 function buildIco(images: { size: number; png: Buffer }[]): Buffer {
   const header = Buffer.alloc(6);
   header.writeUInt16LE(0, 0); // reserved

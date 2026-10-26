@@ -1,5 +1,4 @@
-// Single source of truth for the date formats the site emits, so the machine
-// (`datetime`/`lastmod`) and human renderings can't drift across components.
+// Shared date formats, so every component renders dates the same way.
 
 /** Machine date, YYYY-MM-DD (for <time datetime>, sitemap <lastmod>, etc.). */
 export const isoDate = (d: Date): string => d.toISOString().substring(0, 10);
