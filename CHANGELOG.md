@@ -8,6 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Changed
 
+- Satori 0.63 for OG cards. It sizes boxes as content-box, like browsers, so the card root now sets `boxSizing: border-box`. ([#62](https://github.com/Zmoki/zmoki-astro-starter/pull/62))
 - Docs and code comments pruned: `AGENTS.md` is a short map pointing to the skills, the skills are about a third shorter, and comments explain why instead of restating code. Stale statements fixed. ([#60](https://github.com/Zmoki/zmoki-astro-starter/pull/60))
 - Dependencies updated: Astro 7.4, `@astrojs/mdx` 8, `markdown-it` 15. Remark/rehype plugins moved into `unified({...})`, as Astro 7.4 requires. ([#58](https://github.com/Zmoki/zmoki-astro-starter/pull/58))
 - Node pinned in one place, `.node-version` (24.22.1); CI reads it too. GitHub Actions `setup-node` v7, `cache` v6. ([#58](https://github.com/Zmoki/zmoki-astro-starter/pull/58))
