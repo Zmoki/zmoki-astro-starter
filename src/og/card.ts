@@ -42,6 +42,8 @@ const root = (children: Node[]): Node =>
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
+      // Satori sizes boxes like browsers (content-box), so keep the padding inside the card.
+      boxSizing: "border-box",
       width: OG_WIDTH,
       height: OG_HEIGHT,
       padding: 80,
