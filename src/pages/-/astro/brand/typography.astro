@@ -11,7 +11,7 @@ const accent = indigo["600"];
 const typeScale = [
   {
     label: "Hero",
-    classes: "text-4xl font-semibold xl:text-6xl",
+    classes: "text-4xl font-semibold tracking-tight xl:text-6xl",
     sample: site.name,
     usage: "Post titles (PostLayout h1)",
   },
@@ -23,7 +23,7 @@ const typeScale = [
   },
   {
     label: "Section heading",
-    classes: "text-3xl font-medium md:text-4xl",
+    classes: "text-3xl font-semibold md:text-4xl",
     sample: "What you get",
     usage: "Landing sections & author bio (h2)",
   },
@@ -31,34 +31,40 @@ const typeScale = [
     label: "Card title",
     classes: "text-2xl font-semibold leading-normal xl:text-3xl",
     sample: "An example post",
-    usage: "PostCard (h3)",
+    usage: "PostCard (h2)",
   },
   {
     label: "Body",
-    classes: "text-lg xl:text-xl",
+    classes: "text-lg leading-normal tracking-tight xl:text-xl",
     sample: `The base reading size — ${fonts.sans.name}, set clean.`,
     usage: "Global body (BaseLayout)",
   },
 ] as const;
 
-const monoLabels = [
+const smallLabels = [
   {
-    label: "Eyebrow / meta",
-    classes: "font-mono text-xs uppercase tracking-normal",
+    label: "Eyebrow",
+    classes: "text-sm font-semibold uppercase tracking-wide",
+    sample: "What you get",
+    usage: "Landing section eyebrows",
+  },
+  {
+    label: "Date / meta",
+    classes: "text-sm",
     sample: "20 Jun 2026",
-    usage: "Dates, eyebrows (PostCard, PostLayout)",
+    usage: "Dates (PostCard, PostLayout)",
   },
   {
     label: "Previous / Next",
-    classes: "font-mono text-sm uppercase tracking-normal",
+    classes: "text-sm font-medium",
     sample: "Previous",
     usage: "Post navigation (PostLayout)",
   },
   {
     label: "Button text",
-    classes: "font-mono text-xs font-medium uppercase tracking-normal",
+    classes: "text-xs font-medium",
     sample: "Copy",
-    usage: "Copy / action buttons",
+    usage: "Code block Copy button",
   },
 ] as const;
 
@@ -69,15 +75,19 @@ const trackingRules = [
     where: "Global body, nav, footer",
   },
   {
-    token: "tracking-normal",
-    rule: "In-content mono labels — eyebrows, meta, buttons",
-    where: "Dates, Previous/Next, copy button",
+    token: "tracking-wide",
+    rule: "Uppercase eyebrows",
+    where: "Landing section eyebrows",
   },
 ];
 
 const leadingRules = [
-  { token: "leading-tight", rule: "Body copy & headings", where: "Global body (BaseLayout)" },
-  { token: "leading-normal", rule: "Multi-line titles", where: "PostCard, prev/next titles" },
+  {
+    token: "leading-normal",
+    rule: "Default — body copy, headings and multi-line titles",
+    where: "Global body (BaseLayout), PostCard, prev/next titles",
+  },
+  { token: "leading-tight", rule: "Short copy beside a form", where: "Brevo form intro" },
 ];
 
 // Part 2: prose typography for rendered Markdown/MDX.
@@ -169,10 +179,10 @@ const linkTreatments = [
       }
     </div>
 
-    <h3 class="mt-8 mb-5 text-2xl font-semibold md:text-3xl">Mono labels</h3>
+    <h3 class="mt-8 mb-5 text-2xl font-semibold md:text-3xl">Small labels</h3>
     <div class="divide-zmoki-stone-200 divide-y">
       {
-        monoLabels.map((step) => (
+        smallLabels.map((step) => (
           <div class="grid items-baseline gap-2 py-5 md:grid-cols-[10rem_1fr]">
             <div>
               <p class="font-medium">{step.label}</p>
@@ -234,7 +244,7 @@ const linkTreatments = [
         >prose prose-xl</code
       > (stepping up to
       <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
-        >2xl:prose-2xl</code
+        >xl:prose-2xl</code
       >). Overrides live in
       <code class="bg-zmoki-stone-100 text-zmoki-stone-800 rounded px-1.5 py-0.5 font-mono"
         >tailwind.config.mjs</code
@@ -251,7 +261,7 @@ const linkTreatments = [
       </li>
       <li>
         <span class="text-zmoki-stone-900">--tw-prose-body</span>
-        <span class="text-zmoki-stone-500">→ zmoki-stone-900</span>
+        <span class="text-zmoki-stone-500">→ zmoki-stone-700</span>
       </li>
       <li>
         <span class="text-zmoki-stone-900">--tw-prose-bold</span>
@@ -327,7 +337,7 @@ const linkTreatments = [
       </dl>
       <h2>Code block</h2>
       <p>
-        Fenced blocks are highlighted with Shiki (<code>catppuccin-latte</code>) and get a copy
+        Fenced blocks are highlighted with Shiki (<code>catppuccin-mocha</code>) and get a copy
         button at build time. Hand-written here, they fall back to prose code styling:
       </p>
       <pre><code>const garden = ["posts", "resources", "now"];
