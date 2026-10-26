@@ -1,11 +1,12 @@
 import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { execSync } from "child_process";
+import { site } from "../src/site.config.ts";
 
 // Writes blog-timeline.csv: each post's publish, modified and git-commit dates.
 
 const BLOG_DIR = "src/content/blog";
-const SITE_URL = "https://starter.zmoki.xyz";
+const SITE_URL = site.domain;
 const OUTPUT_FILE = "blog-timeline.csv";
 
 function parseFrontmatter(content) {
