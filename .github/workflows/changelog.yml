@@ -24,7 +24,7 @@ jobs:
           if gh pr diff "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --name-only | grep -qx "CHANGELOG.md"; then
             echo "✓ CHANGELOG.md updated"
           else
-            echo "::error::Add an entry under Unreleased in CHANGELOG.md (what changed, why, how to adopt), or label the PR no-changelog if adopters have nothing to know."
+            echo "::error::Add an entry under Unreleased in CHANGELOG.md (what changed and why), or label the PR no-changelog if there is nothing worth telling."
             exit 1
           fi
 

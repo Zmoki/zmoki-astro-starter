@@ -56,10 +56,11 @@ From an agent or other non-interactive shell, Astro starts `dev` and `preview` i
 
 ## Rules
 
+- **Write short.** This applies to docs, skills, comments, the changelog and PR descriptions. Say each fact once, in the file that owns it, and link to it elsewhere. Use plain short sentences, with no filler, history or restating. Comments say why, not what the code does.
 - **Format before committing** (`npm run format`). The Tailwind plugin owns class order; don't reorder classes by hand. Prefix intentionally unused variables with `_`.
 - **Content dates.** When you edit a content entry, set its `contentModifiedDate` to today. It feeds the sitemap's `<lastmod>`.
 - **Generated files** (`public/_headers`, `public/_redirects`, `vercel.json`, `redirects.json`, `customHeaders.json`) are committed but never edited by hand. Change the source, rebuild, commit both.
-- **Changelog.** Every PR that changes the starter adds an entry under `## [Unreleased]` in `CHANGELOG.md`, written for people who copied the starter: what changed, why, and a **"To adopt:"** list (files to copy, config to set, commands to run). Mark changes that force them to edit their own code or content as breaking. Use the Keep a Changelog headings (`Added`, `Changed`, `Fixed`, `Removed`, `Security`) and link the PR. Label a PR `no-changelog` only when adopters have nothing to learn from it.
+- **Changelog.** Every PR that changes the starter adds a line or two under `## [Unreleased]` in `CHANGELOG.md`: what changed and why, plus the PR link, under a Keep a Changelog heading (`Added`, `Changed`, `Fixed`, `Removed`, `Security`). No adoption steps; the PR has the code. If people who copied the starter must change their own code or content, add one **Breaking:** sentence saying what. Label a PR `no-changelog` only when there's nothing worth telling them.
 
 ### Scripts and the CSP
 

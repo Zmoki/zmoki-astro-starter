@@ -2,7 +2,7 @@
 
 Everything to do to turn this starter into your own site, top to bottom. Each step says what to set and where; the linked skill (`.claude/skills/<name>/SKILL.md`) has the details. You can also ask your AI agent to work through this file with you.
 
-> **Staying up to date.** Your copy won't get starter updates by itself. Keep `package.json` `version` as it is: it records the starter release you began from. Watch [the repo](https://github.com/Zmoki/zmoki-astro-starter) with **Custom → Releases** to hear about new ones; each release and `CHANGELOG.md` say what changed and how to bring it into your copy.
+> **Staying up to date.** Your copy won't get starter updates by itself. Keep `package.json` `version` as it is: it records the starter release you began from. Watch [the repo](https://github.com/Zmoki/zmoki-astro-starter) with **Custom → Releases** to hear about new ones; each release and `CHANGELOG.md` say what changed, with links to the PRs.
 
 ## 1. Site config
 

@@ -88,5 +88,5 @@ src/
 
 - **[SETUP.md](./SETUP.md)**: the checklist for a new site
 - **[AGENTS.md](./AGENTS.md)**: how the code fits together, commands, CI and conventions
-- **[CHANGELOG.md](./CHANGELOG.md)**: what changed, and how to bring it into your copy
+- **[CHANGELOG.md](./CHANGELOG.md)**: what changed in each release
 - **`.claude/skills/`**: playbooks for recurring tasks
