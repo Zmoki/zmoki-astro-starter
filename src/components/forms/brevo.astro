@@ -18,6 +18,7 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
 
 <form
   id="brevo-form"
+  data-form-id={formId}
   data-resource-slug={resourceSlug}
   method="POST"
   action={`https://${BREVO_ACCOUNT_ID}.sibforms.com/serve/${formId}`}
@@ -72,7 +73,7 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
 <script>
   const form = document.getElementById("brevo-form");
   if (form) {
-    const formId = form.getAttribute("action") ?? "";
+    const formId = form.dataset.formId ?? "";
     const resourceSlug = form.dataset.resourceSlug ?? "";
 
     window.track?.("resource_gate_viewed", { resource_slug: resourceSlug, form_id: formId });
