@@ -1,16 +1,16 @@
-// Deploy-host facts shared by src/lib/urls.ts and scripts/check-links.ts.
+// Deploy-host facts shared by src/lib/urls.ts and the scripts in scripts/.
 // No dependencies and relative imports only: plain `node` scripts load it and
 // don't resolve the `@/` alias.
 
-/** Supported hosts (mirrors scripts/generate-{redirects,headers}.ts). The active one is `site.platform.deploy`. */
-export type DeployPlatform = "cloudflare" | "netlify" | "vercel" | "amplify";
+/** Supported hosts. The active one is `site.platform.deploy`. */
+export type Platform = "cloudflare" | "netlify" | "vercel" | "amplify";
 
 // Cloudflare Pages has no "is production" flag, so any other CF_PAGES_BRANCH
 // marks a preview. Change this if production deploys from another branch.
 const PRODUCTION_BRANCH = "main";
 
 /** Preview host suffix per platform, to recognize a preview URL without the build's env vars (e.g. in CI). */
-export const PREVIEW_HOST_SUFFIX: Record<DeployPlatform, string> = {
+export const PREVIEW_HOST_SUFFIX: Record<Platform, string> = {
   cloudflare: ".pages.dev",
   netlify: ".netlify.app",
   vercel: ".vercel.app",
@@ -18,7 +18,7 @@ export const PREVIEW_HOST_SUFFIX: Record<DeployPlatform, string> = {
 };
 
 /** Origin of the current preview deployment, or null on production or when the host exposes none. */
-export function previewOrigin(platform: DeployPlatform): string | null {
+export function previewOrigin(platform: Platform): string | null {
   const env = process.env;
   switch (platform) {
     case "cloudflare":

@@ -1,6 +1,7 @@
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 import { site } from "../src/site.config.ts";
+import type { Platform } from "../src/lib/deploy.ts";
 
 // Compiles src/redirects/*.csv into the redirect file for site.platform.deploy.
 // Also runs before `npm run build`. CSV columns: source,destination,code (code
@@ -9,8 +10,6 @@ import { site } from "../src/site.config.ts";
 const REDIRECTS_DIR = "src/redirects";
 const VALID_CODES = new Set(["200", "301", "302", "303", "307", "308"]);
 const DEFAULT_CODE = "301";
-
-type Platform = "cloudflare" | "netlify" | "vercel" | "amplify";
 
 interface Redirect {
   source: string;
