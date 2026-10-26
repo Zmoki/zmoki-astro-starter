@@ -208,15 +208,18 @@ export default defineConfig({
   },
   markdown: {
     // Astro 7 defaults to the Sätteri processor; opt back into the unified
-    // (remark/rehype) pipeline so the custom plugins below keep working.
-    processor: unified(),
+    // (remark/rehype) pipeline so the custom plugins keep working. The plugins
+    // are passed to unified() itself (markdown.*Plugins is deprecated), and
+    // @astrojs/mdx uses the same processor for .mdx files.
+    processor: unified({
+      remarkPlugins: [remarkDefinitionList],
+      remarkRehype: { handlers: defListHastHandlers },
+      rehypePlugins: [rehypeDefinitionListIds, rehypeExternalLinks, rehypeCodeBlockCopy],
+    }),
     shikiConfig: {
       // Dark theme: light tokens on a dark background clear WCAG AA (the light
       // `catppuccin-latte` failed contrast on several token colors).
       theme: "catppuccin-mocha",
     },
-    remarkPlugins: [remarkDefinitionList],
-    remarkRehype: { handlers: defListHastHandlers },
-    rehypePlugins: [rehypeDefinitionListIds, rehypeExternalLinks, rehypeCodeBlockCopy],
   },
 });
