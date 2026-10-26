@@ -1,13 +1,7 @@
 ---
-// Analytics dispatcher. Renders each built-in provider only when its own
-// committed config (analytics/<provider>-config.ts) is set, chaining onto the
-// shared window.track/window.identify facade so one call fans out to every
-// active provider.
-//
-// Off by default; PUBLIC_ANALYTICS_ENABLED="true" turns it on (host's
-// production env, CI on main, or locally to test — see AGENTS.md → Analytics).
-// To add a provider: add its config module (constants + CSP hosts), chain onto
-// window.track, then import + render it below.
+// Analytics dispatcher. Renders every provider whose config is set; each one
+// chains onto window.track/window.identify, so one call reaches all of them.
+// Off unless PUBLIC_ANALYTICS_ENABLED="true". See AGENTS.md → Swappable providers.
 import PostHog from "@/components/analytics/posthog.astro";
 import Gtm from "@/components/analytics/gtm.astro";
 import { posthogConfigured } from "@/components/analytics/posthog-config";

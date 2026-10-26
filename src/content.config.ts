@@ -1,9 +1,8 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
-// Per-entry robots directives → <meta name="robots"> (e.g. ["noindex"],
-// ["noindex", "nofollow"]). A noindex value also drops the page from the sitemap.
-// Path-level rules live in src/headers/headers.config.ts. Omit to index normally.
+// Per-entry <meta name="robots"> directives, e.g. ["noindex"]. noindex also
+// drops the page from the sitemap.
 const robots = z.array(z.string()).optional();
 
 const blog = defineCollection({
@@ -14,23 +13,18 @@ const blog = defineCollection({
     description: z.string(),
     publishDate: z.coerce.date(),
     contentModifiedDate: z.coerce.date(),
-    // Optional cover image — a real, non-text photo (NOT the OG card): the post's
-    // LCP image, the schema.org BlogPosting.image, and the image-sitemap entry —
-    // i.e. the primary image Google Discover reads. Use a well-cropped landscape
-    // ≥1200px wide at 16:9, as a full URL (on `site.platform.imagesCDNHost` → it's
-    // optimized at build). Both fields are required when `cover` is set, so the
-    // primary image is never decorative. No cover ⇒ schema.image falls back to the OG card.
+    // A real photo, not the OG card: the post's hero and the primary image Google
+    // Discover reads. Landscape, 16:9, at least 1200px wide, as a full URL.
+    // `alt` is required so the primary image is never decorative. See the /images skill.
     cover: z
       .object({
         image: z.string(),
         alt: z.string().min(1),
       })
       .optional(),
-    // Optional canonical URL — set for cross-posted content so search engines
-    // credit the original. Drives <link rel="canonical"> + BlogPosting.mainEntityOfPage.
+    // Set on cross-posted content so search engines credit the original.
     canonical: z.url().optional(),
-    // Per-post byline author — drives the header credit, "Written by" bio, the
-    // schema.org BlogPosting author, and the OG card credit.
+    // The post's byline: header credit, author bio, schema.org author and OG card.
     author: z.object({
       name: z.string(),
       /** The author's site — linked from the byline. */
@@ -55,8 +49,7 @@ const resources = defineCollection({
     order: z.number(),
     form: z
       .object({
-        // Provider-neutral form id, rendered by the site-wide form provider
-        // (built-in: Brevo → the sibforms serve id). See src/components/Form.astro.
+        // Id for the site's form provider (Brevo: the sibforms serve id). See src/components/Form.astro.
         formId: z.string(),
         buttonText: z.string(),
         title: z.string(),
@@ -70,11 +63,9 @@ const resources = defineCollection({
         description: z.string(),
       })
       .optional(),
-    // The gated deliverable, as a public URL — host the file externally (R2, S3,
-    // a CDN/bucket, Brevo's own hosting…) rather than committing binaries to the
-    // repo. Surfaced as a direct download on the thank-you page so delivery does
-    // not depend solely on the Brevo email. Note: a public URL is reachable by
-    // anyone who has it — this is a lead-magnet gate, not access control.
+    // The gated file, as a public URL hosted outside the repo. The thank-you page
+    // links it too, so delivery doesn't rely on the email alone. Anyone with the
+    // URL can download it: this is a lead-magnet gate, not access control.
     asset: z
       .object({
         url: z.string(),

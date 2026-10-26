@@ -2,17 +2,14 @@ import { existsSync, readFileSync, writeFileSync } from "fs";
 import { site } from "../src/site.config.ts";
 import { headerRules, type HeaderRule } from "../src/headers/headers.config.ts";
 
-// Compiles the platform-neutral header rules in src/headers/headers.config.ts
-// into the response-header artifact for the configured hosting platform
-// (site.platform.deploy). headers.config.ts is the source of truth; each emitter
-// below renders its format. Run via `npm run build:headers`; also runs
-// automatically before `npm run build`.
+// Compiles src/headers/headers.config.ts into the header file for
+// site.platform.deploy. Also runs before `npm run build`.
 
 type Platform = "cloudflare" | "netlify" | "vercel" | "amplify";
 
 interface EmitResult {
   output: string;
-  count: number; // header rules written to the artifact
+  count: number;
 }
 
 // ── Validation ────────────────────────────────────────────────────────────────
@@ -33,11 +30,8 @@ function validate(rules: HeaderRule[], errors: string[]): void {
 }
 
 // ── Emitters ──────────────────────────────────────────────────────────────────
-// Each returns the path it wrote so the caller can report and warn about stale
-// artifacts from other platforms.
 
-// Cloudflare Pages and Netlify share the exact `_headers` format: a path line,
-// then each header indented two spaces as `Name: value`.
+// Cloudflare Pages and Netlify share the `_headers` format.
 function emitHeadersFile(rules: HeaderRule[], platform: Platform): EmitResult {
   const output = "public/_headers";
   const header = [
@@ -55,9 +49,7 @@ function emitHeadersFile(rules: HeaderRule[], platform: Platform): EmitResult {
   return { output, count: rules.length };
 }
 
-// Vercel: merge a `headers` array into vercel.json, preserving other config
-// (e.g. `redirects` written by generate-redirects.ts). Shape:
-// [{ source, headers: [{ key, value }] }].
+// Merge into vercel.json, keeping other keys (e.g. `redirects` from generate-redirects.ts).
 function emitVercelJson(rules: HeaderRule[]): EmitResult {
   const output = "vercel.json";
   const headers = rules.map((rule) => ({
@@ -78,9 +70,7 @@ function emitVercelJson(rules: HeaderRule[]): EmitResult {
   return { output, count: headers.length };
 }
 
-// AWS Amplify: emit customHeaders.json ([{ pattern, headers: [{ key, value }] }])
-// to paste into the Amplify console (Custom headers) or manage via IaC. Amplify
-// has no committed-file convention like _headers.
+// Amplify has no committed-file convention: paste the output into its console or IaC.
 function emitAmplifyJson(rules: HeaderRule[]): EmitResult {
   const output = "customHeaders.json";
   const entries = rules.map((rule) => ({
@@ -91,9 +81,7 @@ function emitAmplifyJson(rules: HeaderRule[]): EmitResult {
   return { output, count: entries.length };
 }
 
-// Warn if artifacts from other platforms are still lying around after a switch.
-// Only flags files that exist *solely* to hold headers (not vercel.json, which
-// legitimately holds other config).
+// Warn about files left from a previous platform (not vercel.json, which holds other config).
 function warnStaleArtifacts(platform: Platform, warnings: string[]): void {
   const headersFileHost = platform === "cloudflare" || platform === "netlify";
   if (!headersFileHost && existsSync("public/_headers")) {

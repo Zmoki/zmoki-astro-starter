@@ -1,16 +1,8 @@
 ---
-// Captcha dispatcher, mirroring Analytics.astro but single-select: at most ONE
-// provider renders (two widgets inject competing hidden tokens), the first in
-// `providers` whose site-key constant is set. Its token is validated by the
-// form backend (Brevo) against the captcha configured on that Brevo form —
-// keep the two in sync.
-//
-// Off by default; PUBLIC_CAPTCHA_ENABLED="true" turns it on (host's production
-// env, CI on main, or locally to test) — also keeps Turnstile's domain check
-// from tripping in local dev.
-// To add a provider: add a captcha/<provider>-config.ts exporting its site key
-// and CSP hosts, add a { enabled, Component } entry below, and spread its hosts
-// into src/headers/headers.config.ts.
+// Captcha dispatcher. At most one provider renders, because two widgets would
+// inject competing hidden tokens. Brevo validates the token against the captcha
+// set on the Brevo form, so keep the two in sync.
+// Off unless PUBLIC_CAPTCHA_ENABLED="true". See AGENTS.md → Swappable providers.
 import Turnstile from "@/components/captcha/turnstile.astro";
 import { TURNSTILE_SITE_KEY } from "@/components/captcha/turnstile-config";
 

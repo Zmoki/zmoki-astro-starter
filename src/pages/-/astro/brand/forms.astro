@@ -2,9 +2,7 @@
 import BrandLayout from "@/layouts/BrandLayout.astro";
 import { site } from "@/site.config";
 
-// Shared input class strings so the live examples and the usage code stay in
-// sync with what the resource-gate form (src/components/forms/brevo.astro)
-// actually renders.
+// Copies of what src/components/forms/brevo.astro renders. Keep them in sync.
 const labelClass = "text-sm font-medium";
 const inputClass =
   "w-full rounded-lg border border-zmoki-stone-300 bg-white p-2 text-lg focus:border-zmoki-indigo-500 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500/30";
@@ -34,7 +32,6 @@ const buttonClass =
     </p>
   </header>
 
-  <!-- Inputs & labels -->
   <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Inputs & labels</h2>
   <section
     class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
@@ -59,7 +56,6 @@ const buttonClass =
     </div>
   </section>
 
-  <!-- Focus states -->
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Focus states</h2>
   <section
     class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
@@ -79,7 +75,6 @@ const buttonClass =
     </ul>
   </section>
 
-  <!-- Submit button -->
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Submit button</h2>
   <section
     class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
@@ -98,7 +93,6 @@ const buttonClass =
     </div>
   </section>
 
-  <!-- Consent & captcha -->
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">Consent & captcha</h2>
   <section
     class="border-zmoki-stone-200 space-y-6 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
@@ -132,7 +126,6 @@ const buttonClass =
     </div>
   </section>
 
-  <!-- Validation & error states -->
   <h2 class="text-zmoki-stone-500 mt-10 mb-4 px-1 text-sm font-medium">
     Validation & error states
   </h2>
@@ -174,7 +167,6 @@ const buttonClass =
     </form>
   </section>
 
-  <!-- Usage in code -->
   <section
     class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-10 rounded-2xl border p-6 shadow-sm md:p-8"
   >
@@ -228,6 +220,7 @@ const buttonClass =
     const msg = document.getElementById("demo-validate-msg");
     if (!form || !input || !msg) return;
 
+    // Must match inputClass and inputErrorClass above.
     const ok =
       "w-full rounded-lg border border-zmoki-stone-300 bg-white p-2 text-lg focus:border-zmoki-indigo-500 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500/30";
     const bad =

@@ -1,16 +1,10 @@
 ---
-// Cloudflare Turnstile captcha provider. Gated by Captcha.astro (the
-// dispatcher), which renders this only when TURNSTILE_SITE_KEY is set — so an
-// unconfigured Turnstile never loads its script.
+// Cloudflare Turnstile. api.js renders every `.cf-turnstile` element and adds a
+// hidden token that Brevo validates on submit. Keep the `g-recaptcha` class:
+// Brevo uses it to find the captcha field.
 //
-// After api.js loads, Turnstile auto-renders any `.cf-turnstile` element and
-// injects a hidden `cf-turnstile-response` token that the form backend (Brevo)
-// validates server-side. The extra `g-recaptcha` class matches Brevo's own
-// generated embed (its captcha-field detection) — keep it so the token is
-// picked up on submit.
-
-// The site key lives in turnstile-config.ts, which also gives the CSP its hosts.
-// The loader is an external script on an allowlisted host, not inline code.
+// The loader is an external script on a CSP-allowlisted host, so is:inline is
+// allowed here.
 import { TURNSTILE_SITE_KEY } from "@/components/captcha/turnstile-config";
 ---
 

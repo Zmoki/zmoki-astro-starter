@@ -1,10 +1,8 @@
 import { readdirSync } from "fs";
 import { join } from "path";
 
-// Shared dist/ walking used by the post-build CI guards (check-links,
-// check-structured-data, check-sitemap) so the walk + route mapping lives once.
+// dist/ walking shared by the post-build CI checks.
 
-/** The build output directory these CI guards read. */
 export const DIST_DIR = "dist";
 
 /** Recursively collect every .html file under a directory (default: dist/). */

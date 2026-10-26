@@ -2,35 +2,13 @@ import type { AstroGlobal } from "astro";
 import { site } from "@/site.config";
 import { previewOrigin } from "./deploy";
 
-// Single source of truth for every URL the site emits — the canonical link,
-// og:url, og:image / twitter:image, the RSS alternate link, and the JSON-LD
-// structured data. Route all of them through here so they can never drift apart
-// (e.g. an OG image URL scheme change silently leaving the structured data
-// pointing at a dead path).
-//
-// Two origins, deliberately distinct:
-//   • siteOrigin    — the production origin from astro.config `site`. Used for
-//     everything that must be the real public URL regardless of environment:
-//     canonical, og:url, RSS, and all structured-data URLs.
-//   • currentOrigin — the origin of *this* deployment, so assets/links resolve
-//     against wherever the page is being served right now:
-//       – `astro dev`        → the local dev server (Astro.url.origin)
-//       – preview deployment → the current preview's origin, so a branch/PR
-//         preview's og:image points at that deploy — not production, which may
-//         not even have a new page's card yet
-//       – production / other → the production siteOrigin (custom domain)
-//
-// On the production deploy the two origins are identical, so canonical/OG/SD all
-// resolve to the same absolute URLs; they diverge under `astro dev` and on
-// preview deployments.
+// Every absolute URL the site emits (canonical, og:url, og:image, RSS, JSON-LD)
+// goes through here so they can't drift apart. There are two origins:
+// - siteOrigin: the production URL. Canonical, og:url, RSS and JSON-LD always use it.
+// - currentOrigin: this deployment. OG images use it, so a preview's og:image
+//   points at a card that exists on that preview, not yet on production.
+// They differ only under `astro dev` and on preview deploys.
 
-// Preview-deployment detection (`previewOrigin`) and the platform list live in
-// ./deploy, shared with scripts/check-links.ts so both agree on what "our own
-// preview" means.
-
-// Resolve the origin of the current deployment (see the currentOrigin note
-// above): local dev server, then the configured host's preview deploy, else
-// production.
 function resolveCurrentOrigin(astro: AstroGlobal, siteOrigin: URL): URL {
   if (import.meta.env.DEV) {
     return new URL(astro.url.origin);
@@ -40,7 +18,7 @@ function resolveCurrentOrigin(astro: AstroGlobal, siteOrigin: URL): URL {
     try {
       return new URL(preview);
     } catch {
-      // Malformed preview URL — fall through to production.
+      // Malformed preview URL: fall back to production.
     }
   }
   return siteOrigin;

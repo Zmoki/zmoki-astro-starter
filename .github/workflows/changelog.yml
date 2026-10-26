@@ -1,9 +1,7 @@
 name: Changelog
 
-# Every PR that changes the starter adds its entry to CHANGELOG.md under
-# "Unreleased" (see AGENTS.md → Changelog & releases). A PR with nothing for
-# adopters to know (a typo, CI-only churn) carries the `no-changelog` label.
-# Its own workflow, so adding or removing the label re-runs only this check.
+# Fails a PR with no CHANGELOG.md entry unless it has the `no-changelog` label.
+# A separate workflow, so toggling the label re-runs only this check.
 
 on:
   pull_request:
@@ -26,7 +24,7 @@ jobs:
           if gh pr diff "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --name-only | grep -qx "CHANGELOG.md"; then
             echo "✓ CHANGELOG.md updated"
           else
-            echo "::error::Add an entry under Unreleased in CHANGELOG.md (what changed, why, how to adopt), or label the PR no-changelog if adopters have nothing to know."
+            echo "::error::Add an entry under Unreleased in CHANGELOG.md (what changed and why), or label the PR no-changelog if there is nothing worth telling."
             exit 1
           fi
 

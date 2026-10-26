@@ -1,14 +1,8 @@
 ---
 /**
- * Renders a schema.org JSON-LD block for Google rich results.
- *
- * Pass a single schema object, or an array to emit several graphs at once
- * (e.g. a BlogPosting plus a BreadcrumbList on the same page). JSON-LD is
- * valid anywhere in the document, so drop this component inside any layout
- * or page — no need to reach into <head>.
- *
- * See the /structured-data skill for which types fit this site, Google's
- * policies, and the per-feature eligibility checks.
+ * Renders a schema.org JSON-LD block. Pass one schema, or an array to emit
+ * several. JSON-LD is valid anywhere in the document, so it doesn't need to be
+ * in <head>. See the /structured-data skill.
  */
 export interface Props {
   schema: Record<string, unknown> | Record<string, unknown>[];
@@ -16,8 +10,8 @@ export interface Props {
 
 const { schema } = Astro.props;
 
-// set:html does not escape — neutralise "<" so a stray "</script>" inside any
-// string value can't break out of the tag.
+// set:html does not escape, so "<" is escaped to stop a "</script>" in any
+// string value from closing the tag.
 const json = JSON.stringify(schema).replace(/</g, "\\u003c");
 ---
 

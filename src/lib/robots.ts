@@ -1,5 +1,4 @@
-// Robots directive helpers. A page's `robots` is a list of directives per
-// Google's spec: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag
+// Directives per Google's spec: https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag
 
 /** Site-wide baseline robots directive, always emitted. */
 export const DEFAULT_ROBOTS = "max-image-preview:large";

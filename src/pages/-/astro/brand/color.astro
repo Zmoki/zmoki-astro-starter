@@ -3,9 +3,7 @@ import BrandLayout from "@/layouts/BrandLayout.astro";
 import { colors, paletteNames, customPaletteNames } from "@/design-tokens.mjs";
 import { site } from "@/site.config";
 
-// Pull the real tokens straight from the shared design-tokens module so this
-// page can never drift from what Tailwind actually generates. Every Tailwind
-// palette is exposed under the `zmoki-` prefix (zmoki-slate, zmoki-red, …).
+// The same tokens Tailwind generates its utilities from, so this page can't drift.
 const palette = colors as Record<string, Record<string, string>>;
 
 // The first five names are the greys; the rest are the chromatic ramp.
@@ -14,7 +12,6 @@ const colorNames = paletteNames.slice(5);
 // Any custom scales added via `customPalettes` in design-tokens.mjs.
 const customNames = customPaletteNames as string[];
 
-// Shades of a single palette, ordered 50 → 950.
 const shadesFor = (name: string) =>
   Object.entries(palette[`zmoki-${name}`] ?? {})
     .map(([shade, hex]) => ({ shade: Number(shade), hex }))
@@ -119,7 +116,6 @@ const families = (names: string[]) =>
     )
   }
 
-  <!-- Usage in code -->
   <section
     class="border-zmoki-stone-200 text-zmoki-stone-900 mt-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8"
   >

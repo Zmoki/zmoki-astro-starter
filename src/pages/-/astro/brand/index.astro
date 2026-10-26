@@ -7,13 +7,10 @@ const cream = colors["zmoki-cream"] as Record<string, string>;
 const stone = colors["zmoki-stone"] as Record<string, string>;
 const indigo = colors["zmoki-indigo"] as Record<string, string>;
 
-// The key colors of the system — warm ivory canvas, ink, muted text, and the
-// indigo accent ramp — so the strip reads as a warm, minimal palette.
+// Canvas, ink, muted text and the accent.
 const palettePreview = [cream["100"], stone["900"], stone["500"], indigo["100"], indigo["600"]];
 
-// Top-level brand settings, the files a rebrand starts from before any
-// individual guideline page. Rendered between the hero and the section cards.
-// A summary is a list of parts; a `{ code }` part renders as inline code.
+// The files a rebrand starts from. A `{ code }` summary part renders as inline code.
 const foundations: {
   title: string;
   file: string;

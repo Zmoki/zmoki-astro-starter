@@ -18,9 +18,8 @@ module.exports = {
       },
     },
     upload: {
-      // Uploads each report to Google-hosted temporary public storage and
-      // prints a public URL (kept ~a few days). The PR comment links to it.
-      // See SETUP.md → "Lighthouse report hosting" for other options.
+      // Public for a few days; the PR comment links to it.
+      // Other options: SETUP.md → "Lighthouse reports".
       target: "temporary-public-storage",
     },
   },

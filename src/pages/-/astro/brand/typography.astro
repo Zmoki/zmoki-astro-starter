@@ -3,16 +3,11 @@ import BrandLayout from "@/layouts/BrandLayout.astro";
 import { colors, fonts } from "@/design-tokens.mjs";
 import { site } from "@/site.config";
 
-// Pull real tokens so the link-treatment swatches can never drift from
-// what Tailwind actually generates (mirrors the Color page approach).
+// Real tokens, so the link swatches match what Tailwind generates.
 const indigo = colors["zmoki-indigo"] as Record<string, string>;
 const accent = indigo["600"];
 
-// ---------------------------------------------------------------------------
-// Part 1 — Design typography (UI type scale)
-// Each step renders live with the exact utility classes used in the real
-// layouts/components, so the specimen is the source of truth.
-// ---------------------------------------------------------------------------
+// Part 1: UI type scale. Each `classes` string should match the place named in `usage`.
 const typeScale = [
   {
     label: "Hero",
@@ -46,7 +41,6 @@ const typeScale = [
   },
 ] as const;
 
-// Mono-set UI labels — small, uppercase, tracked normal.
 const monoLabels = [
   {
     label: "Eyebrow / meta",
@@ -68,8 +62,6 @@ const monoLabels = [
   },
 ] as const;
 
-// Tracking & leading conventions — the analysis flagged drift between
-// tracking-tight / -tighter / -normal. This documents the intended rule.
 const trackingRules = [
   {
     token: "tracking-tight",
@@ -88,10 +80,7 @@ const leadingRules = [
   { token: "leading-normal", rule: "Multi-line titles", where: "PostCard, prev/next titles" },
 ];
 
-// ---------------------------------------------------------------------------
-// Part 2 — Prose typography (MDX .prose content)
-// Link treatments sourced from real tokens.
-// ---------------------------------------------------------------------------
+// Part 2: prose typography for rendered Markdown/MDX.
 const linkTreatments = [
   {
     label: "Base link",
@@ -140,9 +129,6 @@ const linkTreatments = [
     </p>
   </header>
 
-  <!-- ===================================================================== -->
-  <!-- Part 1 — Design typography                                            -->
-  <!-- ===================================================================== -->
   <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Part 1 · Design typography</h2>
 
   <!-- Font pairing -->
@@ -164,7 +150,6 @@ const linkTreatments = [
     </section>
   </div>
 
-  <!-- Type scale -->
   <section class="border-zmoki-stone-200 mb-6 rounded-xl border bg-white p-6 shadow-sm md:p-8">
     <h3 class="mb-5 text-2xl font-semibold md:text-3xl">Type scale</h3>
     <div class="divide-zmoki-stone-200 divide-y">
@@ -239,12 +224,8 @@ const linkTreatments = [
     </section>
   </div>
 
-  <!-- ===================================================================== -->
-  <!-- Part 2 — Prose typography                                             -->
-  <!-- ===================================================================== -->
   <h2 class="text-zmoki-stone-500 mb-4 px-1 text-sm font-medium">Part 2 · Prose typography</h2>
 
-  <!-- Prose config -->
   <section class="border-zmoki-stone-200 mb-6 rounded-xl border bg-white p-6 shadow-sm md:p-8">
     <h3 class="mb-4 text-2xl font-semibold md:text-3xl">.prose configuration</h3>
     <p class="text-zmoki-stone-700 mb-4">
@@ -283,7 +264,6 @@ const linkTreatments = [
     </ul>
   </section>
 
-  <!-- Link treatments -->
   <section class="border-zmoki-stone-200 mb-6 rounded-xl border bg-white p-6 shadow-sm md:p-8">
     <h3 class="mb-5 text-2xl font-semibold md:text-3xl">In-prose links</h3>
     <p class="text-zmoki-stone-700 mb-5">
@@ -312,7 +292,6 @@ const linkTreatments = [
     </div>
   </section>
 
-  <!-- Live prose specimen -->
   <section class="mb-10">
     <h3 class="mb-4 px-1 text-2xl font-semibold md:text-3xl">Live specimen</h3>
     <div

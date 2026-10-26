@@ -4,7 +4,6 @@ export type OgTemplate = "article" | "site";
 export interface OgEntry {
   /** Filename stem under /og/, e.g. "blog/my-post" → /og/blog/my-post.png. */
   key: string;
-  /** Which card layout to render. */
   template: OgTemplate;
   /** Headline (already truncated to fit the card). */
   title: string;

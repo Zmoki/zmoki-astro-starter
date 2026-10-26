@@ -1,22 +1,10 @@
 import { readFileSync } from "fs";
 import { DIST_DIR, htmlFiles } from "./lib/dist-files.ts";
 
-// CI guard for structured data (schema.org JSON-LD).
-//
-// Walks the built site in dist/, extracts every
-// `<script type="application/ld+json">` block, and fails the build if any is
-// malformed or structurally unsound. This is an *offline* check — it verifies
-// the markup we emit is well-formed and sane, NOT that Google will grant a rich
-// result (Google's Rich Results Test has no CI API; that stays a manual/live
-// check on the deployed URL — see the /structured-data skill).
-//
-// Per block it asserts:
-//   - valid JSON (catches broken escaping / interpolation)
-//   - top-level is an object, or an array of objects (a JSON-LD graph)
-//   - each object carries "@context" pointing at schema.org and a "@type"
-//   - no unresolved template leftovers ("undefined", "${...}", "[object Object]")
-//
-// Run after `npm run build` (needs dist/). Wired into CI and `npm run check:sd`.
+// CI guard over dist/ (run after `npm run build`): each JSON-LD block must be
+// valid JSON, an object or array of objects, with a schema.org "@context" and a
+// "@type", and no template leftovers. Whether Google grants a rich result can
+// only be tested on the live URL (see the /structured-data skill).
 
 const LD_JSON_RE = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
 

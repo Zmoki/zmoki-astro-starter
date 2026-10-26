@@ -4,20 +4,16 @@ description: Update project dependencies (npm packages + GitHub Actions) safely,
 
 # Update dependencies
 
-Bump dependencies in **staged, separately-committed steps**, verifying at each
-step, so a regression is easy to bisect and revert. Never bump everything in one
-shot.
+Bump dependencies in stages, one commit per stage, verifying each, so a regression is easy to bisect and revert. Never bump everything in one shot.
 
 ## 0. Baseline
 
-Work on a branch (or a dedicated worktree). Ensure a clean tree, install, and
-confirm the project is green **before** changing anything — otherwise you can't
-tell what your changes broke:
+Work on a branch or a dedicated worktree, with a clean tree. Confirm the project is green before changing anything:
 
 ```bash
 npm install
 npm run build && npm run check && npm run lint && npm run format:check
-npm audit   # record the starting vulnerability count, so you know what you fixed
+npm audit   # record the starting count
 ```
 
 ## 1. Categorize
@@ -26,76 +22,44 @@ npm audit   # record the starting vulnerability count, so you know what you fixe
 npm outdated
 ```
 
-Split the results into two buckets:
-
-- **Safe** — the `Wanted` column (within the current semver range). Low risk.
-- **Major** — `Latest` > `Wanted` (a new major). Breaking; handle one at a time.
+- **Safe**: the `Wanted` column (within the current semver range).
+- **Major**: `Latest` > `Wanted`. Breaking; handle one at a time.
 
 ## 2. Security audit
-
-A dependency pass is also the moment to clear (or at least assess) security
-advisories and the `npm warn deprecated …` noise you saw on install.
 
 ```bash
 npm audit
 ```
 
-**Never run `npm audit fix --force` blind.** Its "fix" is frequently a
-_downgrade_ to an ancient major — npm will cheerfully propose `@lhci/cli@0.1.0`
-(15 majors back), which breaks the tool for zero real gain. Read each advisory
-and decide deliberately.
+**Never run `npm audit fix --force` blind.** It often "fixes" by downgrading to an ancient major (it proposes `@lhci/cli@0.1.0`, which breaks the tool). Read each advisory and decide.
 
-Triage each finding by where the vulnerable package sits — `npm ls <pkg>` shows
-the parent chain:
+Find where the vulnerable package sits with `npm ls <pkg>`, then:
 
-1. **Direct dep, forward fix exists** — bump it like any other update (sections
-   below). Prefer this.
-2. **Transitive dep, parent has a newer release** — bump the _parent_; the fix
-   flows down.
-3. **Transitive dep, no forward fix** (the parent is already latest and _still_
-   ships the vulnerable version) — pin the patched version with an `overrides`
-   block in `package.json`, then reinstall and re-audit:
+1. **Direct dep with a forward fix**: bump it like any other update. Prefer this.
+2. **Transitive dep whose parent has a newer release**: bump the parent.
+3. **Transitive dep with no forward fix** (the parent is already latest): pin the patched version in `overrides` in `package.json`, reinstall, re-audit:
 
    ```jsonc
-   // package.json — sits next to "devDependencies"
    "overrides": {
      "tmp": "^0.2.7",
-     "uuid": "^11.1.1"
+     "uuid": "^11.1.1",
+     "@tailwindcss/typography": { "postcss-selector-parser": "^6.1.5" }
    }
    ```
 
-   Use a **global** override when the package reaches the tree through only one
-   parent (confirm with `npm ls <pkg>` — one chain = safe to force globally);
-   scope it (`"parent": { "pkg": "…" }`) when other consumers still need the old
-   version. An override force-changes a transitive package across a major
-   boundary, so **verify the owning tool still runs** — `npm audit` going to 0 is
-   necessary but not sufficient; the bump could break the consumer at runtime. For
-   `@lhci/cli`, `npx lhci healthcheck` is the cheap end-to-end check.
+   Use a global override when `npm ls <pkg>` shows only one parent chain. Scope it under the parent (as with `@tailwindcss/typography` above) when other consumers still need the old version. An override can cross a major, so check the owning tool still runs: a clean `npm audit` isn't enough. For `@lhci/cli`, run `npx lhci healthcheck`.
 
-**Weigh the blast radius.** A vuln in a **dev/CI-only** tool (Lighthouse,
-Prettier, ESLint) never reaches visitors — treat it differently from one in a
-runtime dependency. Fix what's cheap and safe; don't force a risky override on a
-dev tool for a local-only, never-shipped issue. Commit any `overrides` change on
-its own (`fix(deps): …`) so it's easy to bisect.
+Weigh the blast radius. A vuln in a dev/CI-only tool (Lighthouse, Prettier, ESLint) never reaches visitors; don't force a risky override for it. Commit any `overrides` change on its own (`fix(deps): …`).
 
-### Deprecation warnings are not vulnerabilities
-
-The `npm warn deprecated …` lines on install are maintainer notices ("no longer
-supported", "leaks memory"), **not** advisories. Trace each to its parent
-(`npm ls <pkg>`). If it's a transitive dep of a tool you can't move — the parent
-still _requires_ the old version — the warning is cosmetic; leave it until
-upstream updates rather than forcing an override that risks breaking the parent
-at runtime. Only chase one when it carries a matching `npm audit` advisory, or
-the parent is your own direct dep.
+**Deprecation warnings** (`npm warn deprecated …`) are maintainer notices, not advisories. If the parent still requires the old version, leave it until upstream updates. Only chase one when it has a matching `npm audit` advisory or the parent is your own direct dep.
 
 ## 3. Confirm scope
 
-Ask the user how far to go: safe-only, safe + specific majors,
-or everything. Majors can be large migrations — don't assume.
+Ask the user how far to go: safe only, safe plus specific majors, or everything. Majors can be large migrations.
 
-## 4. Stage the work — one commit per bump
+## 4. Stage the work, one commit per bump
 
-For **safe updates** (all at once is fine):
+Safe updates, all at once:
 
 ```bash
 npm update
@@ -103,51 +67,35 @@ npm run build && npm run check && npm run lint
 git commit -am "chore(deps): apply safe within-range dependency updates"
 ```
 
-For **each major**, separately:
+Each major, separately:
 
-1. **Research** the breaking changes first — read the official upgrade guide
-   (fetch it). Don't trust memory for versions newer than your cutoff.
-2. `npm install <pkg>@^<major>` (install coupled packages together — see below).
+1. Read the official upgrade guide (fetch it; don't trust memory for recent versions).
+2. `npm install <pkg>@^<major>`. Install coupled packages together (see the notes at the end).
 3. Apply the code/config migration.
-4. **Verify** (section 5), then commit with a message explaining what broke and
-   how you migrated it.
+4. Verify (section 5), then commit with a message saying what broke and how you migrated it.
 
-## 5. Verification gates (every stage)
+## 5. Verify every stage
 
-- `npm run build` — must produce output; a green build alone isn't proof.
-- `npm run check` (astro type check) and `npm run lint`.
-- `npm run format` — the Tailwind + astro Prettier plugins re-sort/reflow;
-  run it so `format:check` (CI) passes. Expect wide class-reorder diffs after a
-  Tailwind bump — that's cosmetic, not functional.
-- **Runtime**, not just a green build: start `npm run preview` (and `npm run dev`
-  — the Vite dev path differs) and `curl` real pages. Confirm the stylesheet
-  links and serves, and that content-pipeline output is intact (copy buttons
-  `data-copy-button`, external-link `data-external`, shiki `astro-code`). See
-  the `/run` skill.
-- After a **satori**, **@resvg/resvg-js**, or **culori** bump, run `npm run build`
-  and open a couple of `dist/og/**.png` — confirm the cards still render with the
-  brand colors, fonts, and text (a broken font/color pipeline still "builds" but
-  produces blank or black cards). See `src/og/`.
+- `npm run build`, `npm run check`, `npm run lint`.
+- `npm run format`, so CI's `format:check` passes. A Tailwind bump can produce wide class-reorder diffs; they're cosmetic.
+- **Runtime**, not just a green build: start `npm run preview` and `npm run dev` (the Vite dev path differs), `curl` real pages at the URL each prints, then stop them with `npx astro preview stop` / `npx astro dev stop`. Confirm the stylesheet loads and the content pipeline output is intact: copy buttons (`data-copy-button`), external links (`data-external`), Shiki (`astro-code`). See `/run`.
+- After a **satori**, **@resvg/resvg-js** or **culori** bump, open a few `dist/og/**.png`. A broken font/color pipeline still builds but produces blank or black cards.
 
-## 6. Lockfile hygiene (critical for CI)
+## 6. Lockfile hygiene
 
-Incremental `npm install` calls can leave `package-lock.json` missing
-cross-platform **optional** deps (e.g. Tailwind 4 pulls `@tailwindcss/oxide`
-native/wasm bindings + `@emnapi/*`). CI's `npm ci` validates the lock strictly
-and fails with `EUSAGE … Missing: <pkg> from lock file`. After the majors,
-regenerate cleanly and validate the way CI does:
+Incremental installs can leave `package-lock.json` missing cross-platform optional deps (e.g. Tailwind 4's `@tailwindcss/oxide` bindings and `@emnapi/*`). CI's `npm ci` then fails with `EUSAGE … Missing: <pkg> from lock file`. After the majors, regenerate and validate the way CI does:
 
 ```bash
 rm -rf node_modules package-lock.json
 npm install
-npm ci        # must succeed — this is exactly what CI runs
+npm ci        # must succeed; this is what CI runs
 ```
 
 Commit the regenerated lock.
 
 ## 7. GitHub Actions
 
-Workflow actions are dependencies too, and pinned by major tag. Check them:
+Actions are pinned by major tag. List them with their latest release:
 
 ```bash
 grep -rn "uses:" .github/workflows/
@@ -156,38 +104,16 @@ for a in $(grep -rhoE "uses: [^@]+" .github/workflows/ | awk '{print $2}' | sort
 done
 ```
 
-Bump each `uses: <action>@vN` to the latest major. For `github-script`, skim the
-inline `script:` — v8/v9 keep `github.rest.*`, `context.*`, and `require`, so
-stable scripts carry over.
+Bump each `uses: <action>@vN` to the latest major. For `github-script`, skim the inline `script:`; v8/v9 keep `github.rest.*`, `context.*` and `require`.
 
 ### Node and npm versions
 
-**`.node-version`** (repo root, an exact version such as `24.22.1`) is the one
-pin. It's read by:
+- **`.node-version`** (exact, e.g. `24.22.1`) is the one pin. CI reads it (`actions/setup-node` with `node-version-file: .node-version`), and so do Cloudflare Pages and Netlify. Cloudflare reads nothing else, so a missing or stale file falls back to an older Node. The build scripts (`node scripts/*.ts` in `prebuild`) need Node ≥ 24's native type-stripping; on older Node the deploy fails with `ERR_UNKNOWN_FILE_EXTENSION` even when CI is green.
+- **`package.json` `engines.node`** (`">=24"`) is the floor, not a pin. Vercel reads its major. Raise it only for a new Node major, and keep `@types/node` on the pinned major.
+- **AWS Amplify** reads neither; set the Node version in its build settings (or `nvm use` in `amplify.yml`) to match `.node-version`.
+- **npm** isn't pinned separately: each Node release bundles its npm. (Don't add `packageManager`; it relies on corepack, which newer Node no longer bundles.)
 
-- **CI** — both workflows use `actions/setup-node` with
-  `node-version-file: .node-version`, so CI runs exactly what the deploy runs.
-- **Cloudflare Pages** and **Netlify** — the deploy builders. Cloudflare reads
-  _neither_ `engines` nor the CI workflow, so a missing or stale file falls back
-  to an older default Node. That bit us once: Cloudflare ran Node 22, which can't
-  execute the `.ts` build scripts natively (`node scripts/generate-redirects.ts`
-  in `prebuild`), and the deploy died with `ERR_UNKNOWN_FILE_EXTENSION` even
-  though CI was green. The build scripts rely on Node ≥24's native type-stripping
-  — so the deploy Node version is load-bearing, not cosmetic.
-
-**`package.json`** `engines.node` (e.g. `">=24"`) is the declared **floor**, not
-a pin. Vercel reads its major. Raise it only when moving to a new Node major, and
-keep `@types/node` on the same major as the pin.
-
-**AWS Amplify** reads none of these; set the Node version in its build settings
-(or an `amplify.yml` `nvm use`) to match `.node-version`.
-
-**npm** isn't pinned separately: each Node release bundles its npm, so the exact
-Node pin fixes the npm version too. (A `packageManager` field relies on corepack,
-which newer Node releases no longer bundle.)
-
-On a dependency pass, bump `.node-version` to the latest patch of its major —
-patch releases are often security releases:
+On each pass, bump `.node-version` to the latest patch of its major (patches are often security releases):
 
 ```bash
 curl -s https://nodejs.org/dist/index.json | python3 -c "import json,sys; m=open('.node-version').read().split('.')[0]; print(next(r['version'] for r in json.load(sys.stdin) if r['version'].startswith('v'+m+'.')))"
@@ -196,7 +122,7 @@ grep -H . .node-version; grep -n '"node"' package.json; grep -rn node-version .g
 
 Move to a new Node major only once it's LTS, as its own commit.
 
-## 8. PR + watch CI
+## 8. PR and CI
 
 ```bash
 git push -u origin <branch>
@@ -204,43 +130,13 @@ gh pr create --base main --title "chore(deps): …" --body "…"
 gh pr checks <PR#> --watch --interval 15
 ```
 
-Both `ci` and `lighthouse` must go green. If `ci` fails in seconds at "Install
-dependencies", it's the lockfile — go back to section 6.
+Both `ci` and `lighthouse` must pass. If `ci` fails within seconds at "Install dependencies", it's the lockfile: go back to section 6.
 
-**Worktree caveat:** `gh pr merge --delete-branch` fails with
-`'main' is already used by worktree` because the primary checkout holds `main`.
-The merge still lands on GitHub; just delete the branch manually afterward:
-`git push origin --delete <branch>`.
+In a worktree, `gh pr merge --delete-branch` fails with `'main' is already used by worktree`. The merge still lands; delete the branch with `git push origin --delete <branch>`.
 
 ## Project-specific migration notes
 
-Discovered during the Astro 7 / Tailwind 4 / Puppeteer 25 upgrade — check these
-if bumping past those majors:
-
-- **Astro 7 markdown** defaults to the new **Sätteri** processor, which does
-  **not** run remark/rehype plugins. This project depends on custom rehype
-  plugins, `remarkRehype` handlers, and shiki, so it opts back into the unified
-  pipeline: `npm i @astrojs/markdown-remark`, then `markdown.processor:
-unified()` in `astro.config.mjs`. Keep it unless you port the plugins.
-- **Astro Content Layer** replaced the legacy `type: "content"` collections API.
-  Config lives at `src/content.config.ts` with `glob()` loaders (`astro/loaders`);
-  entries use `.id` (not `.slug`) and `render(entry)` from `astro:content`
-  (not `entry.render()`). `entry.body` is now `string | undefined` — guard it.
-- **Tailwind 4** drops the `@astrojs/tailwind` integration (which also caps
-  Astro at 5) — use the `@tailwindcss/vite` plugin in `astro.config.mjs`. Astro 7
-  and Tailwind 4 are therefore **coupled** — bump them together. Styles enter via
-  `src/styles/global.css` (`@import "tailwindcss"`) imported in `BaseLayout` and
-  `BrandLayout`. The v3-style `tailwind.config.mjs` is kept via the `@config`
-  directive; the JS `safelist` is gone — use `@source inline("…")` for classes
-  the scanner can't see (the rehype-injected copy-button classes). Verify the
-  brand color page renders: `/-/astro/brand/color/`.
-- **`@lhci/cli` audit noise (dev-only).** Every `npm audit` finding and most
-  deprecation warnings in this repo trace to `@lhci/cli` (Lighthouse CI) and its
-  Lighthouse sub-deps — `tmp`, `uuid`, `inquirer`, and `chrome-launcher → rimraf
-→ glob → inflight`. It's already on the latest version, so there's no forward
-  fix, and `npm audit fix --force` would downgrade it to 0.1.0. The `overrides`
-  block (`tmp` → `^0.2.7`, `uuid` → `^11.1.1`) clears all of the advisories;
-  confirm with `npx lhci healthcheck`. The residual `inflight`/`rimraf@3`/`glob@7`
-  deprecation warnings come from `chrome-launcher`, carry **no** advisory, and are
-  left as-is — forcing `rimraf@4+` (callback API removed) would break
-  chrome-launcher's temp-profile cleanup for no security gain.
+- **Astro 7 Markdown** defaults to the Sätteri processor, which doesn't run remark/rehype plugins. This project needs its custom rehype plugins, `remarkRehype` handlers and Shiki, so it uses the unified pipeline: `@astrojs/markdown-remark` and `markdown.processor: unified({...})` in `astro.config.mjs`, with the plugins passed inside `unified({...})` (Astro 7.4 deprecates the old `markdown.remarkPlugins` / `rehypePlugins` / `remarkRehype` keys). MDX 8 needs `@astrojs/markdown-remark` 7.3 or later.
+- **Content Layer**: collections live in `src/content.config.ts` with `glob()` loaders (`astro/loaders`). Entries use `.id` (not `.slug`) and `render(entry)` from `astro:content` (not `entry.render()`). `entry.body` is `string | undefined`; guard it.
+- **Tailwind 4** uses the `@tailwindcss/vite` plugin in `astro.config.mjs`; the old `@astrojs/tailwind` integration caps Astro at 5, so Astro 7 and Tailwind 4 move together. Styles enter via `src/styles/global.css` (`@import "tailwindcss"`), imported in `BaseLayout` and `BrandLayout`. `tailwind.config.mjs` is loaded with `@config`. There's no JS `safelist`; use `@source inline("…")` for classes the scanner can't see (the rehype-injected copy-button classes). Check `/-/astro/brand/color/` still renders.
+- **`@lhci/cli` audit noise (dev-only)**: the remaining `npm audit` findings and most deprecation warnings trace to `@lhci/cli` and its Lighthouse sub-deps. It's already latest, so there's no forward fix, and `audit fix --force` would downgrade it to 0.1.0. The `tmp` and `uuid` overrides clear the advisories they target; confirm with `npx lhci healthcheck`. The `inflight` / `rimraf@3` / `glob@7` warnings come from `chrome-launcher` and carry no advisory. Leave them: forcing `rimraf@4+` (callback API removed) breaks chrome-launcher's temp-profile cleanup.

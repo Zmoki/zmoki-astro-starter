@@ -1,16 +1,6 @@
 ---
-// PostHog analytics provider. Gated by Analytics.astro (the dispatcher), which
-// renders this only when POSTHOG_PROJECT_TOKEN and POSTHOG_HOST (in
-// posthog-config.ts) are both set — so an unconfigured PostHog never requests a
-// 404ing script.
-//
-// Beyond loading the library, this registers the vendor-neutral
-// `window.track(event, props)` facade (see Analytics.astro) by *chaining* onto
-// any previously-defined `track` — so multiple providers can coexist and every
-// event fans out to all of them.
-//
-// A bundled script (served from /_astro, covered by the CSP's 'self'), so it
-// reads its config by import rather than define:vars.
+// PostHog. A bundled script (CSP 'self'), so it imports its config instead of
+// using define:vars.
 ---
 
 <script>
@@ -63,13 +53,12 @@
   window.posthog.init(POSTHOG_PROJECT_TOKEN, {
     api_host: POSTHOG_HOST,
     defaults: "2026-01-30",
-    // Capture $pageleave (on pagehide/beforeunload) so Web Analytics can compute
-    // accurate bounce rate + session duration. Set explicitly: this is an MPA, so
-    // every navigation is a full page load and each page needs its own pageleave.
+    // Needed for bounce rate and session duration. Set explicitly because this
+    // is an MPA: every navigation is a full page load with its own pageleave.
     capture_pageleave: true,
   });
 
-  // Chain onto the shared track() facade so events reach every provider.
+  // Wrap the previous track() and identify() so events still reach every provider.
   window.track = (function (prev) {
     return function (event, props) {
       if (prev) prev(event, props);
@@ -77,7 +66,6 @@
     };
   })(window.track);
 
-  // Same for identify() — associate the current user with an id across providers.
   window.identify = (function (prev) {
     return function (id, props) {
       if (prev) prev(id, props);
