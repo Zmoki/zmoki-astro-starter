@@ -2,8 +2,12 @@
 
 HTTP response headers, authored here as **platform-neutral rules** in
 [`headers.config.ts`](./headers.config.ts) — the single source of truth. The
-Content-Security-Policy is built from a directives-to-sources map, so adding an
-allowlisted host is a one-line push onto the relevant array.
+Content-Security-Policy is built from a directives-to-sources map. Its
+`script-src` has no `'unsafe-inline'`: scripts are same-origin files, plus the
+hashed snippets from `src/lib/inline-scripts.ts`. Third-party providers hand in
+their hosts from their own config modules (`<NAME>_CSP`, merged in
+`providerSources`), so they're never copied here by hand; any other host is a
+one-line push onto the relevant array.
 
 Current rules: `X-Robots-Tag: noindex` on the internal (`/-/astro/*`) and
 thank-you paths; on `/*` the standard security set — `X-Content-Type-Options`,

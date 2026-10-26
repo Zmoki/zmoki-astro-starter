@@ -1,50 +1,21 @@
 ---
 // Google Tag Manager provider. Gated by Analytics.astro (the dispatcher), which
-// renders this only when GTM_CONTAINER_ID (GTM-XXXXXXX) is set.
+// renders this only when GTM_CONTAINER_ID (GTM-XXXXXXX, in gtm-config.ts) is set.
 //
 // GTM is a tag hub: it loads its container and exposes `window.dataLayer`, into
 // which we push events. Whatever tags you wire up inside the GTM UI (GA4, Ads,
 // etc.) then read from that dataLayer — so GTM is how you plug in *any*
 // Google-side tool without touching this template again.
 //
-// Beyond loading the container, this registers the vendor-neutral
+// Beyond loading the container, the snippet registers the vendor-neutral
 // `window.track(event, props)` facade (see Analytics.astro) by *chaining* onto
 // any previously-defined `track`, so events fan out to every active provider.
 // A tracked event becomes a `dataLayer.push({ event, ...props })` — the `event`
 // key is what you match on with a "Custom Event" trigger in GTM.
-
-// Committed, not an env var. Empty by default (GTM is unused on this site).
-export const GTM_CONTAINER_ID = "";
-const containerId = GTM_CONTAINER_ID;
+//
+// The snippet lives in src/lib/inline-scripts.ts, which the CSP hashes — it is
+// the one provider that runs inline, because GTM wants to start in <head>.
+import { gtmLoader } from "@/lib/inline-scripts";
 ---
 
-<script is:inline define:vars={{ containerId }}>
-  (function (w, d, s, l, i) {
-    w[l] = w[l] || [];
-    w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
-    var f = d.getElementsByTagName(s)[0],
-      j = d.createElement(s),
-      dl = l != "dataLayer" ? "&l=" + l : "";
-    j.async = true;
-    j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
-    f.parentNode.insertBefore(j, f);
-  })(window, document, "script", "dataLayer", containerId);
-
-  // Chain onto the shared track() facade so events reach every provider.
-  window.track = (function (prev) {
-    return function (event, props) {
-      if (prev) prev(event, props);
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push(Object.assign({ event: event }, props || {}));
-    };
-  })(window.track);
-
-  // Same for identify() — push a `user_id` so GTM tags (GA4, etc.) can key on it.
-  window.identify = (function (prev) {
-    return function (id, props) {
-      if (prev) prev(id, props);
-      window.dataLayer = window.dataLayer || [];
-      window.dataLayer.push(Object.assign({ event: "identify", user_id: id }, props || {}));
-    };
-  })(window.identify);
-</script>
+<script is:inline set:html={gtmLoader} />

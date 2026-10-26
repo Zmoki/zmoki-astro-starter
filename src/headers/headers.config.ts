@@ -13,65 +13,78 @@
  * See `.claude/skills/redirects/SKILL.md` (headers section) and `src/headers/README.md`.
  */
 
+import { createHash } from "node:crypto";
 import { site } from "../site.config.ts";
+import { inlineScripts } from "../lib/inline-scripts.ts";
+import { POSTHOG_CSP } from "../components/analytics/posthog-config.ts";
+import { GTM_CSP } from "../components/analytics/gtm-config.ts";
+import { TURNSTILE_CSP } from "../components/captcha/turnstile-config.ts";
 
 // ── Content-Security-Policy ───────────────────────────────────────────────────
-// Directives → arrays of sources, joined into the header string below. Add a
-// host by pushing it onto the relevant directive.
+// Directives → arrays of sources, joined into the header string below.
 //
-// Third-party hosts in use: Cloudflare (Web Analytics + Turnstile), Google Tag
-// Manager / Analytics (GTM provider — drop if unused), Google Fonts.
+// script-src has no 'unsafe-inline': bundled scripts are same-origin files
+// ('self'), and the few inline snippets in src/lib/inline-scripts.ts are
+// allowed by hash. JSON-LD blocks are data, not scripts, so CSP ignores them.
+//
+// Provider hosts are imported from each provider's config module, never copied
+// here: a provider contributes its hosts only while it's configured, so
+// dropping a vendor drops its hosts. To add one, export a `<NAME>_CSP` record
+// from its config module and add it to `providerSources` below.
 
-// PostHog host (https://a.starter.zmoki.xyz), a reverse-proxy subdomain: keep
-// in sync with the POSTHOG_HOST constant in src/components/analytics/posthog.astro.
-// Duplicated as a literal because this file compiles into the committed,
-// drift-checked public/_headers artifact, which can't import an .astro export.
-
-// Captcha host (https://challenges.cloudflare.com): swap to your provider's
-// host if you change captcha (src/components/Captcha.astro), e.g.
-// https://www.google.com for reCAPTCHA, https://hcaptcha.com for hCaptcha.
+// Hash of each inline snippet, exactly as rendered (set:html emits it verbatim).
+const inlineScriptHashes = inlineScripts.map(
+  (snippet) => `'sha256-${createHash("sha256").update(snippet, "utf8").digest("base64")}'`,
+);
 
 // Remote image origin (fallback for images that render unoptimized — optimized
 // ones are served same-origin from /_astro). Sourced from `site.platform.imagesCDNHost`,
 // the same value the build uses, so the CSP can't drift. Empty ⇒ not added.
 const IMAGE_CDN_HOST = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
 
-const cspDirectives: Record<string, string[]> = {
+const baseDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": [
     "'self'",
-    "'unsafe-inline'",
-    "https://static.cloudflareinsights.com",
-    "https://challenges.cloudflare.com", // built-in captcha (Turnstile) widget script
-    "https://a.starter.zmoki.xyz", // PostHog
-    "https://www.googletagmanager.com",
+    ...inlineScriptHashes,
+    "https://static.cloudflareinsights.com", // Cloudflare Web Analytics (injected by the host)
   ],
-  "frame-src": ["https://challenges.cloudflare.com"], // captcha widget iframe
+  "frame-src": [],
   "style-src": ["'self'", "'unsafe-inline'"],
   "img-src": [
     "'self'",
     "data:",
     // remote image origin (fallback for images that render unoptimized); omitted when unset
     ...(IMAGE_CDN_HOST ? [IMAGE_CDN_HOST] : []),
-    "https://www.googletagmanager.com",
-    "https://www.google-analytics.com",
   ],
   "media-src": ["'self'"],
   "font-src": ["'self'"],
   "manifest-src": ["'self'"],
-  "connect-src": [
-    "'self'",
-    "https://cloudflareinsights.com",
-    "https://a.starter.zmoki.xyz", // PostHog
-    "https://www.googletagmanager.com",
-    "https://www.google-analytics.com",
-  ],
+  "connect-src": ["'self'", "https://cloudflareinsights.com"],
   "object-src": ["'none'"],
   "frame-ancestors": ["'none'"],
 };
 
+// Each provider's sources, by directive. Empty records for unconfigured ones.
+const providerSources: Record<string, string[]>[] = [POSTHOG_CSP, GTM_CSP, TURNSTILE_CSP];
+
+const cspDirectives: Record<string, string[]> = Object.fromEntries(
+  Object.entries(baseDirectives).map(([directive, sources]) => [
+    directive,
+    [...new Set([...sources, ...providerSources.flatMap((p) => p[directive] ?? [])])],
+  ]),
+);
+for (const provider of providerSources) {
+  for (const directive of Object.keys(provider)) {
+    if (!(directive in baseDirectives)) {
+      throw new Error(`Provider CSP uses "${directive}", which baseDirectives doesn't declare`);
+    }
+  }
+}
+
 const contentSecurityPolicy =
   Object.entries(cspDirectives)
+    .filter(([, sources]) => sources.length > 0)
     .map(([directive, sources]) => `${directive} ${sources.join(" ")}`)
     .join("; ") + ";";
 

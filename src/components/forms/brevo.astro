@@ -24,6 +24,7 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
 <!-- Main form -->
 <form
   id="brevo-form"
+  data-resource-slug={resourceSlug}
   method="POST"
   action={`https://${BREVO_ACCOUNT_ID}.sibforms.com/serve/${formId}`}
   class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:flex-row md:gap-8 md:p-8 xl:gap-12 xl:p-12"
@@ -78,18 +79,19 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
   </section>
 </form>
 
-<script is:inline define:vars={{ resourceSlug }}>
-  window.track?.("resource_gate_viewed", {
-    resource_slug: resourceSlug,
-    form_id: document.getElementById("brevo-form")?.getAttribute("action") || "",
-  });
+<script>
+  // The resource slug comes from the form's data-resource-slug.
+  const form = document.getElementById("brevo-form");
+  if (form) {
+    const formId = form.getAttribute("action") ?? "";
+    const resourceSlug = form.dataset.resourceSlug ?? "";
 
-  document.getElementById("brevo-form")?.addEventListener("submit", function () {
-    var email = document.getElementById("EMAIL")?.value || "";
-    window.identify?.(email);
-    window.track?.("resource_gate_submitted", {
-      form_id: this.getAttribute("action") || "",
-      resource_slug: resourceSlug,
+    window.track?.("resource_gate_viewed", { resource_slug: resourceSlug, form_id: formId });
+
+    form.addEventListener("submit", () => {
+      const email = document.querySelector<HTMLInputElement>("#EMAIL")?.value ?? "";
+      window.identify?.(email);
+      window.track?.("resource_gate_submitted", { form_id: formId, resource_slug: resourceSlug });
     });
-  });
+  }
 </script>

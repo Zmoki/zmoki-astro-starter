@@ -10,6 +10,8 @@ import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
 
 export interface Props {
+  /** The post's id — reported with the post_viewed event. */
+  slug: string;
   title: string;
   description?: string;
   publishDate: Date;
@@ -24,6 +26,7 @@ export interface Props {
 }
 
 const {
+  slug,
   title,
   description,
   publishDate,
@@ -76,7 +79,7 @@ const blogPostingLd = {
   robots={robots}
 >
   <JsonLd schema={blogPostingLd} />
-  <article class="space-y-4">
+  <article class="space-y-4" data-post-slug={slug} data-post-title={title}>
     <!-- Post Header -->
     <header
       class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
@@ -179,13 +182,22 @@ const blogPostingLd = {
     </nav>
   </article>
 
-  <script is:inline>
-    // Post-navigation tracking. (Code-block copy behavior lives in <Prose>.)
-    document.querySelectorAll("a[data-nav-direction]").forEach(function (el) {
-      el.addEventListener("click", function () {
+  <script>
+    // Post view + post-navigation tracking. (Code-block copy behavior lives in
+    // <Prose>.) The post's slug and title come from the <article>'s data-*.
+    const article = document.querySelector<HTMLElement>("article[data-post-slug]");
+    if (article) {
+      window.track?.("post_viewed", {
+        post_slug: article.dataset.postSlug,
+        post_title: article.dataset.postTitle,
+      });
+    }
+
+    document.querySelectorAll<HTMLAnchorElement>("a[data-nav-direction]").forEach((el) => {
+      el.addEventListener("click", () => {
         window.track?.("post_navigation_clicked", {
-          direction: this.dataset.navDirection,
-          destination_slug: this.dataset.navSlug,
+          direction: el.dataset.navDirection,
+          destination_slug: el.dataset.navSlug,
         });
       });
     });

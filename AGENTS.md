@@ -129,6 +129,17 @@ Conventions:
 
 ---
 
+## Scripts & the CSP
+
+The CSP's `script-src` has **no `'unsafe-inline'`** (`src/headers/headers.config.ts`), so an inline script that isn't explicitly allowed never runs in production. The rules:
+
+- **Write client code as a bundled `<script>`** (no `is:inline`, no `define:vars`). Astro serves it as a same-origin file under `/_astro` (`'self'`); `vite.build.assetsInlineLimit: 0` in `astro.config.mjs` stops Astro from inlining small ones into the HTML. A bundled script runs once per page (deferred, in document order) however many times its component renders, so query the whole document rather than `document.currentScript`. Pass build-time values through **`data-*` attributes** on the markup, or `import` them from a TS module.
+- **No raw `<script is:inline>` outside `src/lib/inline-scripts.ts`.** That file holds the few snippets that must run before first paint, as exported strings; the component renders one with `<script is:inline set:html={snippet} />`, and `headers.config.ts` hashes the same strings into `script-src` (`'sha256-…'`), so markup and policy can't drift. After changing a snippet, `npm run build:headers` and commit — `check:headers` fails on a stale hash. The only one today is GTM's loader.
+- **Exempt:** JSON-LD blocks (`JsonLd.astro`) — they're data, not executed, so CSP ignores them — and a vendor's **external** loader (`<script src="https://…" is:inline>`), which is a file on an allowlisted host.
+- **Third-party hosts reach the CSP by import, never by copy.** Each provider's config module (`analytics/<p>-config.ts`, `captcha/<p>-config.ts`) exports its constants plus a `<P>_CSP` record of hosts per directive, non-empty only while the provider is configured; `headers.config.ts` merges those records in `providerSources`. `style-src` keeps `'unsafe-inline'` (out of scope for now).
+
+---
+
 ## Formatting
 
 Prettier is configured in `.prettierrc` with two plugins:
@@ -211,7 +222,7 @@ Sets `<html lang="en">`, loads the self-hosted fonts (see Components → Fonts),
 
 ### `PostLayout.astro`
 
-Wraps `BaseLayout`. Props: `title`, `description`, `publishDate`, `contentModifiedDate`, `author`, `prevPost?`, `nextPost?`. The `author` (`{ name, url, bio }`) comes from the post's own frontmatter — it drives the byline, the "Written by" bio, and the schema.org `author`. Shows article header with publish/modified dates, prose content, author bio, prev/next navigation. The home page (`src/pages/index.astro`) is a standalone landing page using `BaseLayout` with `wide`; the blog list lives at `src/pages/blog/index.astro`.
+Wraps `BaseLayout`. Props: `slug` (the post id, reported with `post_viewed`), `title`, `description`, `publishDate`, `contentModifiedDate`, `author`, `prevPost?`, `nextPost?`. The `author` (`{ name, url, bio }`) comes from the post's own frontmatter — it drives the byline, the "Written by" bio, and the schema.org `author`. Shows article header with publish/modified dates, prose content, author bio, prev/next navigation. The home page (`src/pages/index.astro`) is a standalone landing page using `BaseLayout` with `wide`; the blog list lives at `src/pages/blog/index.astro`.
 
 ### `ResourceLayout.astro`, `LegalLayout.astro`
 
@@ -296,14 +307,14 @@ Analytics is **provider-agnostic** and supports **multiple providers at once**. 
 
 Alongside `track`, providers chain a second facade `window.identify(id, props)` — call it (optionally: `window.identify?.(...)`) to associate the current visitor with an id. Every call site (page or component) uses these two facades and **never** touches a vendor SDK (`window.posthog`, `dataLayer`, …) directly, so a new provider needs no changes at the call sites.
 
-Built-in providers ship as components in `src/components/analytics/`, each exporting its own committed config constant (not an env var — no per-environment config needed):
+Built-in providers ship as components in `src/components/analytics/`, each with a `<p>-config.ts` module holding its committed config (not an env var — no per-environment config needed) and the CSP hosts it needs:
 
-- **`posthog.astro`** — PostHog. Exports `POSTHOG_PROJECT_TOKEN` + `POSTHOG_HOST`; active when both are non-empty. `track` → `posthog.capture(event, props)`; `identify` → `posthog.identify(id, props)`.
-- **`gtm.astro`** — Google Tag Manager. Exports `GTM_CONTAINER_ID` (e.g. `GTM-XXXXXXX`); active when non-empty (empty by default — unused on this site). `track` → `dataLayer.push({ event, ...props })`; `identify` → `dataLayer.push({ event: "identify", user_id: id, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
+- **`posthog.astro`** — PostHog (config in `posthog-config.ts`: `POSTHOG_PROJECT_TOKEN` + `POSTHOG_HOST`); active when both are non-empty. A bundled script. `track` → `posthog.capture(event, props)`; `identify` → `posthog.identify(id, props)`.
+- **`gtm.astro`** — Google Tag Manager (config in `gtm-config.ts`: `GTM_CONTAINER_ID`, e.g. `GTM-XXXXXXX`); active when non-empty. Its loader is the hashed inline snippet in `src/lib/inline-scripts.ts`, so it starts in `<head>` (empty by default — unused on this site). `track` → `dataLayer.push({ event, ...props })`; `identify` → `dataLayer.push({ event: "identify", user_id: id, ...props })`; match on a "Custom Event" trigger inside the GTM UI, then wire GA4/Ads/etc. tags there without touching this template.
 
-`Analytics.astro` is the dispatcher: it imports each provider's constant(s) and renders the provider only when they're set, under one global switch, `PUBLIC_ANALYTICS_ENABLED === "true"` — **off by default** (host's production env, CI on `main`, or a local override are the places to set it).
+`Analytics.astro` is the dispatcher: it imports each provider's `<p>Configured` flag and renders the provider only when it's set, under one global switch, `PUBLIC_ANALYTICS_ENABLED === "true"` — **off by default** (host's production env, CI on `main`, or a local override are the places to set it).
 
-**To add a provider:** drop a component in `src/components/analytics/` that exports its own config constant, renders its loader snippet, and chains onto `window.track` (wrap the previous `track` so events still reach earlier providers), then import its constant and render it from `Analytics.astro`. Add its host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`).
+**To add a provider:** add `src/components/analytics/<p>-config.ts` (constants, a `<p>Configured` flag, a `<P>_CSP` hosts record) and a component that loads the vendor and chains onto `window.track` from a bundled script (wrap the previous `track` so events still reach earlier providers); render it from `Analytics.astro`, add its `<P>_CSP` to `providerSources` in `src/headers/headers.config.ts`, then `npm run build:headers`. See **Scripts & the CSP** and the `/analytics` skill.
 
 ### Tracked events
 
@@ -325,19 +336,19 @@ The email-capture form behind the resource lead-magnet gate is **provider-agnost
 
 ## Captcha
 
-Form bot-protection is **provider-agnostic**, structured like analytics: **`Captcha.astro`** is the dispatcher and each provider is a component in **`src/components/captcha/`** that exports its own committed site-key constant (not an env var — see Analytics above) and emits nothing when that constant is empty. The resource-gate form (`forms/brevo.astro`) renders `<Captcha />` and never names a vendor. **Built-in provider: Cloudflare Turnstile** (`captcha/turnstile.astro`, exports `TURNSTILE_SITE_KEY`).
+Form bot-protection is **provider-agnostic**, structured like analytics: **`Captcha.astro`** is the dispatcher and each provider is a component in **`src/components/captcha/`** with a config module holding its committed site key (not an env var — see Analytics above); it emits nothing when that key is empty. The resource-gate form (`forms/brevo.astro`) renders `<Captcha />` and never names a vendor. **Built-in provider: Cloudflare Turnstile** (`captcha/turnstile.astro`; `TURNSTILE_SITE_KEY` and its CSP hosts in `captcha/turnstile-config.ts`).
 
 **Difference from analytics — single-select.** Analytics providers stack (every event fans out to all of them); a form needs exactly **one** captcha (two widgets would inject competing hidden tokens), so the dispatcher renders only the **first** configured provider in its priority list. Like analytics, `PUBLIC_CAPTCHA_ENABLED === "true"` is the switch — **off by default**, which conveniently also keeps Turnstile's domain check from tripping in local dev.
 
 **Backend coupling (important):** the widget produces a hidden token that **Brevo validates server-side against the captcha configured on that form**. So the provider you enable here must match the one enabled on the Brevo form — the frontend swap alone isn't enough. (This is why the Turnstile widget also carries the `g-recaptcha` class: it matches Brevo's own generated embed / field detection.)
 
-**To add a provider** (e.g. Google reCAPTCHA, hCaptcha): drop a component in `src/components/captcha/` that renders its widget + loader script gated on its own `PUBLIC_*` site key; declare that key in `src/env.d.ts` + `.env.example`; add a `{ enabled, Component }` entry to the `providers` list in `Captcha.astro`; and add its script/frame host to the CSP in `src/headers/headers.config.ts` (then `npm run build:headers`).
+**To add a provider** (e.g. Google reCAPTCHA, hCaptcha): add `src/components/captcha/<p>-config.ts` (the site key + a `<P>_CSP` record of its script/frame hosts) and a component that renders the widget + its external loader script; add a `{ enabled, Component }` entry to the `providers` list in `Captcha.astro`; add its `<P>_CSP` to `providerSources` in `src/headers/headers.config.ts` (then `npm run build:headers`).
 
 ---
 
 Components live in **`src/components/`** — they're small and self-documenting, so read them there rather than maintaining a catalog here. The ones with non-obvious contracts:
 
-- **`Prose.astro`** — the content-card panel for rendered MD/MDX (post body, resource + legal pages, thank-you copy): the shared card+prose styling plus the code-block copy behavior, scoped per instance. the resource-gate form's (`forms/brevo.astro`) inline `prose prose-lg` is a deliberately different, non-card pattern.
+- **`Prose.astro`** — the content-card panel for rendered MD/MDX (post body, resource + legal pages, thank-you copy): the shared card+prose styling plus the code-block copy behavior (one bundled script per page, covering every panel). the resource-gate form's (`forms/brevo.astro`) inline `prose prose-lg` is a deliberately different, non-card pattern.
 - **`Button.astro`**, **`Analytics.astro`**, **Fonts** — see the subsections below.
 - **`analytics/*.astro`** — one component per analytics provider (loader + `track`/`identify` facade); see **Analytics** above and the `/analytics` skill.
 - **`Form.astro` + `forms/*.astro`** — provider-agnostic resource-gate email form (dispatcher + one component per backend); single-select, Brevo built in — see **Forms** above.
@@ -366,7 +377,7 @@ Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guid
 
 **DNS / hosting config:** manage it however your host prefers (dashboard, or infrastructure-as-code such as Terraform against your host's provider). None of it lives in this repo.
 
-**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.platform.deploy`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). When adding an analytics/asset host, add it to the CSP directive arrays in `headers.config.ts`. If your CDN or DNS layer also sets some of these security headers, drop them there to avoid duplicates.
+**Response headers** — authored as platform-neutral rules in **`src/headers/headers.config.ts`** and compiled by `scripts/generate-headers.ts` into the artifact for the host set by **`site.platform.deploy`** (`public/_headers` for Cloudflare/Netlify, `vercel.json` `headers[]` for Vercel, `customHeaders.json` for Amplify). Current rules: `X-Robots-Tag: noindex` on `/-/astro/*` and `/thank-you/*`; on `/*` the security set (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Strict-Transport-Security`, `Content-Security-Policy`, `Permissions-Policy`). The artifact is **committed** and CI's `npm run check:headers` fails on drift — edit the config, then `npm run build:headers` and commit. **Don't edit `public/_headers` by hand** (it's generated). Provider hosts reach the CSP by import from each provider's config module (see **Scripts & the CSP**); add any other host to the directive arrays in `headers.config.ts`. If your CDN or DNS layer also sets some of these security headers, drop them there to avoid duplicates.
 
 **Redirects** — authored as platform-neutral CSV in **`src/redirects/`** and compiled by `scripts/generate-redirects.ts` into the artifact for the host set by **`site.platform.deploy`** in `src/site.config.ts` (`public/_redirects` for Cloudflare/Netlify, `vercel.json` for Vercel, `redirects.json` for Amplify). The artifact is **committed** and CI's `npm run check:redirects` fails on drift, so rebuild (`npm run build:redirects`) and commit it alongside any CSV change.
 
@@ -376,7 +387,7 @@ Fonts are **self-hosted via Astro's [Fonts API](https://docs.astro.build/en/guid
 
 ## Environment variables
 
-Provider config (PostHog, GTM, Turnstile, Brevo, the image origin) is committed constants in the relevant components (see **Analytics**/**Captcha**/**Forms** below), not env vars. The only two env vars this site declares are `PUBLIC_ANALYTICS_ENABLED` / `PUBLIC_CAPTCHA_ENABLED` — both **default off**, and turn on only when set to the literal string `"true"` (production env, CI on `main`, or locally to test — see **Analytics**/**Captcha**). No `.env` file is required. `src/env.d.ts` is the source of truth for both, and also declares the `Window` interface for provider globals (`posthog`, `dataLayer`) — add to it if a new provider exposes one.
+Provider config (PostHog, GTM, Turnstile, Brevo, the image origin) is committed constants in the relevant config modules and components (see **Analytics**/**Captcha**/**Forms** below), not env vars. The only two env vars this site declares are `PUBLIC_ANALYTICS_ENABLED` / `PUBLIC_CAPTCHA_ENABLED` — both **default off**, and turn on only when set to the literal string `"true"` (production env, CI on `main`, or locally to test — see **Analytics**/**Captcha**). No `.env` file is required. `src/env.d.ts` is the source of truth for both, and also declares the `Window` interface for provider globals (`posthog`, `dataLayer`) — add to it if a new provider exposes one.
 
 ---
 
