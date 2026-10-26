@@ -60,8 +60,9 @@ function convertMdxComponentsToHtml(content: string): string {
   return processed;
 }
 
-export async function GET(context: { site: string | undefined }) {
-  const siteUrl = String(context.site || site.domain);
+export async function GET(context: { site: URL | undefined }) {
+  // `context.site` is a URL, whose string form ends in "/". Paths below start with "/".
+  const siteUrl = String(context.site ?? site.domain).replace(/\/$/, "");
 
   const sortedPosts = await getPostsNewestFirst();
 
@@ -74,9 +75,7 @@ export async function GET(context: { site: string | undefined }) {
       contentHtml = convertRelativeUrlsToAbsolute(contentHtml, siteUrl);
 
       // The post's OG card is its feed image.
-      const ogImagePath = `og/blog/${post.id}.png`;
-      const baseUrl = String(siteUrl).replace(/\/$/, "");
-      const ogImageUrl = `${baseUrl}/${ogImagePath}`;
+      const ogImageUrl = `${siteUrl}/og/blog/${post.id}.png`;
 
       // Drop leftover captions and the empty figures they leave.
       contentHtml = contentHtml.replace(/<figcaption[^>]*>[\s\S]*?<\/figcaption>/gi, "");
@@ -99,9 +98,8 @@ export async function GET(context: { site: string | undefined }) {
         },
       });
 
-      const imageType = ogImageUrl.endsWith(".jpg") ? "jpeg" : "png";
       const customData = `<media:content
-        type="image/${imageType}"
+        type="image/png"
         medium="image"
         url="${ogImageUrl}" />`;
 
