@@ -151,7 +151,7 @@ Workflow actions are dependencies too, and pinned by major tag. Check them:
 
 ```bash
 grep -rn "uses:" .github/workflows/
-for a in actions/checkout actions/setup-node actions/upload-artifact actions/github-script; do
+for a in $(grep -rhoE "uses: [^@]+" .github/workflows/ | awk '{print $2}' | sort -u); do
   echo "$a -> $(gh api repos/$a/releases/latest --jq .tag_name)"
 done
 ```
@@ -160,27 +160,41 @@ Bump each `uses: <action>@vN` to the latest major. For `github-script`, skim the
 inline `script:` — v8/v9 keep `github.rest.*`, `context.*`, and `require`, so
 stable scripts carry over.
 
-### Node version — keep three files in sync
+### Node and npm versions
 
-The Node major is pinned in **three** places that must move together whenever you
-bump the `engines` floor:
+**`.node-version`** (repo root, an exact version such as `24.22.1`) is the one
+pin. It's read by:
 
-- **`package.json`** `engines.node` (e.g. `">=24"`) — the declared floor.
-- **`.github/workflows/*.yml`** `node-version:` (`ci.yml` + `lighthouse.yml`) — CI.
-- **`.node-version`** (repo root, e.g. `24.11.1`) — **Cloudflare Pages**, the deploy
-  builder. This is the easy one to forget: Cloudflare reads _neither_ `engines`
-  nor the CI workflow, so if it's missing/stale the build falls back to an older
-  default Node. That bit us once — Cloudflare ran Node 22, which can't execute the
-  `.ts` build scripts natively (`node scripts/generate-redirects.ts` in `prebuild`),
-  and the deploy died with `ERR_UNKNOWN_FILE_EXTENSION` even though CI was green.
-  The build scripts are `.ts` and rely on Node ≥24's native type-stripping — so the
-  deploy Node version is load-bearing, not cosmetic.
+- **CI** — both workflows use `actions/setup-node` with
+  `node-version-file: .node-version`, so CI runs exactly what the deploy runs.
+- **Cloudflare Pages** and **Netlify** — the deploy builders. Cloudflare reads
+  _neither_ `engines` nor the CI workflow, so a missing or stale file falls back
+  to an older default Node. That bit us once: Cloudflare ran Node 22, which can't
+  execute the `.ts` build scripts natively (`node scripts/generate-redirects.ts`
+  in `prebuild`), and the deploy died with `ERR_UNKNOWN_FILE_EXTENSION` even
+  though CI was green. The build scripts rely on Node ≥24's native type-stripping
+  — so the deploy Node version is load-bearing, not cosmetic.
 
-After bumping the floor, grep to confirm nothing drifted:
+**`package.json`** `engines.node` (e.g. `">=24"`) is the declared **floor**, not
+a pin. Vercel reads its major. Raise it only when moving to a new Node major, and
+keep `@types/node` on the same major as the pin.
+
+**AWS Amplify** reads none of these; set the Node version in its build settings
+(or an `amplify.yml` `nvm use`) to match `.node-version`.
+
+**npm** isn't pinned separately: each Node release bundles its npm, so the exact
+Node pin fixes the npm version too. (A `packageManager` field relies on corepack,
+which newer Node releases no longer bundle.)
+
+On a dependency pass, bump `.node-version` to the latest patch of its major —
+patch releases are often security releases:
 
 ```bash
-grep -H node .node-version; grep -n '"node"' package.json; grep -rn node-version .github/workflows/
+curl -s https://nodejs.org/dist/index.json | python3 -c "import json,sys; m=open('.node-version').read().split('.')[0]; print(next(r['version'] for r in json.load(sys.stdin) if r['version'].startswith('v'+m+'.')))"
+grep -H . .node-version; grep -n '"node"' package.json; grep -rn node-version .github/workflows/
 ```
+
+Move to a new Node major only once it's LTS, as its own commit.
 
 ## 8. PR + watch CI
 
