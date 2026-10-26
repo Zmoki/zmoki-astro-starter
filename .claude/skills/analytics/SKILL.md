@@ -61,7 +61,8 @@ Let `<p>` be the provider slug (e.g. `plausible`).
      is:inline
      defer
      data-domain={PLAUSIBLE_DOMAIN}
-     src="https://plausible.io/js/script.manual.js"></script>
+     src="https://plausible.io/js/script.manual.js"
+   ></script>
    <script>
      window.track = ((prev) => (event: string, props?: Record<string, unknown>) => {
        prev?.(event, props);

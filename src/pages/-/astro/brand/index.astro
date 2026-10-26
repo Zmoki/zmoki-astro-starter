@@ -94,20 +94,20 @@ const sections = [
   title={`Brand — ${site.name} design system`}
   description={`The brand and design system guideline for ${site.name}`}
 >
-  <header
-    class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 overflow-hidden rounded-2xl border text-white shadow-sm"
-  >
+  <header class="border-zmoki-stone-200 bg-zmoki-indigo-600 mb-8 overflow-hidden rounded-2xl border text-white shadow-sm">
     <div class="px-6 py-10 md:px-10 md:py-14">
       <p class="text-zmoki-indigo-100 text-xs font-medium tracking-normal">{site.name}</p>
       <h1 class="mt-2 text-4xl font-semibold md:text-6xl">Design system</h1>
       <p class="mt-4 max-w-2xl text-xl md:text-2xl">
-        The living guideline for how {site.name} looks and feels — a bright, warm, minimal system: an
-        ivory canvas, soft white cards, and a single indigo accent. One source of truth for color, type,
-        and components.
+        The living guideline for how {site.name} looks and feels — a bright, warm, minimal system:
+        an ivory canvas, soft white cards, and a single indigo accent. One source of truth for
+        color, type, and components.
       </p>
     </div>
     <div class="flex h-3">
-      {palettePreview.map((hex) => <span class="flex-1" style={`background-color: ${hex}`} />)}
+      {palettePreview.map((hex) => (
+        <span class="flex-1" style={`background-color: ${hex}`} />
+      ))}
     </div>
   </header>
 
@@ -118,63 +118,55 @@ const sections = [
       here.
     </p>
     <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
-      {
-        foundations.map((item) => (
-          <div class="border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm">
-            {item.mark ? (
-              <img src="/brand-mark.svg" alt="Brand mark" class="h-10 w-10 rounded-lg" />
-            ) : (
-              <span class="bg-zmoki-indigo-600 h-2 w-12 self-start rounded-full" />
+      {foundations.map((item) => (
+        <div class="border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm">
+          {item.mark ? (
+            <img src="/brand-mark.svg" alt="Brand mark" class="h-10 w-10 rounded-lg" />
+          ) : (
+            <span class="bg-zmoki-indigo-600 h-2 w-12 self-start rounded-full" />
+          )}
+          <h3 class="text-xl font-semibold">{item.title}</h3>
+          <code class="bg-zmoki-indigo-50 text-zmoki-indigo-700 self-start rounded px-2 py-1 font-mono text-xs">
+            {item.file}
+          </code>
+          <p class="text-zmoki-stone-500 text-sm">
+            {item.summary.map((part) =>
+              typeof part === "string" ? (
+                part
+              ) : (
+                <code class="bg-zmoki-cream-100 text-zmoki-stone-900 rounded px-1 py-0.5 font-mono text-xs">
+                  {part.code}
+                </code>
+              ),
             )}
-            <h3 class="text-xl font-semibold">{item.title}</h3>
-            <code class="bg-zmoki-indigo-50 text-zmoki-indigo-700 self-start rounded px-2 py-1 font-mono text-xs">
-              {item.file}
-            </code>
-            <p class="text-zmoki-stone-500 text-sm">
-              {item.summary.map((part) =>
-                typeof part === "string" ? (
-                  part
-                ) : (
-                  <code class="bg-zmoki-cream-100 text-zmoki-stone-900 rounded px-1 py-0.5 font-mono text-xs">
-                    {part.code}
-                  </code>
-                ),
-              )}
-            </p>
-          </div>
-        ))
-      }
+          </p>
+        </div>
+      ))}
     </div>
   </section>
 
   <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-    {
-      sections.map((section) =>
-        section.href ? (
-          <a
-            href={section.href}
-            class="group border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:-translate-y-1 hover:shadow-md md:p-8"
-          >
-            <span class={`h-2 w-12 rounded-full ${section.accent}`} />
-            <h2 class="text-2xl font-semibold md:text-3xl">
-              <span class="text-zmoki-indigo-600 underline underline-offset-2">
-                {section.title}
-              </span>
-            </h2>
-            <p class="text-zmoki-stone-500">{section.summary}</p>
-            <span class="text-zmoki-stone-500 mt-2 text-xs font-medium tracking-normal">
-              View →
-            </span>
-          </a>
-        ) : (
-          <div class="border-zmoki-stone-300 flex flex-col gap-3 rounded-2xl border border-dashed bg-white/50 p-6 md:p-8">
-            <span class={`h-2 w-12 rounded-full opacity-30 ${section.accent}`} />
-            <h2 class="text-2xl font-semibold opacity-50 md:text-3xl">{section.title}</h2>
-            <p class="opacity-50">{section.summary}</p>
-            <span class="mt-2 text-xs font-medium tracking-normal opacity-40">Coming soon</span>
-          </div>
-        ),
-      )
-    }
+    {sections.map((section) =>
+      section.href ? (
+        <a
+          href={section.href}
+          class="group border-zmoki-stone-200 flex flex-col gap-3 rounded-2xl border bg-white p-6 shadow-sm transition-shadow hover:-translate-y-1 hover:shadow-md md:p-8"
+        >
+          <span class={`h-2 w-12 rounded-full ${section.accent}`} />
+          <h2 class="text-2xl font-semibold md:text-3xl">
+            <span class="text-zmoki-indigo-600 underline underline-offset-2">{section.title}</span>
+          </h2>
+          <p class="text-zmoki-stone-500">{section.summary}</p>
+          <span class="text-zmoki-stone-500 mt-2 text-xs font-medium tracking-normal">View →</span>
+        </a>
+      ) : (
+        <div class="border-zmoki-stone-300 flex flex-col gap-3 rounded-2xl border border-dashed bg-white/50 p-6 md:p-8">
+          <span class={`h-2 w-12 rounded-full opacity-30 ${section.accent}`} />
+          <h2 class="text-2xl font-semibold opacity-50 md:text-3xl">{section.title}</h2>
+          <p class="opacity-50">{section.summary}</p>
+          <span class="mt-2 text-xs font-medium tracking-normal opacity-40">Coming soon</span>
+        </div>
+      ),
+    )}
   </div>
 </BrandLayout>

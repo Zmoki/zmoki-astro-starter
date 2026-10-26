@@ -52,12 +52,10 @@ const specs = [
   title="Brand — OG images"
   description="Zmoki Astro Starter social-share cards: the two card templates, their anatomy, and where they come from"
 >
-  <header
-    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10"
-  >
-    <a href="/-/astro/brand/" class="text-xs font-medium tracking-normal text-white/70"
-      >← Zmoki Astro Starter brand</a
-    >
+  <header class="border-zmoki-indigo-100 bg-zmoki-indigo-600 mb-8 rounded-2xl border px-6 py-10 text-white shadow-sm md:px-10">
+    <a href="/-/astro/brand/" class="text-xs font-medium tracking-normal text-white/70">
+      ← Zmoki Astro Starter brand
+    </a>
     <h1 class="mt-2 text-4xl font-semibold md:text-5xl">OG images</h1>
     <p class="mt-4 max-w-2xl text-xl md:text-2xl">
       The social-share cards shown when a page is posted to X, Slack, LinkedIn, or iMessage.
@@ -72,19 +70,16 @@ const specs = [
       A manifest (<code class={codeChip}>src/og/manifest.ts</code>) is the single source of truth —
       it enumerates one card per page and carries each card's text. The endpoint{" "}
       <code class={codeChip}>/og/[...path].png</code> renders each entry with{" "}
-      <strong>Satori</strong> (a React-like vdom → SVG) then <strong>resvg</strong> (SVG → PNG).{
-        " "
-      }
+      <strong>Satori</strong> (a React-like vdom → SVG) then <strong>resvg</strong> (SVG → PNG).{" "}
       <code class={codeChip}>astro build</code> writes them all to{" "}
-      <code class={codeChip}>dist/og/</code>; <code class={codeChip}>astro dev</code> renders the same
-      route on request.
+      <code class={codeChip}>dist/og/</code>; <code class={codeChip}>astro dev</code> renders the
+      same route on request.
     </p>
     <p class="text-zmoki-stone-500 max-w-2xl">
-      Each page's <code class={codeChip}>og:image</code> points at its card by URL. The pattern mirrors
-      the route:
+      Each page's <code class={codeChip}>og:image</code> points at its card by URL. The pattern
+      mirrors the route:
     </p>
-    <pre
-      class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-4 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>/                → /og/index.png
+    <pre class="border-zmoki-indigo-100 bg-zmoki-indigo-50 text-zmoki-stone-700 mt-4 overflow-x-auto rounded-xl border p-4 font-mono text-xs"><code>/                → /og/index.png
 /blog/           → /og/blog.png
 /blog/&lt;slug&gt;/    → /og/blog/&lt;slug&gt;.png
 /resources/&lt;s&gt;/  → /og/resources/&lt;s&gt;.png
@@ -94,64 +89,58 @@ const specs = [
 
   <h2 class={sectionLabel}>Templates</h2>
   <div class="mb-10 space-y-6">
-    {
-      templates.map((t) => (
-        <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
-          <div class="mb-6 flex items-baseline gap-3">
-            <code class="bg-zmoki-indigo-100 text-zmoki-indigo-700 rounded px-2 py-0.5 font-mono text-sm font-medium">
-              {t.name}
-            </code>
-            <span class="text-zmoki-stone-500 text-sm">{t.tagline}</span>
-          </div>
+    {templates.map((t) => (
+      <section class="border-zmoki-stone-200 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
+        <div class="mb-6 flex items-baseline gap-3">
+          <code class="bg-zmoki-indigo-100 text-zmoki-indigo-700 rounded px-2 py-0.5 font-mono text-sm font-medium">
+            {t.name}
+          </code>
+          <span class="text-zmoki-stone-500 text-sm">{t.tagline}</span>
+        </div>
 
-          <img
-            src={t.src}
-            alt={t.alt}
-            width="1200"
-            height="630"
-            loading="lazy"
-            class="border-zmoki-stone-200 h-auto w-full rounded-xl border shadow-sm"
-          />
+        <img
+          src={t.src}
+          alt={t.alt}
+          width="1200"
+          height="630"
+          loading="lazy"
+          class="border-zmoki-stone-200 h-auto w-full rounded-xl border shadow-sm"
+        />
 
-          <div class="mt-6 grid gap-6 sm:grid-cols-2">
-            <div>
-              <p class="text-zmoki-stone-500 mb-2 text-xs font-medium tracking-normal">Used for</p>
-              <p class="text-zmoki-stone-700">{t.usedFor}</p>
-            </div>
-            <div>
-              <p class="text-zmoki-stone-500 mb-2 text-xs font-medium tracking-normal">Anatomy</p>
-              <ul class="space-y-1.5">
-                {t.anatomy.map(([part, desc]) => (
-                  <li class="text-zmoki-stone-700 text-base">
-                    <span class="font-semibold">{part}</span>
-                    <span class="text-zmoki-stone-500"> — {desc}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <div class="mt-6 grid gap-6 sm:grid-cols-2">
+          <div>
+            <p class="text-zmoki-stone-500 mb-2 text-xs font-medium tracking-normal">Used for</p>
+            <p class="text-zmoki-stone-700">{t.usedFor}</p>
           </div>
-        </section>
-      ))
-    }
+          <div>
+            <p class="text-zmoki-stone-500 mb-2 text-xs font-medium tracking-normal">Anatomy</p>
+            <ul class="space-y-1.5">
+              {t.anatomy.map(([part, desc]) => (
+                <li class="text-zmoki-stone-700 text-base">
+                  <span class="font-semibold">{part}</span>
+                  <span class="text-zmoki-stone-500"> — {desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    ))}
   </div>
 
   <h2 class={sectionLabel}>Specs</h2>
   <section class="border-zmoki-stone-200 mb-10 rounded-2xl border bg-white p-6 shadow-sm md:p-8">
     <dl class="grid gap-4 sm:grid-cols-2">
-      {
-        specs.map(([term, def]) => (
-          <div>
-            <dt class="text-zmoki-stone-500 text-xs font-medium tracking-normal">{term}</dt>
-            <dd class="text-zmoki-stone-700 mt-1">{def}</dd>
-          </div>
-        ))
-      }
+      {specs.map(([term, def]) => (
+        <div>
+          <dt class="text-zmoki-stone-500 text-xs font-medium tracking-normal">{term}</dt>
+          <dd class="text-zmoki-stone-700 mt-1">{def}</dd>
+        </div>
+      ))}
     </dl>
   </section>
 
-  <section
-    class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8"
-  >
+  <section class="border-zmoki-indigo-100 bg-zmoki-indigo-600 rounded-2xl border p-6 text-white shadow-sm md:p-8">
     <h2 class="mb-4 text-2xl font-semibold md:text-3xl">Where to change it</h2>
     <ul class="space-y-2 font-mono text-sm">
       <li>

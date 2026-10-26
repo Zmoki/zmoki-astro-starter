@@ -40,9 +40,7 @@ const randomFeedPosts = shuffled.slice(0, 3);
   description={`Confirmation for downloading ${name}. Check your inbox for the link and find other useful resources while you wait.`}
 >
   <section class="space-y-4" data-resource-name={name} data-resource-url={url}>
-    <header
-      class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
-    >
+    <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">
       <h1
         class="text-5xl font-semibold tracking-tight lg:text-6xl"
         set:html={`Your ${name} is on its way`}
@@ -51,42 +49,38 @@ const randomFeedPosts = shuffled.slice(0, 3);
 
     <Prose class="prose-xl lg:prose-2xl lg:px-28 lg:py-16">
       <p>Thank you for signing up!</p>
-      <p>I've just sent <a href={url} set:html={name} /> to the email address you provided.</p>
+      <p>
+        I've just sent <a href={url} set:html={name} /> to the email address you provided.
+      </p>
       <p>It should arrive in your inbox in the next minute or two.</p>
       <p>
-        <b>Important:</b> If you don't see the email, please check your <em>spam</em> or <em
-          >Promotions</em
-        > folder, as it can sometimes end up there. If you need help, please contact me at <a
-          href={`mailto:${site.contact.email}`}>{site.contact.email}</a
-        >.
+        <b>Important:</b> If you don't see the email, please check your <em>spam</em> or{" "}
+        <em>Promotions</em> folder, as it can sometimes end up there. If you need help, please
+        contact me at <a href={`mailto:${site.contact.email}`}>{site.contact.email}</a>.
       </p>
-      {
-        asset && (
-          <p class="not-prose">
-            <Button
-              href={asset.url}
-              size="lg"
-              download
-              id="resource-download"
-              data-resource-name={name}
-              data-asset-url={asset.url}
-            >
-              {asset.label ?? "Download now"}
-            </Button>
-          </p>
-        )
-      }
+      {asset && (
+        <p class="not-prose">
+          <Button
+            href={asset.url}
+            size="lg"
+            download
+            id="resource-download"
+            data-resource-name={name}
+            data-asset-url={asset.url}
+          >
+            {asset.label ?? "Download now"}
+          </Button>
+        </p>
+      )}
       <section>
         <h2>While you wait...</h2>
         <p>You might also find these posts useful:</p>
         <ul>
-          {
-            randomFeedPosts.map((post) => (
-              <li>
-                <a href={`/blog/${post.id}/`} set:html={post.data.title} />
-              </li>
-            ))
-          }
+          {randomFeedPosts.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}/`} set:html={post.data.title} />
+            </li>
+          ))}
         </ul>
       </section>
     </Prose>

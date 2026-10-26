@@ -77,99 +77,88 @@ const blogPostingLd = {
 >
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4" data-post-slug={slug} data-post-title={title}>
-    <header
-      class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
-    >
+    <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">
       <h1 class="text-4xl font-semibold tracking-tight xl:text-6xl" set:html={title} />
-      {
-        description && (
-          <p class="text-zmoki-stone-600 text-2xl xl:text-3xl" set:html={description} />
-        )
-      }
+      {description && (
+        <p class="text-zmoki-stone-600 text-2xl xl:text-3xl" set:html={description} />
+      )}
       <p class="text-zmoki-stone-500 order-first flex flex-col gap-2 text-sm md:flex-row lg:gap-4">
-        {
-          isContentModified ? (
-            <>
-              <span>
-                Updated on <Time datetime={contentModifiedDate} />
-              </span>
-              <span>
-                [published on <Time datetime={publishDate} />]
-              </span>
-            </>
-          ) : (
+        {isContentModified ? (
+          <>
             <span>
-              Published on <Time datetime={publishDate} />
+              Updated on <Time datetime={contentModifiedDate} />
             </span>
-          )
-        }
+            <span>
+              [published on <Time datetime={publishDate} />]
+            </span>
+          </>
+        ) : (
+          <span>
+            Published on <Time datetime={publishDate} />
+          </span>
+        )}
       </p>
     </header>
 
     <!-- Cover photo: the primary image for Google Discover -->
-    {
-      cover && (
-        <Image
-          src={cover.image}
-          alt={cover.alt}
-          width={1200}
-          height={675}
-          priority
-          sizes="(min-width: 768px) 768px, 100vw"
-          class="border-zmoki-stone-200 w-full rounded-2xl border shadow-sm"
-        />
-      )
-    }
+    {cover && (
+      <Image
+        src={cover.image}
+        alt={cover.alt}
+        width={1200}
+        height={675}
+        priority
+        sizes="(min-width: 768px) 768px, 100vw"
+        class="border-zmoki-stone-200 w-full rounded-2xl border shadow-sm"
+      />
+    )}
 
     <Prose class="prose-xl xl:prose-2xl xl:px-28 xl:py-16">
       <slot />
     </Prose>
 
-    <aside
-      class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white lg:p-20"
-    >
+    <aside class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white lg:p-20">
       <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">Written by {author.name}</h2>
       <p>
-        {author.bio} Find more of my work at <a
+        {author.bio} Find more of my work at{" "}
+        <a
           href={author.url}
           class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
-          >{new URL(author.url).host}</a
-        >.
+        >
+          {new URL(author.url).host}
+        </a>
+        .
       </p>
     </aside>
 
     <nav class="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-      {
-        prevPost && (
-          <a
-            href={`/blog/${prevPost.id}/`}
-            data-nav-direction="prev"
-            data-nav-slug={prevPost.id}
-            class="border-zmoki-stone-200 border-l-zmoki-indigo-600 flex flex-col gap-2 rounded-2xl border border-l-4 bg-white px-6 pt-8 pb-10 shadow-sm transition-shadow hover:shadow-md"
-          >
-            <div class="text-zmoki-stone-500 text-sm font-medium">Previous</div>
-            <div class="text-zmoki-stone-900 text-2xl leading-normal font-medium">
-              <span set:html={prevPost.data.title} />
-            </div>
-          </a>
-        )
-      }
+      {prevPost && (
+        <a
+          href={`/blog/${prevPost.id}/`}
+          data-nav-direction="prev"
+          data-nav-slug={prevPost.id}
+          class="border-zmoki-stone-200 border-l-zmoki-indigo-600 flex flex-col gap-2 rounded-2xl border border-l-4 bg-white px-6 pt-8 pb-10 shadow-sm transition-shadow hover:shadow-md"
+        >
+          <div class="text-zmoki-stone-500 text-sm font-medium">Previous</div>
+          <div class="text-zmoki-stone-900 text-2xl leading-normal font-medium">
+            <span set:html={prevPost.data.title} />
+          </div>
+        </a>
+      )}
 
-      {
-        nextPost && (
-          <a
-            href={`/blog/${nextPost.id}/`}
-            data-nav-direction="next"
-            data-nav-slug={nextPost.id}
-            class="border-zmoki-stone-200 border-r-zmoki-indigo-600 flex flex-col gap-2 rounded-2xl border border-r-4 bg-white px-6 pt-8 pb-10 text-right shadow-sm transition-shadow hover:shadow-md md:col-start-2"
-          >
-            <div class="text-zmoki-stone-500 text-sm font-medium">Next</div>
-            <div class="text-zmoki-stone-900 text-2xl leading-normal font-medium">
-              <span set:html={nextPost.data.title} />
-            </div>
-          </a>
-        )
-      }
+      {nextPost && (
+        <a
+          href={`/blog/${nextPost.id}/`}
+          data-nav-direction="next"
+          data-nav-slug={nextPost.id}
+          class="border-zmoki-stone-200 border-r-zmoki-indigo-600 flex flex-col gap-2 rounded-2xl border border-r-4 bg-white px-6 pt-8 pb-10 text-right shadow-sm transition-shadow hover:shadow-md md:col-start-2"
+        >
+          <div class="text-zmoki-stone-500 text-sm font-medium">Next</div>
+          <div class="text-zmoki-stone-900 text-2xl leading-normal font-medium">
+            <span set:html={nextPost.data.title} />
+          </div>
+        </a>
+      )}
     </nav>
   </article>
 

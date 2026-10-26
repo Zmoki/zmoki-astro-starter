@@ -37,25 +37,21 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   robots={robots}
 >
   <article class="space-y-4">
-    <header
-      class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
-    >
+    <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">
       <h1 class="text-5xl font-semibold tracking-tight xl:text-6xl" set:html={title} />
-      {
-        description && (
-          <p class="text-zmoki-stone-600 text-2xl xl:text-3xl" set:html={description} />
-        )
-      }
+      {description && (
+        <p class="text-zmoki-stone-600 text-2xl xl:text-3xl" set:html={description} />
+      )}
 
       <p class="text-zmoki-stone-500 order-first flex flex-col gap-2 text-sm md:flex-row lg:gap-4">
-        <span>Published on <Time datetime={publishDate} /></span>
-        {
-          isContentModified && (
-            <span>
-              [updated on <Time datetime={contentModifiedDate} />]
-            </span>
-          )
-        }
+        <span>
+          Published on <Time datetime={publishDate} />
+        </span>
+        {isContentModified && (
+          <span>
+            [updated on <Time datetime={contentModifiedDate} />]
+          </span>
+        )}
       </p>
     </header>
 
@@ -63,28 +59,26 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
       <Prose class="prose-xl xl:prose-2xl xl:px-28 xl:py-16">
         <slot />
       </Prose>
-      {
-        form && (
-          <div class="order-first">
-            <Form formId={form.formId} buttonText={form.buttonText} resourceSlug={slug}>
-              <h2 set:html={form.title} />
-              <p set:html={form.description} />
-              <p>
-                You'll also join my occasional newsletter with new tools and ideas, you can
-                unsubscribe at any time though.
+      {form && (
+        <div class="order-first">
+          <Form formId={form.formId} buttonText={form.buttonText} resourceSlug={slug}>
+            <h2 set:html={form.title} />
+            <p set:html={form.description} />
+            <p>
+              You'll also join my occasional newsletter with new tools and ideas, you can
+              unsubscribe at any time though.
+            </p>
+            {asset && (
+              <p class="text-zmoki-stone-500">
+                <em>
+                  This is a demo of the signup form — you can also{" "}
+                  <a href={asset.url}>read the checklist directly</a>.
+                </em>
               </p>
-              {asset && (
-                <p class="text-zmoki-stone-500">
-                  <em>
-                    This is a demo of the signup form — you can also{" "}
-                    <a href={asset.url}>read the checklist directly</a>.
-                  </em>
-                </p>
-              )}
-            </Form>
-          </div>
-        )
-      }
+            )}
+          </Form>
+        </div>
+      )}
     </div>
   </article>
 </BaseLayout>
