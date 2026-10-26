@@ -1,0 +1,35 @@
+name: Changelog
+
+# Every PR that changes the starter adds its entry to CHANGELOG.md under
+# "Unreleased" (see AGENTS.md → Changelog & releases). A PR with nothing for
+# adopters to know (a typo, CI-only churn) carries the `no-changelog` label.
+# Its own workflow, so adding or removing the label re-runs only this check.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require a CHANGELOG.md entry
+        if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-changelog') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh pr diff "${{ github.event.pull_request.number }}" --repo "${{ github.repository }}" --name-only | grep -qx "CHANGELOG.md"; then
+            echo "✓ CHANGELOG.md updated"
+          else
+            echo "::error::Add an entry under Unreleased in CHANGELOG.md (what changed, why, how to adopt), or label the PR no-changelog if adopters have nothing to know."
+            exit 1
+          fi
+
+      - name: Skipped (no-changelog label)
+        if: ${{ contains(github.event.pull_request.labels.*.name, 'no-changelog') }}
+        run: echo "no-changelog label set; skipping the CHANGELOG.md check"

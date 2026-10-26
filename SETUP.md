@@ -2,6 +2,8 @@
 
 Everything you need to do to turn this starter into your own site. Work top to bottom.
 
+> **Staying up to date.** Your copy won't receive starter updates on its own. `package.json` `version` records the starter release you began from — keep it as is (or note it somewhere) so you know your baseline. To hear about new releases, watch [the repo](https://github.com/Zmoki/zmoki-astro-starter) with **Custom → Releases**. Each release's notes, and **`CHANGELOG.md`**, say what changed and how to bring it into your copy.
+
 ## 1. Site config
 
 Edit **`src/site.config.ts`** — this is the main one. Set:

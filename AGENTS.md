@@ -10,6 +10,20 @@ An Astro starter for personal websites — posts, resources, and legal pages. Bu
 
 When starting a new site from this template, see **`SETUP.md`** for the checklist.
 
+### Changelog & releases
+
+People copy this starter, and a copy never updates itself, so **`CHANGELOG.md`** is how they learn what changed. **Every PR that changes the starter adds an entry under `## [Unreleased]` in the same PR** (CI's `changelog.yml` fails otherwise; label a PR `no-changelog` only when adopters have nothing to know, e.g. a typo or CI-only churn). Write each entry for someone porting the change into their own copy: what changed, why, and a **"To adopt:"** list of the files to copy, config to set and commands to run. Mark anything that forces them to change their own code or content as breaking. Group entries under Keep a Changelog headings (`Added`, `Changed`, `Fixed`, `Removed`, `Security`) and link the PR.
+
+Versions are semver as an adopter sees them: **major** = they must change their own code or content to adopt it, **minor** = something they can port as-is, **patch** = a fix. `package.json` `version` is the latest release, so a copy records which release it started from. To cut a release:
+
+1. In a PR: rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD`, add a fresh empty `## [Unreleased]` above it, update the two link references at the bottom, and set `package.json` `version` (then `npm install --package-lock-only`).
+2. After it merges: tag the merge commit and publish the GitHub Release with that section as its notes, so people watching the repo for releases get notified:
+
+   ```bash
+   git fetch origin && git tag vX.Y.Z origin/main && git push origin vX.Y.Z
+   gh release create vX.Y.Z --title "vX.Y.Z" --notes "<the version's section from CHANGELOG.md>"
+   ```
+
 ---
 
 ## Tech stack
