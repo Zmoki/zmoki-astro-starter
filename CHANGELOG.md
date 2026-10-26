@@ -8,6 +8,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Ver
 
 ### Changed
 
+- **Docs and code comments pruned.** `AGENTS.md` is now a short map that points to the skill owning each topic (about a third of its old size, so agents load less every session); `README.md` and `SETUP.md` no longer repeat it; the skills are about a third shorter; code comments explain why rather than restate the code. Several stale statements were corrected along the way. The built site is unchanged. ([#60](https://github.com/Zmoki/zmoki-astro-starter/pull/60))
+
+  **To adopt (optional):** copy `AGENTS.md`, `.claude/skills/` and `src/headers/README.md` if you haven't edited them; otherwise compare with yours. `SETUP.md` and `README.md` are for the starter itself, so keep your own. The comment changes need no action.
+
 - **Dependencies updated.** Astro 7.0 → 7.4, `@astrojs/mdx` 7 → 8, `markdown-it` 14 → 15, and every other package to the newest version its range allows. ([#58](https://github.com/Zmoki/zmoki-astro-starter/pull/58))
   - MDX 8 hands `.mdx` files to the configured Markdown processor. With `unified()` that needs `@astrojs/markdown-remark` 7.3 or later.
   - The remark/rehype plugins moved from `markdown.remarkPlugins` / `rehypePlugins` / `remarkRehype` into `unified({...})`, which Astro 7.4 requires (the old keys are deprecated).
