@@ -12,6 +12,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 - Dependencies updated: Astro 7.4, `@astrojs/mdx` 8, `markdown-it` 15. Remark/rehype plugins moved into `unified({...})`, as Astro 7.4 requires. ([#58](https://github.com/Zmoki/zmoki-astro-starter/pull/58))
 - Node pinned in one place, `.node-version` (24.22.1); CI reads it too. GitHub Actions `setup-node` v7, `cache` v6. ([#58](https://github.com/Zmoki/zmoki-astro-starter/pull/58))
 
+### Fixed
+
+- Analytics: `resource_gate_viewed` and `resource_gate_submitted` send the Brevo form id as `form_id` instead of the form URL, and `contact_email_clicked` fires for every `mailto:` link, not only the first. Both change your analytics data. ([#61](https://github.com/Zmoki/zmoki-astro-starter/pull/61))
+- RSS self link no longer has a double slash; the home trust chip, blog timeline script and `Platform` type each read one source; the typography and OG brand pages match the real code. ([#61](https://github.com/Zmoki/zmoki-astro-starter/pull/61))
+
 ### Security
 
 - The CSP no longer allows inline scripts. Scripts are bundled files; the GTM loader is allowed by hash; provider hosts come from each provider's config module. ([#57](https://github.com/Zmoki/zmoki-astro-starter/pull/57))

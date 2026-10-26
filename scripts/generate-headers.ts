@@ -1,11 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { site } from "../src/site.config.ts";
 import { headerRules, type HeaderRule } from "../src/headers/headers.config.ts";
+import type { Platform } from "../src/lib/deploy.ts";
 
 // Compiles src/headers/headers.config.ts into the header file for
 // site.platform.deploy. Also runs before `npm run build`.
-
-type Platform = "cloudflare" | "netlify" | "vercel" | "amplify";
 
 interface EmitResult {
   output: string;
