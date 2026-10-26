@@ -205,6 +205,10 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // Never inline a bundled <script> into the HTML: the CSP's script-src has no
+    // 'unsafe-inline', so every script must be a same-origin file ('self') or a
+    // hashed snippet from src/lib/inline-scripts.ts.
+    build: { assetsInlineLimit: 0 },
   },
   markdown: {
     // Astro 7 defaults to the Sätteri processor; opt back into the unified

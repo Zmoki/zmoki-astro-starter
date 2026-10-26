@@ -40,7 +40,7 @@ const randomFeedPosts = shuffled.slice(0, 3);
   title={`Thank You! Your ${name} is on its way.`}
   description={`Confirmation for downloading ${name}. Check your inbox for the link and find other useful resources while you wait.`}
 >
-  <section class="space-y-4">
+  <section class="space-y-4" data-resource-name={name} data-resource-url={url}>
     <header
       class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20"
     >
@@ -94,16 +94,21 @@ const randomFeedPosts = shuffled.slice(0, 3);
   </section>
 </BaseLayout>
 
-<script is:inline define:vars={{ resourceName: name, resourceUrl: url }}>
-  window.track?.("resource_download_confirmed", {
-    resource_name: resourceName,
-    resource_url: resourceUrl,
-  });
+<script>
+  // The resource comes from the page section's data-resource-name/-url.
+  const page = document.querySelector<HTMLElement>("[data-resource-name][data-resource-url]");
+  if (page) {
+    window.track?.("resource_download_confirmed", {
+      resource_name: page.dataset.resourceName,
+      resource_url: page.dataset.resourceUrl,
+    });
+  }
 
-  document.getElementById("resource-download")?.addEventListener("click", function () {
+  const download = document.getElementById("resource-download");
+  download?.addEventListener("click", () => {
     window.track?.("resource_downloaded", {
-      resource_name: this.getAttribute("data-resource-name") || "",
-      asset_url: this.getAttribute("data-asset-url") || "",
+      resource_name: download.dataset.resourceName ?? "",
+      asset_url: download.dataset.assetUrl ?? "",
     });
   });
 </script>

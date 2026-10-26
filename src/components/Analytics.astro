@@ -1,20 +1,20 @@
 ---
 // Analytics dispatcher. Renders each built-in provider only when its own
-// committed config constant is set, chaining onto the shared window.track/
-// window.identify facade so one call fans out to every active provider.
+// committed config (analytics/<provider>-config.ts) is set, chaining onto the
+// shared window.track/window.identify facade so one call fans out to every
+// active provider.
 //
 // Off by default; PUBLIC_ANALYTICS_ENABLED="true" turns it on (host's
 // production env, CI on main, or locally to test — see AGENTS.md → Analytics).
-// To add a provider: export a config constant, chain onto window.track, then
-// import + render it below.
-import PostHog, { POSTHOG_PROJECT_TOKEN, POSTHOG_HOST } from "@/components/analytics/posthog.astro";
-import Gtm, { GTM_CONTAINER_ID } from "@/components/analytics/gtm.astro";
+// To add a provider: add its config module (constants + CSP hosts), chain onto
+// window.track, then import + render it below.
+import PostHog from "@/components/analytics/posthog.astro";
+import Gtm from "@/components/analytics/gtm.astro";
+import { posthogConfigured } from "@/components/analytics/posthog-config";
+import { gtmConfigured } from "@/components/analytics/gtm-config";
 
 const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED === "true";
-
-const posthogEnabled = !!POSTHOG_PROJECT_TOKEN && !!POSTHOG_HOST;
-const gtmEnabled = !!GTM_CONTAINER_ID;
 ---
 
-{analyticsEnabled && posthogEnabled && <PostHog />}
-{analyticsEnabled && gtmEnabled && <Gtm />}
+{analyticsEnabled && gtmConfigured && <Gtm />}
+{analyticsEnabled && posthogConfigured && <PostHog />}

@@ -1,7 +1,7 @@
 /// <reference path="../.astro/types.d.ts" />
 
 // Provider config (PostHog, GTM, Turnstile, Brevo, image origin) is committed
-// constants in the relevant components, not env vars — see AGENTS.md →
+// constants in config modules and components, not env vars — see AGENTS.md →
 // Analytics/Captcha/Forms. Analytics/captcha are the exception: both default
 // OFF and only turn on when their env var is literally "true" (set it in your
 // host's production env, in CI for the main branch, or locally to test).

@@ -221,31 +221,31 @@ const buttonClass =
   </section>
 </BrandLayout>
 
-<script is:inline>
+<script>
   (function () {
     const form = document.getElementById("demo-validate");
-    if (!form) return;
-    const input = document.getElementById("demo-validate-email");
+    const input = document.querySelector<HTMLInputElement>("#demo-validate-email");
     const msg = document.getElementById("demo-validate-msg");
+    if (!form || !input || !msg) return;
 
     const ok =
       "w-full rounded-lg border border-zmoki-stone-300 bg-white p-2 text-lg focus:border-zmoki-indigo-500 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500/30";
     const bad =
       "w-full rounded-lg border border-zmoki-red-400 bg-white p-2 text-lg focus:border-zmoki-red-500 focus:outline-none focus:ring-2 focus:ring-zmoki-red-500/30";
 
-    function setError(text) {
+    const setError = (text: string) => {
       input.className = bad;
       input.setAttribute("aria-invalid", "true");
       msg.textContent = text;
       msg.className = "mt-2 text-xs text-zmoki-red-600";
-    }
+    };
 
-    function setValid() {
+    const setValid = () => {
       input.className = ok;
       input.removeAttribute("aria-invalid");
       msg.textContent = "Looks good — thanks!";
       msg.className = "mt-2 text-xs text-zmoki-indigo-600";
-    }
+    };
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();

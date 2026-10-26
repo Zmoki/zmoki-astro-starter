@@ -167,10 +167,11 @@ const ownerSiteLabel = new URL(site.organization.url).host;
       <slot />
     </main>
 
-    <script is:inline>
-      document.querySelector('a[href^="mailto:"]')?.addEventListener("click", function () {
+    <script>
+      const mailto = document.querySelector<HTMLAnchorElement>('a[href^="mailto:"]');
+      mailto?.addEventListener("click", () => {
         window.track?.("contact_email_clicked", {
-          email: this.getAttribute("href").replace("mailto:", ""),
+          email: (mailto.getAttribute("href") ?? "").replace("mailto:", ""),
         });
       });
     </script>

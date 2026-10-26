@@ -9,8 +9,9 @@
 // generated embed (its captcha-field detection) — keep it so the token is
 // picked up on submit.
 
-// Committed, not an env var.
-export const TURNSTILE_SITE_KEY = "0x4AAAAAAB2gqKaM5dY-L2kN";
+// The site key lives in turnstile-config.ts, which also gives the CSP its hosts.
+// The loader is an external script on an allowlisted host, not inline code.
+import { TURNSTILE_SITE_KEY } from "@/components/captcha/turnstile-config";
 ---
 
 <div

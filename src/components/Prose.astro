@@ -22,54 +22,46 @@ const base =
   <slot />
 </div>
 
-<script is:inline>
-  // Scoped to THIS Prose instance: bind copy handlers to the code-block buttons
-  // in the panel above only (document.currentScript is this script; its previous
-  // element sibling is that panel's <div>). rehypeCodeBlockCopy injects the
-  // buttons; the copy is tracked via the vendor-neutral facade. Kept as a sibling
-  // *after* the div — a script inside .prose would become its :last-child and
-  // steal the prose/space-y last-child margin reset.
-  (function () {
-    var root = document.currentScript.previousElementSibling;
-    if (!root) return;
+<script>
+  // Bundled, so it runs once per page however many Prose panels render: binds
+  // every code-block Copy button that rehypeCodeBlockCopy injected. The copy is
+  // tracked via the vendor-neutral facade.
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-button="true"]').forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const wrapper = btn.closest(".relative");
+      const codeBlock = wrapper?.querySelector("pre code");
+      const code = codeBlock?.textContent ?? "";
 
-    root.querySelectorAll('[data-copy-button="true"]').forEach(function (btn) {
-      btn.addEventListener("click", async function () {
-        var wrapper = btn.closest(".relative");
-        var codeBlock = wrapper && wrapper.querySelector("pre code");
-        var code = codeBlock ? codeBlock.textContent || "" : "";
+      window.track?.("code_block_copied", { snippet_length: code.length });
+      if (!code) return;
 
-        window.track?.("code_block_copied", { snippet_length: code.length });
-        if (!code) return;
+      const original = btn.textContent;
+      const markCopied = () => {
+        btn.textContent = "Copied";
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 2000);
+      };
 
-        var original = btn.textContent;
-        var markCopied = function () {
-          btn.textContent = "Copied";
-          setTimeout(function () {
-            btn.textContent = original;
-          }, 2000);
-        };
-
+      try {
+        await navigator.clipboard.writeText(code);
+        markCopied();
+      } catch {
+        // Fallback for browsers without the async clipboard API.
+        const textArea = document.createElement("textarea");
+        textArea.value = code;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.select();
         try {
-          await navigator.clipboard.writeText(code);
+          document.execCommand("copy");
           markCopied();
-        } catch {
-          // Fallback for browsers without the async clipboard API.
-          var textArea = document.createElement("textarea");
-          textArea.value = code;
-          textArea.style.position = "fixed";
-          textArea.style.opacity = "0";
-          document.body.appendChild(textArea);
-          textArea.select();
-          try {
-            document.execCommand("copy");
-            markCopied();
-          } catch (fallbackErr) {
-            console.error("Failed to copy code:", fallbackErr);
-          }
-          document.body.removeChild(textArea);
+        } catch (fallbackErr) {
+          console.error("Failed to copy code:", fallbackErr);
         }
-      });
+        document.body.removeChild(textArea);
+      }
     });
-  })();
+  });
 </script>
