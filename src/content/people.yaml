@@ -1,0 +1,16 @@
+# Everyone the site names, keyed by id: others point at a person by it (a post's
+# `author: zarema-khalilova`), and a typo or a repeated id fails the build.
+# A `profile` turns on /people/{id}/. Without it, a person is only named where they appear.
+
+zarema-khalilova:
+  name: Zarema Khalilova
+  role: Creator of the Zmoki Astro Starter
+  url: https://zmoki.xyz
+  bio: I build small, fast websites and the tools around them. This starter is one of them.
+  image:
+    src: https://images.zmoki.xyz/starter/zmoki.jpg
+    alt: Zarema Khalilova, smiling, with short blue hair, half hidden behind a long green leaf in warm evening light.
+  profile:
+    description: Zarema Khalilova builds small, fast websites and the tools around them, including this starter.
+    publishDate: "2026-10-27"
+    contentModifiedDate: "2026-10-27"

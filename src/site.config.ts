@@ -21,7 +21,7 @@ export const site = {
     { label: "SEO Checklist", href: "/resources/new-website-seo-checklist/" },
   ],
 
-  /** The site owner. A post's author is set separately, in its frontmatter. */
+  /** The site owner. A post's author is a person in src/content/people.yaml. */
   organization: {
     /** Shown in the footer copyright and as the content-image credit. */
     name: "Zarema Khalilova",

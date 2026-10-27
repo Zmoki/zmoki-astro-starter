@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from "astro:content";
 import PostLayout from "@/layouts/PostLayout.astro";
 import { getPostsNewestFirst } from "@/lib/page-collections";
 import { contentComponents } from "@/lib/content-components";
+import { getPerson, personToProps } from "@/lib/people";
 
 export async function getStaticPaths() {
   const posts = await getPostsNewestFirst();
@@ -14,6 +15,7 @@ export async function getStaticPaths() {
 
 const post = Astro.props as CollectionEntry<"blog">;
 const { Content } = await render(post);
+const author = personToProps(await getPerson(post.data.author));
 
 // Newest first, so the previous (older) post is at currentIndex + 1.
 const sortedPosts = await getPostsNewestFirst();
@@ -28,7 +30,7 @@ const nextPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
   description={post.data.description}
   publishDate={post.data.publishDate}
   contentModifiedDate={post.data.contentModifiedDate}
-  author={post.data.author}
+  author={author}
   cover={post.data.cover}
   canonical={post.data.canonical}
   prevPost={prevPost}

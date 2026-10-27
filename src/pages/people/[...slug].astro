@@ -1,0 +1,99 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import JsonLd from "@/components/JsonLd.astro";
+import Image from "@/components/Image.astro";
+import PostCard from "@/components/PostCard.astro";
+import { homeCrumb, peopleCrumb } from "@/lib/crumbs";
+import { getProfiles, personToProps, type PersonEntry } from "@/lib/people";
+import { getPostsNewestFirst } from "@/lib/page-collections";
+import { profilePage } from "@/lib/structured-data";
+import { siteUrls } from "@/lib/urls";
+import { publishedImageUrl } from "@/lib/images";
+
+// A profile page, for each person with a `profile` (src/content/people.yaml).
+export async function getStaticPaths() {
+  const people = await getProfiles();
+  return people.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props as { entry: PersonEntry };
+const person = personToProps(entry);
+const profile = entry.data.profile!;
+const posts = (await getPostsNewestFirst()).filter((post) => post.data.author.id === entry.id);
+
+const { absoluteUrl } = siteUrls(Astro);
+const profileLd = profilePage({
+  ...person,
+  // Published as a rendition, never the origin URL. The photo carries no license
+  // markup: it's the person's, not the site's.
+  image: person.image && (await publishedImageUrl(person.image.src)),
+  sameAs: [person.url, ...person.socials.map((social) => social.url)].filter(
+    (url): url is string => !!url,
+  ),
+  url: absoluteUrl(Astro.url.pathname),
+  publishDate: profile.publishDate,
+  contentModifiedDate: profile.contentModifiedDate,
+});
+---
+
+<BaseLayout
+  title={person.name}
+  description={profile.description}
+  publishDate={profile.publishDate}
+  contentModifiedDate={profile.contentModifiedDate}
+  robots={profile.robots}
+>
+  <JsonLd schema={profileLd} />
+  <article class="space-y-4">
+    <Breadcrumbs crumbs={[homeCrumb, peopleCrumb, { name: person.name }]} />
+    <header class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center">
+      {person.image && (
+        <Image
+          src={person.image.src}
+          alt={person.image.alt}
+          width={160}
+          height={160}
+          priority
+          schema={false}
+          class="size-40 rounded-full object-cover"
+        />
+      )}
+      <h1 class="text-5xl font-semibold tracking-tight">{person.name}</h1>
+      <p class="text-zmoki-stone-600 text-xl">
+        {person.role}
+        {person.company && `, ${person.company}`}
+      </p>
+      {person.bio && <p class="max-w-2xl text-lg">{person.bio}</p>}
+      {(person.url || person.socials.length > 0) && (
+        <ul class="flex flex-wrap gap-x-4 gap-y-2 text-base md:justify-center">
+          {person.url && (
+            <li>
+              <a href={person.url} class="text-zmoki-indigo-600 underline underline-offset-2">
+                {new URL(person.url).host}
+              </a>
+            </li>
+          )}
+          {person.socials.map((social) => (
+            <li>
+              <a href={social.url} class="text-zmoki-indigo-600 underline underline-offset-2">
+                {social.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    {posts.length > 0 && (
+      <section class="space-y-4 pt-6">
+        <h2 class="px-1 text-2xl font-semibold">Posts by {person.name}</h2>
+        <div class="grid grid-cols-1 gap-6">
+          {posts.map((post) => (
+            <PostCard {...post} />
+          ))}
+        </div>
+      </section>
+    )}
+  </article>
+</BaseLayout>

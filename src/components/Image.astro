@@ -26,6 +26,8 @@ interface Props {
   author?: { name: string; url: string };
   /** ImageObject license URL. Defaults to site.copyright.images.license. */
   licenseUrl?: string;
+  /** Emit the ImageObject license JSON-LD. Off for photos the site doesn't own, such as people's. */
+  schema?: boolean;
   class?: string;
   [key: string]: unknown;
 }
@@ -40,6 +42,7 @@ const {
   sizes,
   author,
   licenseUrl,
+  schema = true,
   class: className,
   ...rest
 } = Astro.props;
@@ -75,12 +78,13 @@ const shared = {
 };
 
 const hasCaption = Astro.slots.has("default");
-const contentUrl = await publishedImageUrl(src);
-const imageLd = imageObject({
-  contentUrl,
-  license: licenseUrl ?? site.copyright.images.license,
-  author,
-});
+const imageLd =
+  schema &&
+  imageObject({
+    contentUrl: await publishedImageUrl(src),
+    license: licenseUrl ?? site.copyright.images.license,
+    author,
+  });
 
 // In a figure, <picture> is display: contents, so the <img> stays the centered flex item.
 const captionImgClasses =
@@ -120,4 +124,4 @@ const captionImgClasses =
 ) : (
   <img {...shared} decoding="async" class={className} {...rest} />
 )}
-<JsonLd schema={imageLd} />
+{imageLd && <JsonLd schema={imageLd} />}

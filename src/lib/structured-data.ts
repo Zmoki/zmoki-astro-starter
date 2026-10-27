@@ -6,7 +6,7 @@ import { htmlToText } from "@/lib/html-text";
 // (siteUrls in src/lib/urls.ts). Which pages carry which type: src/STRUCTURED-DATA.md.
 
 type Schema = Record<string, unknown>;
-type Person = { name: string; url: string };
+type Person = { name: string; url?: string };
 
 const CONTEXT = "https://schema.org";
 
@@ -22,7 +22,11 @@ const owner = (): Schema => ({
   url: site.organization.url,
 });
 
-const person = ({ name, url }: Person): Schema => ({ "@type": "Person", name, url });
+const person = ({ name, url }: Person): Schema => ({
+  "@type": "Person",
+  name,
+  ...(url ? { url } : {}),
+});
 
 /** A blog post. `image` is the cover's published URL, or the OG card. */
 export function blogPosting(post: {
@@ -108,4 +112,37 @@ export function siteIdentity({ home, logo }: { home: string; logo: string }): Sc
       logo,
     },
   ];
+}
+
+/**
+ * A person's profile page. `url` is the page's absolute URL; `sameAs` their own
+ * site and profiles elsewhere; `image` an absolute photo URL.
+ */
+export function profilePage(profile: {
+  name: string;
+  role: string;
+  company?: string;
+  bio?: string;
+  image?: string;
+  sameAs: string[];
+  url: string;
+  publishDate: Date;
+  contentModifiedDate: Date;
+}): Schema {
+  return {
+    "@context": CONTEXT,
+    "@type": "ProfilePage",
+    url: profile.url,
+    dateCreated: profile.publishDate.toISOString(),
+    dateModified: profile.contentModifiedDate.toISOString(),
+    mainEntity: {
+      "@type": "Person",
+      name: profile.name,
+      jobTitle: profile.role,
+      ...(profile.company ? { worksFor: { "@type": "Organization", name: profile.company } } : {}),
+      ...(profile.bio ? { description: profile.bio } : {}),
+      ...(profile.image ? { image: profile.image } : {}),
+      ...(profile.sameAs.length ? { sameAs: profile.sameAs } : {}),
+    },
+  };
 }

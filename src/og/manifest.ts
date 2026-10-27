@@ -6,6 +6,7 @@ import { formatShortDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
 import { meta as homeMeta } from "@/pages/index.astro";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
+import { meta as peopleIndexMeta } from "@/pages/people/index.astro";
 import { OG_FRAMES } from "./theme";
 import type { OgEntry } from "./types";
 
@@ -59,11 +60,11 @@ async function computeEntries(): Promise<RoutedEntry[]> {
 
   // Read here, not at module top level, to avoid an import cycle. Doubles as the
   // build-time check that title and description are set together.
-  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
+  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta, peopleIndexMeta];
   for (const page of standalonePages) {
     if ((page.title === undefined) !== (page.description === undefined)) {
       throw new Error(
-        `Standalone page "${page.path || "/"}" has incomplete metadata — set title and description together, or neither (src/pages/${page.ogKey === "index" ? "index" : "blog/index"}.astro).`,
+        `Standalone page "${page.path || "/"}" has incomplete metadata — set title and description together, or neither (src/pages/${page.path}index.astro).`,
       );
     }
   }
@@ -80,17 +81,18 @@ async function computeEntries(): Promise<RoutedEntry[]> {
           ]
         : [],
     ),
-    // One article card per collection page; card key drops the trailing slash.
-    ...records.map((record) => ({
-      route: `/${record.path}`,
-      entry: article(
-        record.path.replace(/\/$/, ""),
-        record.title,
-        record.description,
-        record.publishDate,
-        record.byline,
-      ),
-    })),
+    // One card per collection page (article unless the record asks for a site
+    // card); the card key drops the trailing slash.
+    ...records.map((record) => {
+      const key = record.path.replace(/\/$/, "");
+      return {
+        route: `/${record.path}`,
+        entry:
+          record.card === "site"
+            ? siteEntry(key, record.title, record.description)
+            : article(key, record.title, record.description, record.publishDate, record.byline),
+      };
+    }),
     { route: null, entry: DEFAULT_ENTRY },
   ];
 }

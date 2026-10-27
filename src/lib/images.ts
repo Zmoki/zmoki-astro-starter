@@ -31,6 +31,8 @@ export async function publishedImageUrl(src: ImageMetadata | string): Promise<st
   const natural = typeof src === "string" ? await remoteImageSize(src) : src;
   const width = Math.min(PUBLISHED_WIDTH, natural.width);
   const height = Math.round((natural.height * width) / natural.width);
-  const image = await getImage({ src, width, height, format: "webp" });
+  // layout "none": one file. The site-wide "constrained" layout would also render a
+  // srcset nobody reads.
+  const image = await getImage({ src, width, height, format: "webp", layout: "none" });
   return new URL(image.src, site.domain).href;
 }
