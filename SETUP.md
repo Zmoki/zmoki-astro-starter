@@ -33,7 +33,7 @@ The home page is written directly in `src/pages/index.astro`.
 
 ## 3. Content
 
-- `src/content/blog/`: `1-set-up-your-site.mdx` is the example post. Each post's `author` is a person's id: replace `src/content/people/zarema-khalilova.yaml` with yourself. A higher `order` is newer.
+- `src/content/blog/`: `1-set-up-your-site.mdx` is the example post. Each post's `author` is a person's id: replace the sample person in `src/content/people.yaml` with yourself. A higher `order` is newer.
 - `src/content/resources/`: `new-website-seo-checklist.mdx` shows the shape. `type: "page"` makes a page; `type: "link"` is only an outbound link.
 - `src/content/legal/`: `privacy.mdx` and `terms.mdx` are **placeholders, not legal advice**. Fill them in and have them reviewed before launch.
 

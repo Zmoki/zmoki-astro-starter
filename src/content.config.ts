@@ -1,5 +1,5 @@
 import { defineCollection, reference, z } from "astro:content";
-import { glob } from "astro/loaders";
+import { file, glob } from "astro/loaders";
 
 // Per-entry <meta name="robots"> directives, e.g. ["noindex"]. noindex also
 // drops the page from the sitemap.
@@ -24,7 +24,7 @@ const blog = defineCollection({
       .optional(),
     // Set on cross-posted content so search engines credit the original.
     canonical: z.url().optional(),
-    // The post's author, by id in src/content/people/: the byline, author bio,
+    // The post's author, by id in src/content/people.yaml: the byline, author bio,
     // schema.org author and OG card. A typo fails the build.
     author: reference("people"),
     robots,
@@ -71,10 +71,11 @@ const resources = defineCollection({
   }),
 });
 
-// One record per person, referenced by id from other entries (a post's `author`),
-// so a name, role or bio is written once. See src/lib/people.ts.
+// One record per person, keyed by id in one file and referenced from other entries
+// (a post's `author`), so a name, role or bio is written once. A map, not a list:
+// a repeated key is a YAML error, where a repeated list id only warns. See src/lib/people.ts.
 const people = defineCollection({
-  loader: glob({ pattern: "**/*.yaml", base: "./src/content/people" }),
+  loader: file("src/content/people.yaml"),
   schema: z.object({
     name: z.string(),
     /** Their title alone, e.g. "Founder". */

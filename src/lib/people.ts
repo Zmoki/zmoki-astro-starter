@@ -44,7 +44,7 @@ export function personToProps(entry: PersonEntry): PersonProps {
 /** The person a reference points at. Throws on a dangling id. */
 export async function getPerson(ref: ReferenceDataEntry<"people">): Promise<PersonEntry> {
   const entry = await getEntry(ref);
-  if (!entry) throw new Error(`No person "${ref.id}" in src/content/people/.`);
+  if (!entry) throw new Error(`No person "${ref.id}" in src/content/people.yaml.`);
   return entry;
 }
 

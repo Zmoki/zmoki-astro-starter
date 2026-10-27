@@ -11,7 +11,7 @@ import { profilePage } from "@/lib/structured-data";
 import { siteUrls } from "@/lib/urls";
 import { publishedImageUrl } from "@/lib/images";
 
-// A profile page, for each person with a `profile` (src/content/people/).
+// A profile page, for each person with a `profile` (src/content/people.yaml).
 export async function getStaticPaths() {
   const people = await getProfiles();
   return people.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
