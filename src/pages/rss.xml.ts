@@ -3,6 +3,7 @@ import sanitizeHtml from "sanitize-html";
 import MarkdownIt from "markdown-it";
 import { site } from "@/site.config";
 import { getPostsNewestFirst } from "@/lib/page-collections";
+import { isOnImageOrigin, publishedImageUrl } from "@/lib/images";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 
 // HTML must stay enabled for the placeholders convertMdxComponentsToHtml emits.
@@ -29,6 +30,26 @@ function convertRelativeUrlsToAbsolute(html: string, siteUrl: string): string {
   });
 
   return html;
+}
+
+// An <img>'s src, quoted either way or unquoted.
+const IMG_SRC = /(<img\b[^>]*?\ssrc\s*=\s*)(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/gi;
+
+/** Points images on the origin at their published renditions. */
+async function publishOriginImages(html: string): Promise<string> {
+  // markdown-it escapes & in attributes.
+  const urlOf = (m: (string | undefined)[]) =>
+    (m[2] ?? m[3] ?? m[4] ?? "").replaceAll("&amp;", "&");
+  const published = new Map<string, string>();
+  for (const match of html.matchAll(IMG_SRC)) {
+    const url = urlOf(match);
+    if (isOnImageOrigin(url) && !published.has(url))
+      published.set(url, await publishedImageUrl(url));
+  }
+  return html.replace(IMG_SRC, (tag, before: string, ...groups: (string | undefined)[]) => {
+    const url = published.get(urlOf([tag, before, ...groups]));
+    return url ? `${before}"${url}"` : tag;
+  });
 }
 
 /**
@@ -73,6 +94,7 @@ export async function GET(context: { site: URL | undefined }) {
       processedContent = convertMdxComponentsToHtml(processedContent);
       let contentHtml = parser.render(processedContent);
       contentHtml = convertRelativeUrlsToAbsolute(contentHtml, siteUrl);
+      contentHtml = await publishOriginImages(contentHtml);
 
       // The post's OG card is its feed image.
       const ogImageUrl = `${siteUrl}/og/blog/${post.id}.png`;

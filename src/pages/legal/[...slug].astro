@@ -1,6 +1,7 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import LegalLayout from "@/layouts/LegalLayout.astro";
+import { contentComponents } from "@/lib/content-components";
 
 export async function getStaticPaths() {
   const posts = await getCollection("legal");
@@ -21,5 +22,5 @@ const { Content } = await render(post);
   contentModifiedDate={post.data.contentModifiedDate}
   robots={post.data.robots}
 >
-  <Content />
+  <Content components={contentComponents} />
 </LegalLayout>

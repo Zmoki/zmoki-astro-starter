@@ -4,7 +4,7 @@ description: Set up or work on content images (png/jpg/webp) — remote-hosted o
 
 # Content images
 
-Content images (photos: png/jpg/webp) are optimized at build by `astro:assets`: resized, re-encoded to webp/avif, content-hashed into `dist/_astro/`. `image.layout: "constrained"` in `astro.config.mjs` makes them responsive by default. There's no runtime CDN transform.
+Content images (photos: png/jpg/webp) are optimized at build by `astro:assets`: resized, re-encoded to AVIF with a WebP fallback, content-hashed into `dist/_astro/`. `image.layout: "constrained"` in `astro.config.mjs` makes them responsive by default. There's no runtime CDN transform.
 
 Originals live in one of two places:
 
@@ -13,20 +13,24 @@ Originals live in one of two places:
 
 Key files:
 
-- `src/site.config.ts`: `site.platform.imagesCDNHost`, the one source for the origin. It also feeds `image.remotePatterns` in `astro.config.mjs` and the CSP `img-src`.
-- `src/components/Image.astro`: the only image component. Wraps `astro:assets` and reads `site.config` directly.
+- `src/site.config.ts`: `site.platform.imagesCDNHost`, the one source for the origin. It also feeds `image.remotePatterns` in `astro.config.mjs`.
+- `src/components/Image.astro`: the only image component. Wraps `astro:assets` `<Picture>`.
+- `src/lib/images.ts`: `publishedImageUrl(src)`, the URL of a 1200px WebP rendition under `/_astro`. Everything that hands out an image URL uses it.
+
+## The origin is never published
+
+The origin is a build input. A leaked origin gets crawled in place of the site's own URLs, and anyone can hotlink the full-size originals. So JSON-LD (`contentUrl`, `BlogPosting.image`) and the image sitemap use `publishedImageUrl`, the CSP `img-src` doesn't list the origin, and `npm run check:origin` (in CI, after the build) fails if the origin host appears in any file in `dist/`.
 
 ## Enable a remote origin
 
 1. Set `platform.imagesCDNHost: "https://images.example.com"` (a full URL) in `src/site.config.ts`.
-2. Run `npm run build:headers` and commit `public/_headers`.
-3. Upload originals (e.g. `wrangler r2 object put <bucket>/<key> --file=… --remote`) and reference them by full URL.
+2. Upload originals (e.g. `wrangler r2 object put <bucket>/<key> --file=… --remote`) and reference them by full URL.
 
 With `imagesCDNHost: ""`, commit images to `src/images/` and import them.
 
 ## Authoring
 
-**`<Image>`**: `src` is an imported asset or a full remote URL. A remote `src` needs `width` and `height`. `priority` sets eager loading + `fetchpriority=high`; use it on the LCP/hero image only.
+**`<Image>`**: `src` is an imported asset or a full remote URL. A remote `src` without `width` and `height` is measured at build. `priority` sets eager loading + `fetchpriority=high`; use it on the LCP/hero image only.
 
 ```astro
 <Image src="https://images.example.com/photo.jpg" alt="…" width={1200} height={675} priority />
@@ -38,13 +42,13 @@ With `imagesCDNHost: ""`, commit images to `src/images/` and import them.
 
 - A caption (the default slot) wraps the image in `<figure>` + `<figcaption>`.
 - Every image emits a schema.org `ImageObject` license JSON-LD (license, acquireLicensePage, creditText, copyrightNotice, creator) from `site.copyright.images.license` and `site.organization`. Override per image with `author={{ name, url }}` (credits a Person) and/or `licenseUrl="…"`.
-- An image Astro can't optimize (off the origin) renders as a plain `<img>`.
+- An image Astro can't optimize (off the origin) renders as a plain `<img>`, and its `contentUrl` is that URL.
 
-**Markdown `![alt](…)`** uses Astro's built-in optimization: local files (`./photo.jpg`) and full URLs on a domain in `image.remotePatterns`.
+**Markdown `![alt](…)`** works with local files (`./photo.jpg`) and origin URLs. In `.mdx`, every content route maps `img` to `src/components/MarkdownImage.astro` (`src/lib/content-components.ts`): local and origin images go through `<Image>`, any other URL stays a plain `<img>` with no license JSON-LD (the CSP blocks it unless you add its host to `img-src` in `src/headers/headers.config.ts`). In `.md`, Astro optimizes them itself (WebP only, no license JSON-LD). A raw `<img>` in content is handled the same way (`remarkImgTags` in `astro.config.mjs`): in `.mdx` it goes through `MarkdownImage` with its attributes; in `.md` an origin or relative one becomes `![]()`, keeping only `src`, `alt` and `title`. An `<img>` inside a `<picture>` is left alone, as is one in a component or page: on the origin, the CSP blocks it and `check:origin` fails.
 
 ## Post cover and Google Discover
 
-A post's optional `cover` (`{ image, alt }` in blog frontmatter) is a real photo, separate from the OG card. It renders as the hero (LCP), becomes `BlogPosting.image`, and adds an `<image:loc>` to the image sitemap (`src/pages/sitemap.xml.ts`). Google Discover reads these. `og:image` stays the OG card.
+A post's optional `cover` (`{ image, alt }` in blog frontmatter) is a real photo, separate from the OG card. It renders as the hero (LCP), and its published rendition becomes `BlogPosting.image` and the `<image:loc>` in the image sitemap (`src/pages/sitemap.xml.ts`). Google Discover reads these. `og:image` stays the OG card.
 
 ```yaml
 cover:
@@ -66,5 +70,6 @@ cover:
 
 ## Verify
 
-- `npm run build`: the cover `<img>` points at `/_astro/*.webp` with a srcset of distinct sizes, the JSON-LD `image` is the cover URL, `/sitemap.xml` has an `<image:image>`, and `node_modules/.astro/assets/` fills with webp files.
+- `npm run build`: the cover is a `<picture>` with an AVIF `<source>` and a `/_astro/*.webp` `<img>`, each with a srcset of distinct sizes; the JSON-LD `image` and `/sitemap.xml`'s `<image:loc>` are a `/_astro/*.webp` URL; `node_modules/.astro/assets/` fills with avif and webp files.
+- `npm run check:origin` passes.
 - `npm run check:sd` validates the JSON-LD.

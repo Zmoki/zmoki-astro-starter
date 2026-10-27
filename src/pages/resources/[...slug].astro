@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import ResourceLayout from "@/layouts/ResourceLayout.astro";
 import { isResourcePage } from "@/lib/page-collections";
+import { contentComponents } from "@/lib/content-components";
 
 export async function getStaticPaths() {
   const items: CollectionEntry<"resources">[] = await getCollection("resources", isResourcePage);
@@ -17,5 +18,5 @@ const { Content } = await render(item);
 ---
 
 <ResourceLayout {...item.data} slug={item.id}>
-  <Content />
+  <Content components={contentComponents} />
 </ResourceLayout>

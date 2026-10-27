@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Changed
 
+- The image origin is never published. JSON-LD, the image sitemap and the feed point at a 1200px WebP under `/_astro`, the CSP drops the origin from `img-src`, and `npm run check:origin` fails CI if the origin appears in `dist/`. `<Image>` serves AVIF with a WebP fallback, and in `.mdx` Markdown `![]()` and raw `<img>` go through it, so they are optimized too (a raw `<img>` in `.md` becomes `![]()`). ([#66](https://github.com/Zmoki/zmoki-astro-starter/pull/66))
+  **Breaking:** an `<img>` pointing at the origin outside content (in a component or page) is now blocked by the CSP; use `<Image>`.
 - CI: a new push to a PR cancels its runs in flight, and Lighthouse restores CI's image and font cache instead of re-optimizing every image. The cache now holds only `node_modules/.astro/assets` and `fonts`, not the content store. ([#65](https://github.com/Zmoki/zmoki-astro-starter/pull/65))
 
 ## [2.0.0] - 2026-10-26

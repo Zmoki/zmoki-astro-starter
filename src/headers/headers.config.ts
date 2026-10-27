@@ -10,7 +10,6 @@
  */
 
 import { createHash } from "node:crypto";
-import { site } from "../site.config.ts";
 import { inlineScripts } from "../lib/inline-scripts.ts";
 import { POSTHOG_CSP } from "../components/analytics/posthog-config.ts";
 import { GTM_CSP } from "../components/analytics/gtm-config.ts";
@@ -29,9 +28,6 @@ const inlineScriptHashes = inlineScripts.map(
   (snippet) => `'sha256-${createHash("sha256").update(snippet, "utf8").digest("base64")}'`,
 );
 
-// For images that render unoptimized; optimized ones are same-origin under /_astro.
-const IMAGE_CDN_HOST = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
-
 const baseDirectives: Record<string, string[]> = {
   "default-src": ["'self'"],
   "script-src": [
@@ -41,12 +37,9 @@ const baseDirectives: Record<string, string[]> = {
   ],
   "frame-src": [],
   "style-src": ["'self'", "'unsafe-inline'"],
-  "img-src": [
-    "'self'",
-    "data:",
-    // the image origin, if set
-    ...(IMAGE_CDN_HOST ? [IMAGE_CDN_HOST] : []),
-  ],
+  // No image origin: its images are optimized to same-origin /_astro files.
+  // To embed images from another host, add the host here.
+  "img-src": ["'self'", "data:"],
   "media-src": ["'self'"],
   "font-src": ["'self'"],
   "manifest-src": ["'self'"],

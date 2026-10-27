@@ -42,6 +42,7 @@ npm run check:headers    # CI: fail if the committed header file is stale
 npm run check:sd         # after build: validate every JSON-LD block in dist/
 npm run check:links      # after build: no broken internal links, no hard-coded own origin
 npm run check:sitemap    # after build: every indexable page is in sitemap.xml, and only those
+npm run check:origin     # after build: the image origin appears in no built file
 npm run lhci:mobile      # Lighthouse CI (also lhci:desktop)
 npm run timeline:blog    # write blog-timeline.csv
 ```
@@ -50,7 +51,7 @@ From an agent or other non-interactive shell, Astro starts `dev` and `preview` i
 
 ## CI
 
-- **`ci.yml`** (every push and PR to `main`): format check, type check, lint, redirect and header drift checks, build, then `check:sd`, `check:links` and `check:sitemap`. The build turns analytics and captcha on only for pushes to `main`, so that build matches production. No secrets are needed: provider config is committed.
+- **`ci.yml`** (every push and PR to `main`): format check, type check, lint, redirect and header drift checks, build, then `check:sd`, `check:links`, `check:sitemap` and `check:origin`. The build turns analytics and captcha on only for pushes to `main`, so that build matches production. No secrets are needed: provider config is committed.
 - **`lighthouse.yml`**: Lighthouse CI on every push and PR, always with analytics and captcha off.
 - **`changelog.yml`**: a PR must change `CHANGELOG.md` unless it has the `no-changelog` label.
 
@@ -129,6 +130,7 @@ Every absolute URL (canonical, `og:url`, OG image, JSON-LD) comes from `siteUrls
 `astro.config.mjs` uses the unified processor, `unified({...})` from `@astrojs/markdown-remark`, for both `.md` and `.mdx`, with:
 
 - `remark-definition-list` for `<dl>` lists;
+- `remarkImgTags`: a raw `<img>` is treated like `![]()`, so origin images are optimized (`/images`);
 - `rehypeDefinitionListIds`: an `id` on every `<dt>`, for anchor links;
 - `rehypeExternalLinks`: `target="_blank"` and `data-external` on outbound links, `data-resource` on `/resources/` links, `data-anchor` on `#` links (the prose styles key off these);
 - `rehypeCodeBlockCopy`: a Copy button on every code block, wired up in `Prose.astro`.
@@ -171,7 +173,7 @@ Pushing to `main` deploys, through the host's GitHub integration; PRs get previe
 
 ### Images
 
-Content images are optimized at build (`astro:assets`), from files in `src/images/` or from a remote origin (`site.platform.imagesCDNHost`). Use `src/components/Image.astro`, which also emits the image's license JSON-LD, or Markdown `![]()`. A post's optional `cover` is its hero, its `BlogPosting.image` and its image-sitemap entry. Details: `/images`.
+Content images are optimized at build (`astro:assets`), from files in `src/images/` or from a remote origin (`site.platform.imagesCDNHost`). Use `src/components/Image.astro`, which also emits the image's license JSON-LD, or Markdown `![]()`. A post's optional `cover` is its hero, its `BlogPosting.image` and its image-sitemap entry. The origin is never published: image URLs go through `src/lib/images.ts`, and `check:origin` enforces it. Details: `/images`.
 
 ### OG images
 

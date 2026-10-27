@@ -25,7 +25,7 @@ export interface PageRecord {
   byline: string;
   /** robots directives from frontmatter (drives sitemap noindex filtering). */
   robots?: string[];
-  /** Cover image URL for the image-sitemap <image:loc> (blog covers). */
+  /** Cover image source (blog covers). The sitemap publishes it through publishedImageUrl. */
   imageLoc?: string;
 }
 

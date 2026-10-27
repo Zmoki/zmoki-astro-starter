@@ -44,7 +44,7 @@ If the user asks for a type not in the gallery, tell them it won't produce a Sea
 
 **Values.** Take text from `src/site.config.ts` (`site.name`, `site.domain`, `site.organization.*`, `site.contact.email`, `site.social.github`); never hard-code it. A post's author comes from its own frontmatter (`{ name, url, bio }`); there's no site-level author.
 
-**URLs.** Build every absolute URL with `absoluteUrl(path)` from `siteUrls(Astro)` (`src/lib/urls.ts`), the same helper behind the canonical link and `og:image`. Use `absoluteUrl(Astro.url.pathname)` for the current page. For a page's OG card, use `getOgImage(pathname)` (`src/og/manifest.ts`). Dates are ISO 8601 (`.toISOString()`).
+**URLs.** Build every absolute URL with `absoluteUrl(path)` from `siteUrls(Astro)` (`src/lib/urls.ts`), the same helper behind the canonical link and `og:image`. Use `absoluteUrl(Astro.url.pathname)` for the current page. For a page's OG card, use `getOgImage(pathname)` (`src/og/manifest.ts`). For a content image, use `publishedImageUrl(src)` (`src/lib/images.ts`), never the origin URL. Dates are ISO 8601 (`.toISOString()`).
 
 **Render** with `src/components/JsonLd.astro`. It takes one schema object or an array, escapes `<`, and works anywhere in the document, so no `<head>` edit is needed. JSON-LD is data, so the CSP doesn't affect it.
 

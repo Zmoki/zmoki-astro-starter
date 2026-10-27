@@ -74,3 +74,6 @@ jobs:
 
       - name: Sitemap check
         run: npm run check:sitemap
+
+      - name: Image origin check
+        run: npm run check:origin

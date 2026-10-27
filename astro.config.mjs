@@ -6,19 +6,80 @@ import mdx from "@astrojs/mdx";
 import { unified } from "@astrojs/markdown-remark";
 import remarkDefinitionList from "remark-definition-list";
 import { defListHastHandlers } from "remark-definition-list";
-import { visit } from "unist-util-visit";
+import { SKIP, visit } from "unist-util-visit";
+import { IMAGE_ORIGIN, isOnImageOrigin } from "./src/lib/image-origin.ts";
 
 // The image origin's hostname, authorized for build-time optimization below.
-const imagesCDNHost = (site.platform.imagesCDNHost || "").trim().replace(/\/+$/, "");
 let imageHostname = "";
-if (imagesCDNHost) {
+if (IMAGE_ORIGIN) {
   try {
-    imageHostname = new URL(imagesCDNHost).hostname;
+    imageHostname = new URL(IMAGE_ORIGIN).hostname;
   } catch {
     throw new Error(
-      `site.platform.imagesCDNHost must be a full URL (e.g. "https://images.example.com") or "": got "${imagesCDNHost}"`,
+      `site.platform.imagesCDNHost must be a full URL (e.g. "https://images.example.com") or "": got "${IMAGE_ORIGIN}"`,
     );
   }
+}
+
+// Treat a raw <img> in content like Markdown `![]()`, so origin images are optimized
+// instead of published (the CSP blocks the origin). See the /images skill.
+// - .mdx: MDX never swaps literal JSX for a component, and marks it with
+//   `_mdxExplicitJsx` before our plugins run. Clearing the flag lets <Content components>
+//   map it like `![]()` (to MarkdownImage), with its attributes. Without the map it stays an <img>.
+// - .md: each origin or relative <img> in raw HTML becomes `![]()`, keeping only src,
+//   alt and title. The HTML around it stays raw.
+// An <img> inside a <picture> is left alone: the author chose its sources.
+const ENTITIES = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" };
+const decodeEntities = (text) =>
+  text.replace(/&(?:#(\d+)|#x([0-9a-f]+)|(amp|quot|apos|lt|gt));/gi, (_, dec, hex, name) =>
+    dec
+      ? String.fromCodePoint(Number(dec))
+      : hex
+        ? String.fromCodePoint(parseInt(hex, 16))
+        : ENTITIES[name.toLowerCase()],
+  );
+function remarkImgTags() {
+  const attr = (tag, name) => {
+    const match = tag.match(
+      new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s"'>]+))`, "i"),
+    );
+    const value = match && (match[1] ?? match[2] ?? match[3]);
+    return value == null ? undefined : decodeEntities(value);
+  };
+  return (tree) => {
+    visit(tree, (node, index, parent) => {
+      if (node.type === "mdxJsxFlowElement" || node.type === "mdxJsxTextElement") {
+        if (node.name === "picture") return SKIP;
+        if (node.name === "img") node.data = { ...node.data, _mdxExplicitJsx: false };
+        return;
+      }
+      if (node.type !== "html" || !parent || index === undefined) return;
+      if (/<picture\b/i.test(node.value)) return;
+      const nodes = [];
+      let last = 0;
+      for (const match of node.value.matchAll(/<img\b[^>]*>/gi)) {
+        const src = attr(match[0], "src");
+        if (!src || !(src.startsWith(".") || isOnImageOrigin(src))) continue;
+        if (match.index > last)
+          nodes.push({ type: "html", value: node.value.slice(last, match.index) });
+        nodes.push({
+          type: "image",
+          url: src,
+          alt: attr(match[0], "alt") ?? "",
+          title: attr(match[0], "title") ?? null,
+        });
+        last = match.index + match[0].length;
+      }
+      if (!nodes.length) return;
+      if (last < node.value.length) nodes.push({ type: "html", value: node.value.slice(last) });
+      // Only images: a paragraph, like `![]()` on its own line.
+      const onlyImages = nodes.every((n) => n.type === "image" || !n.value.trim());
+      const replacement =
+        parent.type === "root" && onlyImages ? [{ type: "paragraph", children: nodes }] : nodes;
+      parent.children.splice(index, 1, ...replacement);
+      return [SKIP, index + replacement.length];
+    });
+  };
 }
 
 // Give each <dt> a slug id so glossary terms can be linked to.
@@ -197,7 +258,7 @@ export default defineConfig({
     // Astro 7's default Sätteri processor doesn't run remark/rehype plugins.
     // Pass plugins to unified() itself (markdown.*Plugins is deprecated); .mdx uses it too.
     processor: unified({
-      remarkPlugins: [remarkDefinitionList],
+      remarkPlugins: [remarkDefinitionList, remarkImgTags],
       remarkRehype: { handlers: defListHastHandlers },
       rehypePlugins: [rehypeDefinitionListIds, rehypeExternalLinks, rehypeCodeBlockCopy],
     }),
