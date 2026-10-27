@@ -169,7 +169,7 @@ The build is a static `dist/` for Cloudflare Pages (the reference host), Netlify
 - **Redirects**: CSVs in `src/redirects/`. See `/redirects`.
 - **Headers**: rules in `src/headers/headers.config.ts` (see `src/headers/README.md`): `noindex` on `/-/astro/*` and `/thank-you/*`, and the security set (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, …) on every path. If your CDN also sets security headers, remove them there to avoid duplicates.
 
-Pushing to `main` deploys, through the host's GitHub integration; PRs get preview deploys. Cloudflare and Netlify build with the Node from `.node-version`; Amplify needs it set in its build settings.
+Pushing to `main` deploys, through the host's GitHub integration; PRs get preview deploys. A preview build (a PR or non-production branch, detected by `isPreviewBuild` in `src/lib/deploy.ts`) adds `noindex` to every page's robots meta, since not every host can set `X-Robots-Tag` per deployment. It's only a hint to crawlers: to keep previews private, put access control on them. Cloudflare and Netlify build with the Node from `.node-version`; Amplify needs it set in its build settings.
 
 ### Images
 

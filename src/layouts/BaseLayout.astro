@@ -7,7 +7,8 @@ import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
-import { robotsContent } from "@/lib/robots";
+import { isNoindex, robotsContent } from "@/lib/robots";
+import { isPreviewBuild } from "@/lib/deploy";
 import { commitHash } from "@/lib/version";
 
 export interface Props {
@@ -43,6 +44,13 @@ const {
 } = Astro.props;
 
 const pagePathname = Astro.url.pathname;
+
+// Preview deploys are public, and a canonical is only a hint, so they're noindex.
+const pageRobots =
+  isPreviewBuild(site.platform.deploy) && !isNoindex(robots)
+    ? ["noindex", ...(robots ?? [])]
+    : robots;
+
 const isPageArticle = publishDate && contentModifiedDate;
 
 // One helper for every absolute URL, so canonical, OG and JSON-LD match.
@@ -76,7 +84,7 @@ const ownerSiteLabel = new URL(site.organization.url).host;
 
     <title>{title}</title>
     <meta name="description" content={description} />
-    <meta name="robots" content={robotsContent(robots)} />
+    <meta name="robots" content={robotsContent(pageRobots)} />
     {canonicalURL && <link rel="canonical" href={canonicalURL} />}
     <link
       rel="alternate"
