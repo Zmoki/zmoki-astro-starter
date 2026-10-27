@@ -1,5 +1,5 @@
 ---
-// What Markdown `![]()` renders in .mdx (mapped in src/lib/content-components.ts).
+// What Markdown `![]()` and a raw <img> render in .mdx (mapped in src/lib/content-components.ts).
 // Local and origin images go through <Image>: optimized, with license JSON-LD.
 // Any other URL stays a plain <img> with no license JSON-LD, since the site doesn't own it.
 import Image from "@/components/Image.astro";
@@ -8,14 +8,21 @@ import { isOnImageOrigin } from "@/lib/images";
 interface Props {
   src: ImageMetadata | string;
   alt?: string;
+  width?: number | string;
+  height?: number | string;
   [key: string]: unknown;
 }
 
-const { src, alt = "", ...rest } = Astro.props;
+// A raw <img> passes its size as strings.
+const { src, alt = "", width, height, ...rest } = Astro.props;
+const size = {
+  ...(width ? { width: Number(width) } : {}),
+  ...(height ? { height: Number(height) } : {}),
+};
 ---
 
 {typeof src !== "string" || isOnImageOrigin(src) ? (
-  <Image src={src} alt={alt} {...rest} />
+  <Image src={src} alt={alt} {...size} {...rest} />
 ) : (
-  <img src={src} alt={alt} loading="lazy" decoding="async" {...rest} />
+  <img src={src} alt={alt} loading="lazy" decoding="async" {...size} {...rest} />
 )}

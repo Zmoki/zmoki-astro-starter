@@ -21,6 +21,43 @@ if (imagesCDNHost) {
   }
 }
 
+// Treat a raw <img> in content like Markdown `![]()`, so origin images are optimized
+// instead of published (the CSP blocks the origin). In .mdx it becomes <MarkdownImage>,
+// keeping its attributes. In .md an origin or relative <img> becomes `![]()`, which drops
+// attributes other than src, alt and title. See the /images skill.
+function remarkImgTags() {
+  const attr = (tag, name) =>
+    tag
+      .match(new RegExp(`\\s${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)')`, "i"))
+      ?.slice(1)
+      .find((v) => v !== undefined);
+  return (tree) => {
+    visit(tree, (node, index, parent) => {
+      if (
+        (node.type === "mdxJsxFlowElement" || node.type === "mdxJsxTextElement") &&
+        node.name === "img"
+      ) {
+        node.name = "MarkdownImage";
+        return;
+      }
+      if (node.type !== "html" || !parent || index === undefined) return;
+      const tag = node.value.trim();
+      if (!/^<img\b[^>]*>$/i.test(tag)) return;
+      const src = attr(tag, "src")?.replaceAll("&amp;", "&");
+      if (!src || !(src.startsWith(".") || (imagesCDNHost && src.startsWith(`${imagesCDNHost}/`))))
+        return;
+      const image = {
+        type: "image",
+        url: src,
+        alt: attr(tag, "alt") ?? "",
+        title: attr(tag, "title") ?? null,
+      };
+      parent.children[index] =
+        parent.type === "root" ? { type: "paragraph", children: [image] } : image;
+    });
+  };
+}
+
 // Give each <dt> a slug id so glossary terms can be linked to.
 function rehypeDefinitionListIds() {
   return (tree) => {
@@ -197,7 +234,7 @@ export default defineConfig({
     // Astro 7's default Sätteri processor doesn't run remark/rehype plugins.
     // Pass plugins to unified() itself (markdown.*Plugins is deprecated); .mdx uses it too.
     processor: unified({
-      remarkPlugins: [remarkDefinitionList],
+      remarkPlugins: [remarkDefinitionList, remarkImgTags],
       remarkRehype: { handlers: defListHastHandlers },
       rehypePlugins: [rehypeDefinitionListIds, rehypeExternalLinks, rehypeCodeBlockCopy],
     }),

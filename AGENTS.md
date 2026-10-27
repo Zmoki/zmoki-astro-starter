@@ -130,6 +130,7 @@ Every absolute URL (canonical, `og:url`, OG image, JSON-LD) comes from `siteUrls
 `astro.config.mjs` uses the unified processor, `unified({...})` from `@astrojs/markdown-remark`, for both `.md` and `.mdx`, with:
 
 - `remark-definition-list` for `<dl>` lists;
+- `remarkImgTags`: a raw `<img>` is treated like `![]()`, so origin images are optimized (`/images`);
 - `rehypeDefinitionListIds`: an `id` on every `<dt>`, for anchor links;
 - `rehypeExternalLinks`: `target="_blank"` and `data-external` on outbound links, `data-resource` on `/resources/` links, `data-anchor` on `#` links (the prose styles key off these);
 - `rehypeCodeBlockCopy`: a Copy button on every code block, wired up in `Prose.astro`.
