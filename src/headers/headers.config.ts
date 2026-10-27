@@ -37,7 +37,8 @@ const baseDirectives: Record<string, string[]> = {
   ],
   "frame-src": [],
   "style-src": ["'self'", "'unsafe-inline'"],
-  // No image origin: images on it are always optimized to same-origin /_astro files.
+  // No image origin: its images are optimized to same-origin /_astro files.
+  // To embed images from another host, add the host here.
   "img-src": ["'self'", "data:"],
   "media-src": ["'self'"],
   "font-src": ["'self'"],

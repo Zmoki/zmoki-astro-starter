@@ -32,14 +32,24 @@ function convertRelativeUrlsToAbsolute(html: string, siteUrl: string): string {
   return html;
 }
 
-/** Points Markdown images on the origin at their published renditions. */
+// An <img>'s src, quoted either way or unquoted.
+const IMG_SRC = /(<img\b[^>]*?\ssrc\s*=\s*)(?:"([^"]*)"|'([^']*)'|([^\s"'>]+))/gi;
+
+/** Points images on the origin at their published renditions. */
 async function publishOriginImages(html: string): Promise<string> {
-  const srcs = new Set([...html.matchAll(/<img\b[^>]*?\bsrc="([^"]+)"/gi)].map((m) => m[1]));
-  for (const src of srcs) {
-    const url = src.replaceAll("&amp;", "&"); // markdown-it escapes & in attributes
-    if (isOnImageOrigin(url)) html = html.replaceAll(src, await publishedImageUrl(url));
+  // markdown-it escapes & in attributes.
+  const urlOf = (m: (string | undefined)[]) =>
+    (m[2] ?? m[3] ?? m[4] ?? "").replaceAll("&amp;", "&");
+  const published = new Map<string, string>();
+  for (const match of html.matchAll(IMG_SRC)) {
+    const url = urlOf(match);
+    if (isOnImageOrigin(url) && !published.has(url))
+      published.set(url, await publishedImageUrl(url));
   }
-  return html;
+  return html.replace(IMG_SRC, (tag, before: string, ...groups: (string | undefined)[]) => {
+    const url = published.get(urlOf([tag, before, ...groups]));
+    return url ? `${before}"${url}"` : tag;
+  });
 }
 
 /**

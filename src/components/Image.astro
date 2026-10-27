@@ -4,9 +4,9 @@
 // <img>, so there is no build-time fetch and no srcset that repeats the original
 // at every width. Every image also emits ImageObject license JSON-LD, whose
 // contentUrl is a rendition, never the origin. See the /images skill.
-import { Picture, inferRemoteSize } from "astro:assets";
+import { Picture } from "astro:assets";
 import JsonLd from "@/components/JsonLd.astro";
-import { isOnImageOrigin, publishedImageUrl } from "@/lib/images";
+import { isOnImageOrigin, publishedImageUrl, remoteImageSize } from "@/lib/images";
 import { site } from "@/site.config";
 
 type ImageLayout = "constrained" | "fullWidth" | "fixed";
@@ -45,11 +45,16 @@ const {
 
 const willOptimize = typeof src !== "string" || isOnImageOrigin(src);
 // Markdown `![]()` (mapped here in src/lib/content-components.ts) gives no size.
+// A missing side is derived from the natural aspect ratio, so the image isn't cropped.
 const natural =
-  typeof src === "string" && willOptimize && !(width && height)
-    ? await inferRemoteSize(src)
-    : undefined;
-const finalWidth = width ?? natural?.width ?? (typeof src === "object" ? src.width : undefined);
+  typeof src === "object"
+    ? src
+    : willOptimize && !(width && height)
+      ? await remoteImageSize(src)
+      : undefined;
+const finalWidth =
+  width ??
+  (height && natural ? Math.round((natural.width * height) / natural.height) : natural?.width);
 const finalHeight =
   height ??
   (natural && finalWidth ? Math.round((natural.height * finalWidth) / natural.width) : undefined);

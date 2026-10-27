@@ -1,7 +1,8 @@
 ---
 // What Markdown `![]()` and a raw <img> render in .mdx (mapped in src/lib/content-components.ts).
 // Local and origin images go through <Image>: optimized, with license JSON-LD.
-// Any other URL stays a plain <img> with no license JSON-LD, since the site doesn't own it.
+// Any other URL stays a plain <img> with no license JSON-LD, since the site doesn't own it
+// (the CSP blocks it unless its host is in img-src, src/headers/headers.config.ts).
 import Image from "@/components/Image.astro";
 import { isOnImageOrigin } from "@/lib/images";
 
@@ -13,16 +14,21 @@ interface Props {
   [key: string]: unknown;
 }
 
-// A raw <img> passes its size as strings.
 const { src, alt = "", width, height, ...rest } = Astro.props;
-const size = {
-  ...(width ? { width: Number(width) } : {}),
-  ...(height ? { height: Number(height) } : {}),
-};
+// A raw <img> passes its size as strings; one that isn't a pixel count ("100%") is dropped.
+const px = (value: unknown) => (Number(value) > 0 ? Number(value) : undefined);
 ---
 
 {typeof src !== "string" || isOnImageOrigin(src) ? (
-  <Image src={src} alt={alt} {...size} {...rest} />
+  <Image src={src} alt={alt} width={px(width)} height={px(height)} {...rest} />
 ) : (
-  <img src={src} alt={alt} loading="lazy" decoding="async" {...size} {...rest} />
+  <img
+    src={src}
+    alt={alt}
+    loading="lazy"
+    decoding="async"
+    width={width}
+    height={height}
+    {...rest}
+  />
 )}
