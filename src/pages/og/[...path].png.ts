@@ -1,4 +1,5 @@
-// One PNG per OG manifest entry: Satori renders SVG, resvg turns it into PNG.
+// One PNG per OG manifest entry and frame (landscape at /og/<key>.png, square at
+// /og/square/<key>.png): Satori renders SVG, resvg turns it into PNG.
 // See the /og-images skill.
 import type { APIRoute, GetStaticPaths } from "astro";
 import satori from "satori";
@@ -6,24 +7,29 @@ import { Resvg } from "@resvg/resvg-js";
 import { getOgEntries } from "@/og/manifest";
 import { renderCard } from "@/og/card";
 import { fonts } from "@/og/fonts";
-import { OG_WIDTH, OG_HEIGHT } from "@/og/theme";
+import { OG_FRAMES, type OgFrame } from "@/og/theme";
 import type { OgEntry } from "@/og/types";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const entries = await getOgEntries();
-  return entries.map((entry) => ({ params: { path: entry.key }, props: { entry } }));
+  return entries.flatMap((entry) =>
+    OG_FRAMES.map((frame) => ({
+      params: { path: `${frame.dir}${entry.key}` },
+      props: { entry, frame },
+    })),
+  );
 };
 
 export const GET: APIRoute = async ({ props }) => {
-  const entry = props.entry as OgEntry;
+  const { entry, frame } = props as { entry: OgEntry; frame: OgFrame };
 
-  const svg = await satori(renderCard(entry) as never, {
-    width: OG_WIDTH,
-    height: OG_HEIGHT,
+  const svg = await satori(renderCard(entry, frame) as never, {
+    width: frame.width,
+    height: frame.height,
     fonts,
   });
 
-  const png = new Resvg(svg, { fitTo: { mode: "width", value: OG_WIDTH } }).render().asPng();
+  const png = new Resvg(svg, { fitTo: { mode: "width", value: frame.width } }).render().asPng();
 
   return new Response(new Uint8Array(png), {
     headers: {

@@ -120,7 +120,7 @@ Collections are defined in `src/content.config.ts` (Content Layer API, `glob()` 
 
 ### Layouts
 
-- **`BaseLayout`**: every page's shell (nav, footer, fonts, meta, analytics). Notable props: `wide` (full-width `<main>` for pages that manage their own sections; default is a centered reading column), `canonical` (`true` = own URL, `false` = none, a string = another URL), `robots`.
+- **`BaseLayout`**: every page's shell (nav, footer, fonts, meta, analytics). Notable props: `wide` (full-width `<main>` for pages that manage their own sections; default is a centered reading column), `canonical` (`true` = own URL, `false` = none, a string = another URL), `robots`, `article` (`og:type="article"` and the `article:*_time` tags; posts set it, other dated pages stay `website`). A `head` slot (`<Fragment slot="head">`) adds page-specific tags, such as an LCP preload; the other layouts forward it.
 - **`PostLayout`**, **`ResourceLayout`**, **`LegalLayout`** wrap it. `PostLayout` adds the `BlogPosting` JSON-LD, author bio, prev/next links and the `post_viewed` event.
 - **`BrandLayout`**: a bare, noindex canvas for the brand pages.
 
@@ -179,7 +179,7 @@ Content images are optimized at build (`astro:assets`), from files in `src/image
 
 ### OG images
 
-Each page gets a 1200×630 PNG card rendered at build time (`src/og/`, endpoint `src/pages/og/[...path].png.ts`). The manifest (`src/og/manifest.ts`) lists every card from the page registry and the standalone pages; colors come from the design tokens. The cards use their own font files in `src/og/fonts/`, so a font swap must update those too. Details: `/og-images`.
+Each page gets two PNG cards rendered at build time, 1200×630 at `/og/<key>.png` and 1200×1200 at `/og/square/<key>.png` (`src/og/`, endpoint `src/pages/og/[...path].png.ts`). The manifest (`src/og/manifest.ts`) lists every card from the page registry and the standalone pages; colors come from the design tokens. The cards use their own font files in `src/og/fonts/`, so a font swap must update those too. Details: `/og-images`.
 
 ### Brand mark and favicons
 

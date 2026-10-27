@@ -73,9 +73,11 @@ const blogPostingLd = {
   description={description}
   publishDate={publishDate}
   contentModifiedDate={contentModifiedDate}
+  article
   canonical={canonical}
   robots={robots}
 >
+  <slot name="head" slot="head" />
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4" data-post-slug={slug} data-post-title={title}>
     <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">

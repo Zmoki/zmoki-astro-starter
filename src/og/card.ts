@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { Resvg } from "@resvg/resvg-js";
 import { site } from "@/site.config";
-import { theme, OG_WIDTH, OG_HEIGHT } from "./theme";
+import { theme, type OgFrame } from "./theme";
 import type { OgEntry } from "./types";
 
 type Node = { type: string; props: Record<string, unknown> };
@@ -35,7 +35,10 @@ const brandMark = (size = 56): Node => ({
   },
 });
 
-const root = (children: Node[]): Node =>
+/** A size in landscape pixels, scaled to the frame. */
+const px = (frame: OgFrame, n: number) => Math.round(n * frame.scale);
+
+const root = (frame: OgFrame, children: Node[]): Node =>
   el(
     "div",
     {
@@ -44,9 +47,9 @@ const root = (children: Node[]): Node =>
       justifyContent: "space-between",
       // Satori sizes boxes like browsers (content-box), so keep the padding inside the card.
       boxSizing: "border-box",
-      width: OG_WIDTH,
-      height: OG_HEIGHT,
-      padding: 80,
+      width: frame.width,
+      height: frame.height,
+      padding: px(frame, 80),
       backgroundColor: theme.bg,
       color: theme.ink,
       fontFamily: "Noto Sans",
@@ -54,21 +57,33 @@ const root = (children: Node[]): Node =>
     children,
   );
 
-function articleCard(entry: OgEntry): Node {
+function articleCard(entry: OgEntry, frame: OgFrame): Node {
   const header = el(
     "div",
-    { display: "flex", fontSize: 24, color: theme.muted, fontWeight: 700 },
+    { display: "flex", fontSize: px(frame, 24), color: theme.muted, fontWeight: 700 },
     entry.eyebrow ?? "",
   );
   const body = el("div", { display: "flex", flexDirection: "column" }, [
     el(
       "div",
-      { display: "flex", fontSize: 56, fontWeight: 700, lineHeight: 1.15, color: theme.ink },
+      {
+        display: "flex",
+        fontSize: px(frame, 56),
+        fontWeight: 700,
+        lineHeight: 1.15,
+        color: theme.ink,
+      },
       entry.title,
     ),
     el(
       "div",
-      { display: "flex", marginTop: 28, fontSize: 24, lineHeight: 1.4, color: theme.muted },
+      {
+        display: "flex",
+        marginTop: px(frame, 28),
+        fontSize: px(frame, 24),
+        lineHeight: 1.4,
+        color: theme.muted,
+      },
       entry.description,
     ),
   ]);
@@ -77,37 +92,59 @@ function articleCard(entry: OgEntry): Node {
     { display: "flex", alignItems: "center", justifyContent: "space-between" },
     [
       el("div", { display: "flex", alignItems: "center" }, [
-        brandMark(52),
+        brandMark(px(frame, 52)),
         el(
           "div",
-          { display: "flex", marginLeft: 20, fontSize: 28, fontWeight: 700, color: theme.ink },
+          {
+            display: "flex",
+            marginLeft: px(frame, 20),
+            fontSize: px(frame, 28),
+            fontWeight: 700,
+            color: theme.ink,
+          },
           site.name,
         ),
       ]),
-      el("div", { display: "flex", fontSize: 24, color: theme.muted }, domain),
+      el("div", { display: "flex", fontSize: px(frame, 24), color: theme.muted }, domain),
     ],
   );
-  return root([header, body, footer]);
+  return root(frame, [header, body, footer]);
 }
 
-function siteCard(entry: OgEntry): Node {
-  const header = el("div", { display: "flex" }, [brandMark(72)]);
+function siteCard(entry: OgEntry, frame: OgFrame): Node {
+  const header = el("div", { display: "flex" }, [brandMark(px(frame, 72))]);
   const body = el("div", { display: "flex", flexDirection: "column" }, [
     el(
       "div",
-      { display: "flex", fontSize: 74, fontWeight: 700, lineHeight: 1.1, color: theme.ink },
+      {
+        display: "flex",
+        fontSize: px(frame, 74),
+        fontWeight: 700,
+        lineHeight: 1.1,
+        color: theme.ink,
+      },
       entry.title,
     ),
     el(
       "div",
-      { display: "flex", marginTop: 28, fontSize: 24, lineHeight: 1.4, color: theme.muted },
+      {
+        display: "flex",
+        marginTop: px(frame, 28),
+        fontSize: px(frame, 24),
+        lineHeight: 1.4,
+        color: theme.muted,
+      },
       entry.description,
     ),
   ]);
-  const footer = el("div", { display: "flex", fontSize: 24, color: theme.muted }, domain);
-  return root([header, body, footer]);
+  const footer = el(
+    "div",
+    { display: "flex", fontSize: px(frame, 24), color: theme.muted },
+    domain,
+  );
+  return root(frame, [header, body, footer]);
 }
 
-export function renderCard(entry: OgEntry): Node {
-  return entry.template === "site" ? siteCard(entry) : articleCard(entry);
+export function renderCard(entry: OgEntry, frame: OgFrame): Node {
+  return entry.template === "site" ? siteCard(entry, frame) : articleCard(entry, frame);
 }

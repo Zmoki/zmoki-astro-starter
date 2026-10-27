@@ -36,6 +36,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
   contentModifiedDate={contentModifiedDate}
   robots={robots}
 >
+  <slot name="head" slot="head" />
   <article class="space-y-4">
     <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">
       <h1 class="text-5xl font-semibold tracking-tight xl:text-6xl" set:html={title} />

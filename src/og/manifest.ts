@@ -6,6 +6,7 @@ import { formatShortDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
 import { meta as homeMeta } from "@/pages/index.astro";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
+import { OG_FRAMES } from "./theme";
 import type { OgEntry } from "./types";
 
 /** Card text has no line-clamp, so cap lengths that would overflow the layout. */
@@ -105,13 +106,26 @@ const norm = (p: string): string => {
   return s === "" ? "/" : s;
 };
 
+export interface OgImage {
+  /** The landscape card's path, e.g. /og/blog/my-post.png. */
+  path: string;
+  alt: string;
+  /** Every frame's card, landscape first. */
+  images: { path: string; width: number; height: number }[];
+}
+
 /**
- * The OG image URL + alt for a page, by pathname. Falls back to the site's
- * default card for any route without its own entry.
+ * A page's OG cards and alt, by pathname. Falls back to the site's default card
+ * for any route without its own entry.
  */
-export async function getOgImage(pathname: string): Promise<{ path: string; alt: string }> {
+export async function getOgImage(pathname: string): Promise<OgImage> {
   const routed = await buildEntries();
   const match = routed.find((r) => r.route !== null && norm(r.route) === norm(pathname));
   const entry = match?.entry ?? DEFAULT_ENTRY;
-  return { path: `/og/${entry.key}.png`, alt: entry.alt };
+  const images = OG_FRAMES.map((frame) => ({
+    path: `/og/${frame.dir}${entry.key}.png`,
+    width: frame.width,
+    height: frame.height,
+  }));
+  return { path: images[0].path, alt: entry.alt, images };
 }

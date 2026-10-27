@@ -17,6 +17,11 @@ export interface Props {
   publishDate?: Date;
   contentModifiedDate?: Date;
   /**
+   * The page reads as an article (a post, news): og:type="article" plus the
+   * article:*_time tags, which need both dates. Other pages stay "website".
+   */
+  article?: boolean;
+  /**
    * Robots directives added to the site default, e.g. ["noindex"]. Directives
    * that imply noindex also drop the page from the sitemap.
    */
@@ -38,6 +43,7 @@ const {
   description = site.description,
   publishDate,
   contentModifiedDate,
+  article = false,
   robots,
   wide = false,
   canonical = true,
@@ -51,7 +57,7 @@ const pageRobots =
     ? ["noindex", ...(robots ?? [])]
     : robots;
 
-const isPageArticle = publishDate && contentModifiedDate;
+const isPageArticle = article && publishDate && contentModifiedDate;
 
 // One helper for every absolute URL, so canonical, OG and JSON-LD match.
 const urls = siteUrls(Astro);
@@ -59,8 +65,8 @@ const selfURL = urls.absoluteUrl(pagePathname);
 const canonicalURL =
   canonical === false ? null : typeof canonical === "string" ? canonical : selfURL;
 
-// Falls back to the site's default card. The image URL uses the current origin,
-// so a preview deploy shows its own cards.
+// Falls back to the site's default card. Image URLs use the current origin, so a
+// preview deploy shows its own cards.
 const ogImage = await getOgImage(pagePathname);
 const pageImageUrl = urls.currentAbsoluteUrl(ogImage.path);
 
@@ -79,7 +85,9 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     <link rel="icon" type="image/svg+xml" href="/brand-mark.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <Font cssVariable={fonts.sans.variable} preload />
+    <!-- Preload only the upright sans (headings and body): a late swap re-wraps the hero
+         copy and pushes the LCP image down. Italic and mono load on use. -->
+    <Font cssVariable={fonts.sans.variable} preload={[{ style: "normal" }]} />
     <Font cssVariable={fonts.mono.variable} />
 
     <title>{title}</title>
@@ -100,20 +108,30 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     <meta property="og:type" content={isPageArticle ? "article" : "website"} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:locale" content="en_US" />
-    <meta property="og:image" content={pageImageUrl} />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={ogImage.alt} />
+    <!-- Landscape first, then square: consumers take the first image they support. -->
+    {ogImage.images.map((image) => (
+      <>
+        <meta property="og:image" content={urls.currentAbsoluteUrl(image.path)} />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="og:image:width" content={String(image.width)} />
+        <meta property="og:image:height" content={String(image.height)} />
+        <meta property="og:image:alt" content={ogImage.alt} />
+      </>
+    ))}
     {isPageArticle && (
       <meta property="article:published_time" content={publishDate.toISOString()} />
     )}
     {isPageArticle && (
       <meta property="article:modified_time" content={contentModifiedDate.toISOString()} />
     )}
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:image" content={pageImageUrl} />
-    <meta property="twitter:image:alt" content={ogImage.alt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={pageImageUrl} />
+    <meta name="twitter:image:alt" content={ogImage.alt} />
+
+    <!-- Page-specific extras, e.g. preloading the LCP image: <Fragment slot="head">. -->
+    <slot name="head" />
 
     <Analytics />
   </head>
