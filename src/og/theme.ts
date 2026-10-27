@@ -18,6 +18,15 @@ export const theme = {
   accent: hex(indigo[600]), // links / brand mark (WCAG-AA on white & cream)
 } as const;
 
-// OG images are served at the recommended 1.91:1 ratio.
-export const OG_WIDTH = 1200;
-export const OG_HEIGHT = 630;
+/**
+ * Every card is rendered in each frame. Landscape (1.91:1) comes first: it's the
+ * og:image most consumers take. Some (e.g. LinkedIn on mobile, WhatsApp) prefer the
+ * square one, listed second. `dir` is the frame's folder under /og/. `scale` sizes
+ * the type, mark and padding: a square card is usually shown smaller, so it's larger.
+ */
+export const OG_FRAMES = [
+  { name: "landscape", width: 1200, height: 630, dir: "", scale: 1 },
+  { name: "square", width: 1200, height: 1200, dir: "square/", scale: 1.35 },
+] as const;
+
+export type OgFrame = (typeof OG_FRAMES)[number];

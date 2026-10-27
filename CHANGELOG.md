@@ -8,12 +8,15 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Added
 
+- Social meta: a square 1200×1200 OG card beside each landscape one, listed as a second `og:image`; `twitter:title` and `twitter:description`; and a `head` slot on `BaseLayout` for page-specific tags. ([#71](https://github.com/Zmoki/zmoki-astro-starter/pull/71))
 - Analytics you can check locally: with analytics off or no provider configured, a console provider logs every `track` and `identify` call. New site-wide events: `cta_clicked` for any link to a standing ask in `site.asks`, and every click event now carries a `location` (the closest `data-band`). `trackWhenVisible()` fires an event once an element is seen. `src/ANALYTICS.md` lists every event. ([#70](https://github.com/Zmoki/zmoki-astro-starter/pull/70))
 - Markdown tables: a `: Caption` line right after a table becomes its `<caption>`, and every table scrolls inside its own keyboard-reachable box instead of widening the page on a phone. ([#68](https://github.com/Zmoki/zmoki-astro-starter/pull/68))
 - Preview deploys are `noindex`: a PR or non-production branch build adds it to every page's robots meta, since a canonical pointing at production is only a hint. Amplify previews are now detected too, so their OG images use the preview's own URL. ([#67](https://github.com/Zmoki/zmoki-astro-starter/pull/67))
 
 ### Changed
 
+- `og:type="article"` and the `article:*_time` tags now need the new `article` prop on `BaseLayout` (posts set it); resources and legal pages are `website`. The Twitter tags use `name=` instead of `property=`. Only the body and heading faces are preloaded (weights 400 and 600, upright). ([#71](https://github.com/Zmoki/zmoki-astro-starter/pull/71))
+  **Breaking:** a layout of yours that should read as an article must pass `article` to `BaseLayout`.
 - `resource_gate_viewed` fires when the gate form is half on screen, not on page load, so it counts people who saw the form. ([#70](https://github.com/Zmoki/zmoki-astro-starter/pull/70))
 - The Markdown plugins moved from `astro.config.mjs` to `src/markdown/`, one TypeScript file each with unit tests (`npm test`, run in CI). The output is unchanged. ([#69](https://github.com/Zmoki/zmoki-astro-starter/pull/69))
 - The image origin is never published. JSON-LD, the image sitemap and the feed point at a 1200px WebP under `/_astro`, the CSP drops the origin from `img-src`, and `npm run check:origin` fails CI if the origin appears in `dist/`. `<Image>` serves AVIF with a WebP fallback, and in `.mdx` Markdown `![]()` and raw `<img>` go through it, so they are optimized too (a raw `<img>` in `.md` becomes `![]()`). ([#66](https://github.com/Zmoki/zmoki-astro-starter/pull/66))

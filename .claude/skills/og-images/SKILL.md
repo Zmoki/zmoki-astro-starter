@@ -4,7 +4,7 @@ description: Customize the Open Graph / social-share image cards — layout, col
 
 # OG images
 
-Social-share cards are rendered at build time: Satori (nodes → SVG), then resvg (SVG → PNG). `astro build` writes them to `dist/og/**/*.png` (1200×630); `astro dev` renders the same route on request. Nothing is committed except the card fonts.
+Social-share cards are rendered at build time: Satori (nodes → SVG), then resvg (SVG → PNG). Every card comes in two frames: 1200×630 at `/og/<key>.png` and 1200×1200 at `/og/square/<key>.png`. `astro build` writes them to `dist/og/`; `astro dev` renders the same routes on request. Nothing is committed except the card fonts.
 
 ## Files
 
@@ -12,17 +12,17 @@ Social-share cards are rendered at build time: Satori (nodes → SVG), then resv
 | ---------------------------------- | --------------------------------------------------------------------------------------- |
 | `src/og/manifest.ts`               | Which pages get a card, and each card's text (`title`, `description`, `eyebrow`, `alt`) |
 | `src/og/card.ts`                   | How cards look: the `article` and `site` layouts                                        |
-| `src/og/theme.ts`                  | Card colors (from design tokens) and `OG_WIDTH` / `OG_HEIGHT`                           |
+| `src/og/theme.ts`                  | Card colors (from design tokens) and `OG_FRAMES` (each frame's size, folder and scale)  |
 | `src/og/fonts.ts` + `fonts/*.woff` | The card font (Noto Sans Latin subset)                                                  |
 | `src/og/types.ts`                  | The `OgEntry` shape and the `OgTemplate` union                                          |
 | `src/pages/og/[...path].png.ts`    | The endpoint: `getStaticPaths` from the manifest → render → PNG                         |
 
-The manifest feeds both the endpoint and `BaseLayout.astro` (`og:image` + `og:image:alt` via `getOgImage(pathname)`). A page with no entry gets the `default` card.
+The manifest feeds both the endpoint and `BaseLayout.astro`, which lists one `og:image` group per frame, landscape first (consumers take the first they support), via `getOgImage(pathname)`. `twitter:image` is the landscape card. A page with no entry gets the `default` card.
 
 ## Preview
 
 ```bash
-npm run dev     # then open /og/index.png, /og/blog/<id>.png, /og/default.png
+npm run dev     # then open /og/index.png, /og/square/index.png, /og/blog/<id>.png, /og/default.png
 npm run build   # then open dist/og/**/*.png
 ```
 
@@ -42,7 +42,7 @@ Put the new `.woff`/`.ttf` in `src/og/fonts/` (Satori needs the file, not a CSS 
 
 ### Layout or copy
 
-Layout: edit `articleCard` / `siteCard` in `src/og/card.ts`, built with the small `el(type, style, children)` helper (no JSX). The brand mark comes from `public/brand-mark.svg`, and the site name and domain from `src/site.config.ts`.
+Layout: edit `articleCard` / `siteCard` in `src/og/card.ts`, built with the small `el(type, style, children)` helper (no JSX). Write sizes as `px(frame, n)`, in landscape pixels: the square frame scales them up (`scale` in `OG_FRAMES`). Check both frames. The brand mark comes from `public/brand-mark.svg`, and the site name and domain from `src/site.config.ts`.
 
 Text (eyebrow format, site-card tagline, truncation): edit `src/og/manifest.ts`.
 
@@ -62,9 +62,9 @@ Text (eyebrow format, site-card tagline, truncation): edit `src/og/manifest.ts`.
 
 An entry's `key` is its filename stem under `/og/` (`"blog/<id>"` → `/og/blog/<id>.png`).
 
-### Dimensions
+### Dimensions and frames
 
-Change `OG_WIDTH` / `OG_HEIGHT` in `src/og/theme.ts` and the `og:image:width` / `og:image:height` meta in `src/layouts/BaseLayout.astro`. Keep 1.91:1 unless there's a reason not to.
+Each frame in `OG_FRAMES` (`src/og/theme.ts`) is rendered for every card: `width`, `height`, `dir` (its folder under `/og/`) and `scale` (type size against landscape). The meta tags and the endpoint read the list, so adding or resizing a frame is one edit. The `landscape` frame (keep it 1.91:1) is always listed first, by name. Each frame renders every card again, so it adds build time and files; on a very large site, drop the square frame. The build fails if a frame's `dir` clashes with a card key.
 
 ## Satori gotchas
 
