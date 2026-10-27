@@ -2,7 +2,7 @@
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import JsonLd from "@/components/JsonLd.astro";
-import MarkdownImage from "@/components/MarkdownImage.astro";
+import Image from "@/components/Image.astro";
 import PostCard from "@/components/PostCard.astro";
 import { homeCrumb, peopleCrumb } from "@/lib/crumbs";
 import { getProfiles, personToProps, type PersonEntry } from "@/lib/people";
@@ -25,7 +25,8 @@ const posts = (await getPostsNewestFirst()).filter((post) => post.data.author.id
 const { absoluteUrl } = siteUrls(Astro);
 const profileLd = profilePage({
   ...person,
-  // A photo on the image origin is published as a rendition, never the origin URL.
+  // Published as a rendition, never the origin URL. The photo carries no license
+  // markup: it's the person's, not the site's.
   image: person.image && (await publishedImageUrl(person.image.src)),
   sameAs: [person.url, ...person.socials.map((social) => social.url)].filter(
     (url): url is string => !!url,
@@ -48,12 +49,13 @@ const profileLd = profilePage({
     <Breadcrumbs crumbs={[homeCrumb, peopleCrumb, { name: person.name }]} />
     <header class="border-zmoki-stone-200 flex flex-col gap-4 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center">
       {person.image && (
-        <MarkdownImage
+        <Image
           src={person.image.src}
           alt={person.image.alt}
           width={160}
           height={160}
           priority
+          schema={false}
           class="size-40 rounded-full object-cover"
         />
       )}

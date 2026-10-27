@@ -9,7 +9,7 @@ import { isNoindexPath } from "@/lib/noindex";
 import { publishedImageUrl } from "@/lib/images";
 
 /** `path` has a trailing slash and no leading slash. `imageLoc` is the cover's published URL. */
-type SitemapEntry = { path: string; lastmod: Date; imageLoc?: string };
+type SitemapEntry = { path: string; lastmod?: Date; imageLoc?: string };
 
 // Image URLs can carry `&` (query params), which must be `&amp;` in valid XML.
 const xmlEscape = (s: string) =>
@@ -31,27 +31,34 @@ export const GET: APIRoute = async ({ site }) => {
       })),
   );
 
+  const listed = (page: StandalonePageMeta) =>
+    page.lists === undefined ? [] : records.filter((record) => record.path.startsWith(page.lists!));
+
   // A page that lists collection pages (home and the blog index list posts, the
   // people index lists profiles) changes when they do, so its <lastmod> is the newest
-  // of its own dates and theirs.
-  const standaloneLastmod = (page: StandalonePageMeta) =>
-    new Date(
-      Math.max(
-        ...[page.publishDate, page.contentModifiedDate]
-          .filter((date): date is Date => date !== undefined)
-          .map((date) => date.getTime()),
-        ...records
-          .filter((record) => page.lists !== undefined && record.path.startsWith(page.lists))
-          .map((record) => record.contentModifiedDate.getTime()),
-      ),
-    );
+  // of its own dates and theirs. None at all (an empty blog with no dates of its own)
+  // leaves <lastmod> out, which the protocol allows.
+  const standaloneLastmod = (page: StandalonePageMeta): Date | undefined => {
+    const times = [
+      page.publishDate,
+      page.contentModifiedDate,
+      ...listed(page).map((record) => record.contentModifiedDate),
+    ]
+      .filter((date): date is Date => date !== undefined)
+      .map((date) => date.getTime());
+    return times.length ? new Date(Math.max(...times)) : undefined;
+  };
 
   // <image:loc> ties the cover to the page. It is the only image-sitemap tag
   // Google still reads.
   const sitemapUrl = ({ path, lastmod, imageLoc }: SitemapEntry) => `
   <url>
-    <loc>${site}${path}</loc>
-    <lastmod>${isoDate(lastmod)}</lastmod>${
+    <loc>${site}${path}</loc>${
+      lastmod
+        ? `
+    <lastmod>${isoDate(lastmod)}</lastmod>`
+        : ""
+    }${
       imageLoc
         ? `
     <image:image>
@@ -64,7 +71,10 @@ export const GET: APIRoute = async ({ site }) => {
 
   // isNoindexPath applies the X-Robots-Tag header rules.
   const urls: SitemapEntry[] = [
-    ...standalonePages.map((page) => ({ path: page.path, lastmod: standaloneLastmod(page) })),
+    // A page marked noindexWhenEmpty (the people index) is noindex while it lists nothing.
+    ...standalonePages
+      .filter((page) => !(page.noindexWhenEmpty && listed(page).length === 0))
+      .map((page) => ({ path: page.path, lastmod: standaloneLastmod(page) })),
     ...collectionEntries,
   ].filter((url) => !isNoindexPath(`/${url.path}`));
 

@@ -13,12 +13,17 @@ export const meta = {
   publishDate: new Date("2026-10-27"),
   contentModifiedDate: new Date("2026-10-27"),
   lists: "people/",
+  noindexWhenEmpty: true,
 } satisfies StandalonePageMeta;
 
 const people = (await getProfiles()).map(personToProps);
 ---
 
-<BaseLayout title={meta.title} description={meta.description}>
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  robots={people.length === 0 ? ["noindex"] : undefined}
+>
   <div class="mb-6">
     <Breadcrumbs crumbs={[homeCrumb, { name: meta.title }]} />
   </div>

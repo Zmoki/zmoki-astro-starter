@@ -11,4 +11,6 @@ interface StandalonePageMeta {
   contentModifiedDate?: Date;
   /** Path prefix of the collection pages it lists, e.g. "blog/": its sitemap <lastmod> follows their newest change. */
   lists?: string;
+  /** Noindex and out of the sitemap while it lists nothing (needs `lists`). */
+  noindexWhenEmpty?: boolean;
 }

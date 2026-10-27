@@ -121,29 +121,34 @@ const blogPostingLd = blogPosting({
       <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">
         Written by{" "}
         {author.profilePath ? (
-          <a href={author.profilePath} class="underline underline-offset-4">
+          <a
+            href={author.profilePath}
+            class="text-zmoki-indigo-600 underline underline-offset-4 md:text-white"
+          >
             {author.name}
           </a>
         ) : (
           author.name
         )}
       </h2>
-      <p>
-        {author.bio}
-        {author.url && (
-          <>
-            {" "}
-            Find more of my work at{" "}
-            <a
-              href={author.url}
-              class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
-            >
-              {new URL(author.url).host}
-            </a>
-            .
-          </>
-        )}
-      </p>
+      {(author.bio || author.url) && (
+        <p>
+          {author.bio}
+          {author.url && (
+            <>
+              {" "}
+              Find more of my work at{" "}
+              <a
+                href={author.url}
+                class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
+              >
+                {new URL(author.url).host}
+              </a>
+              .
+            </>
+          )}
+        </p>
+      )}
     </aside>
 
     <nav class="grid w-full grid-cols-1 gap-4 md:grid-cols-2">

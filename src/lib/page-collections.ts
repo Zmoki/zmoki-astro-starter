@@ -34,15 +34,29 @@ export interface PageRecord {
 
 type PageFields = Omit<PageRecord, "path">;
 
-function definePageCollection<K extends PageCollectionName>(config: {
-  collection: K;
-  /** URL path prefix, e.g. "blog/" → /blog/{slug}/. */
-  basePath: string;
-  /** Which entries render as pages (default: all). */
-  filter?: (entry: CollectionEntry<K>) => boolean;
-  /** The page's fields. Default: the entry's own title, description, dates and robots. */
-  fields?: (entry: CollectionEntry<K>) => PageFields | Promise<PageFields>;
-}) {
+// Collections whose entries have their own title, description and dates; any other
+// collection must pass `fields`.
+type WithPageFields = "blog" | "resources" | "legal";
+type FieldsMapper<K extends PageCollectionName> = (
+  entry: CollectionEntry<K>,
+) => PageFields | Promise<PageFields>;
+
+function definePageCollection<K extends PageCollectionName>(
+  config: {
+    collection: K;
+    /** URL path prefix, e.g. "blog/" → /blog/{slug}/. */
+    basePath: string;
+    /** Which entries render as pages (default: all). */
+    filter?: (entry: CollectionEntry<K>) => boolean;
+  } & (K extends WithPageFields
+    ? {
+        /** The page's fields. Default: the entry's own title, description, dates and robots. */
+        fields?: FieldsMapper<K>;
+      }
+    : { fields: FieldsMapper<K> }),
+) {
+  // The conditional type above checks call sites; inside, it's the plain mapper.
+  const fields = config.fields as FieldsMapper<K> | undefined;
   return {
     ...config,
     async records(): Promise<PageRecord[]> {
@@ -50,18 +64,17 @@ function definePageCollection<K extends PageCollectionName>(config: {
       return Promise.all(
         entries.map(async (entry) => ({
           path: `${config.basePath}${entry.id}/`,
-          ...(config.fields ? await config.fields(entry) : defaultFields(entry)),
+          ...(fields
+            ? await fields(entry)
+            : defaultFields(entry as CollectionEntry<WithPageFields>)),
         })),
       );
     },
   };
 }
 
-type PageEntry = CollectionEntry<"blog" | "resources" | "legal">;
-
-const defaultFields = (entry: CollectionEntry<PageCollectionName>): PageFields => {
-  const { title, description, publishDate, contentModifiedDate, robots } = (entry as PageEntry)
-    .data;
+const defaultFields = (entry: CollectionEntry<WithPageFields>): PageFields => {
+  const { title, description, publishDate, contentModifiedDate, robots } = entry.data;
   return { title, description, publishDate, contentModifiedDate, robots, byline: site.name };
 };
 
