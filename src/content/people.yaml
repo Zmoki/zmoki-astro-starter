@@ -7,6 +7,9 @@ zarema-khalilova:
   role: Creator of the Zmoki Astro Starter
   url: https://zmoki.xyz
   bio: I build small, fast websites and the tools around them. This starter is one of them.
+  image:
+    src: https://images.zmoki.xyz/starter/zmoki.jpg
+    alt: Zarema Khalilova, smiling, with short blue hair, half hidden behind a long green leaf in warm evening light.
   profile:
     description: Zarema Khalilova builds small, fast websites and the tools around them, including this starter.
     publishDate: "2026-10-27"

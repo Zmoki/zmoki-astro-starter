@@ -28,6 +28,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Fixed
 
+- Published image URLs (JSON-LD, sitemap, feed) render one file each; they also rendered a full srcset that nothing used, adding files and build time. ([#73](https://github.com/Zmoki/zmoki-astro-starter/pull/73))
 - In `.md`, an `<img>` inside a one-line `<picture>…</picture>` is no longer turned into `![]()`. ([#69](https://github.com/Zmoki/zmoki-astro-starter/pull/69))
 
 ## [2.0.0] - 2026-10-26
