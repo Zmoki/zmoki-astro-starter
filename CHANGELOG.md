@@ -6,6 +6,10 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ## [Unreleased]
 
+### Added
+
+- Preview deploys are `noindex`: a PR or non-production branch build adds it to every page's robots meta, since a canonical pointing at production is only a hint. Amplify previews are now detected too, so their OG images use the preview's own URL. ([#67](https://github.com/Zmoki/zmoki-astro-starter/pull/67))
+
 ### Changed
 
 - The image origin is never published. JSON-LD, the image sitemap and the feed point at a 1200px WebP under `/_astro`, the CSP drops the origin from `img-src`, and `npm run check:origin` fails CI if the origin appears in `dist/`. `<Image>` serves AVIF with a WebP fallback, and in `.mdx` Markdown `![]()` and raw `<img>` go through it, so they are optimized too (a raw `<img>` in `.md` becomes `![]()`). ([#66](https://github.com/Zmoki/zmoki-astro-starter/pull/66))
