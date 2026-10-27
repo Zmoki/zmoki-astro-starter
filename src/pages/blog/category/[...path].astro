@@ -1,0 +1,56 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import PostList from "@/components/PostList.astro";
+import { getPostsNewestFirst } from "@/lib/page-collections";
+import {
+  categoryPagePath,
+  getCategories,
+  pageCount,
+  pageItems,
+  postsInCategory,
+  type Category,
+} from "@/lib/blog";
+import { blogCrumb, homeCrumb } from "@/lib/crumbs";
+
+// A category's archive: /blog/category/{id}/, then /blog/category/{id}/page/{n}/.
+// Every post in the category is listed, the featured one too.
+export async function getStaticPaths() {
+  const posts = await getPostsNewestFirst();
+  const categories = await getCategories();
+  return categories.flatMap((category) => {
+    const pages = pageCount(postsInCategory(posts, category.id));
+    return Array.from({ length: pages }, (_, i) => ({
+      params: { path: i === 0 ? category.id : `${category.id}/page/${i + 1}` },
+      props: { category, current: i + 1 },
+    }));
+  });
+}
+
+const { category, current } = Astro.props as { category: Category; current: number };
+const posts = postsInCategory(await getPostsNewestFirst(), category.id);
+const hrefs = Array.from({ length: pageCount(posts) }, (_, i) =>
+  categoryPagePath(category.id, i + 1),
+);
+const { label, description } = category.data;
+const title = current === 1 ? label : `${label}, page ${current}`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  robots={posts.length === 0 ? ["noindex"] : undefined}
+>
+  <div class="mb-6">
+    <Breadcrumbs crumbs={[homeCrumb, blogCrumb, { name: title }]} />
+  </div>
+  <header class="mb-10">
+    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+    <p class="text-zmoki-stone-600 mt-3 text-lg">{description}</p>
+  </header>
+  {posts.length === 0 ? (
+    <p>No posts in this category yet.</p>
+  ) : (
+    <PostList posts={pageItems(posts, current)} hrefs={hrefs} current={current} />
+  )}
+</BaseLayout>

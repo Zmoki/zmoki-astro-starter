@@ -1,0 +1,23 @@
+---
+// A page of post cards and its page links, for the blog index, /blog/page/{n}/
+// and the category archives.
+import PostCard from "@/components/PostCard.astro";
+import Pagination from "@/components/Pagination.astro";
+import type { Post } from "@/lib/blog";
+
+export interface Props {
+  posts: Post[];
+  /** Every page's path, first to last. */
+  hrefs: string[];
+  current: number;
+}
+
+const { posts, hrefs, current } = Astro.props;
+---
+
+<div class="grid grid-flow-dense grid-cols-1 gap-6">
+  {posts.map((post) => (
+    <PostCard post={post} />
+  ))}
+</div>
+<Pagination hrefs={hrefs} current={current} />

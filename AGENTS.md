@@ -95,13 +95,14 @@ Pick the version by the semver rule at the top of `CHANGELOG.md` (major = people
 
 Collections are defined in `src/content.config.ts` (Content Layer API, `glob()` loaders; read the Zod schemas there). Entries are rendered with `render(entry)` from `astro:content`, and `entry.id` is the slug.
 
-- **`blog`**: files are `src/content/blog/{order}-{slug}.{md,mdx}`. A higher `order` is newer; it drives the list and prev/next links. A post's `author` is a person's id (`reference("people")`).
+- **`blog`**: files are `src/content/blog/{order}-{slug}.{md,mdx}`. A higher `order` is newer; it drives the list and prev/next links. A post's `author` is a person's id (`reference("people")`). Optional `category` is an id from `src/content/blog-categories.yaml`; `featured: true` pins the post to the blog index's hero.
 - **`resources`**: `type: "page"` renders `/resources/{slug}/`; `type: "link"` is only an outbound `url`. A resource with both `form` and `asset` is an email gate: the form backend emails the asset and redirects to `/thank-you/resources/{slug}/`, which also offers a direct download. Host assets outside the repo. This isn't access control: anyone with the URL can download.
 - **`legal`**: privacy and terms.
+- **`blogCategories`**: a taxonomy, one keyed file (`src/content/blog-categories.yaml`: `label`, `description`). Each category has a paginated archive at `/blog/category/{id}/`. The listing rules (the featured post, page size, paths) live in `src/lib/blog.ts`, shared by the blog pages and the sitemap. Taxonomies are keyed data files referenced by id; structural switches such as a resource's `type` stay Zod enums. Astro only logs a dangling reference, so look it up through a throwing getter (`getCategory`, `getPerson`) to fail the build.
 - **`people`**: one file, `src/content/people.yaml`, keyed by id (`name`, `role`, optional `company`, `url`, `bio`, `image` on the image origin, `socials`), referenced by id, so a person is written once. A repeated id is a YAML error: a clean build (CI) fails, but locally Astro may keep the last good data, so watch for `[file-loader]` errors. A `profile` block (description and dates) turns on `/people/{id}/`, with its sitemap entry, OG card and `ProfilePage` JSON-LD; `/people/` lists everyone with one, and is noindex while that's no one. Components take `PersonProps` from `personToProps()` (`src/lib/people.ts`), never a collection entry.
 - **`robots`** (any entry): robots directives merged into the page's `<meta name="robots">`. A noindex entry also leaves the sitemap. The path-level equivalent is an `X-Robots-Tag` rule in `headers.config.ts`; the sitemap honors both (`src/lib/robots.ts`, `src/lib/noindex.ts`).
 
-**Page registry.** Collections that render a page per entry are listed once in `src/lib/page-collections.ts`. Both the sitemap (`src/pages/sitemap.xml.ts`) and the OG card manifest (`src/og/manifest.ts`) read that list. A new section therefore means: define the collection (with `title`, `description`, `publishDate`, `contentModifiedDate`, `robots`), add its `[...slug].astro` route, and register it. `check:sitemap` fails if you forget the last step.
+**Page registry.** Collections that render a page per entry are listed once in `src/lib/page-collections.ts`. Both the sitemap (`src/pages/sitemap.xml.ts`) and the OG card manifest (`src/og/manifest.ts`) read that list, plus the blog's archive pages (`/blog/page/{n}/` and each category page). A new section therefore means: define the collection (with `title`, `description`, `publishDate`, `contentModifiedDate`, `robots`), add its `[...slug].astro` route, and register it. `check:sitemap` fails if you forget the last step.
 
 **Standalone pages** (`/` and `/blog/`) export a `meta` object from their frontmatter (type: `src/standalone-page.d.ts`). The page's layout props, its OG card and its sitemap `<lastmod>` all read it. `title` and `description` are optional but go together; the build fails if only one is set.
 
@@ -110,6 +111,8 @@ Collections are defined in `src/content.config.ts` (Content Layer API, `glob()` 
 ```
 /                         home (landing page)
 /blog/  /blog/{slug}/     blog list, posts
+/blog/page/{n}/           blog list, page 2 on
+/blog/category/{id}/      category archive (then …/page/{n}/)
 /resources/{slug}/        resource pages
 /legal/{slug}/            privacy, terms
 /people/  /people/{id}/     people with a profile

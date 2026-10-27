@@ -1,0 +1,6 @@
+# Blog categories, keyed by id: a post points at one (`category: guides`), and a
+# typo or a repeated id fails the build. Each gets an archive at /blog/category/{id}/.
+
+guides:
+  label: Guides
+  description: Step-by-step guides to setting up, customizing and shipping a site with the Zmoki Astro Starter.

@@ -28,6 +28,11 @@ const blog = defineCollection({
     // The post's author, by id in src/content/people.yaml: the byline, author bio,
     // schema.org author and OG card. A typo fails the build.
     author: reference("people"),
+    // A category id from src/content/blog-categories.yaml: the post card's badge and
+    // its archive at /blog/category/{id}/.
+    category: reference("blogCategories").optional(),
+    // Pins the post to the blog index's hero. If several posts set it, the newest wins.
+    featured: z.boolean().default(false),
     robots,
   }),
 });
@@ -109,6 +114,18 @@ const people = defineCollection({
   }),
 });
 
+// A taxonomy: one keyed yaml file, referenced from posts, so a category has a label,
+// a description and an archive page, and a misspelled id fails the build. Structural
+// switches (a resource's `type`) stay Zod enums.
+const blogCategories = defineCollection({
+  loader: file("src/content/blog-categories.yaml"),
+  schema: z.object({
+    label: z.string(),
+    /** The archive page's description (meta, OG card, intro). */
+    description: z.string(),
+  }),
+});
+
 const legal = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/legal" }),
   schema: z.object({
@@ -125,4 +142,5 @@ export const collections = {
   resources,
   legal,
   people,
+  blogCategories,
 };

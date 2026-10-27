@@ -1,19 +1,45 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import Time from "@/components/Time.astro";
+import type { Post } from "@/lib/blog";
+import { categoryPagePath, getCategory } from "@/lib/blog";
 
-const { data, id } = Astro.props as CollectionEntry<"blog">;
-const { title, description, contentModifiedDate } = data;
+export interface Props {
+  post: Post;
+  /** The blog index's pinned post: larger, with a "Featured" label. */
+  featured?: boolean;
+}
+
+const { post, featured = false } = Astro.props;
+const { title, description, contentModifiedDate } = post.data;
+const category = post.data.category && (await getCategory(post.data.category));
 ---
 
-<article class="border-zmoki-stone-200 overflow-hidden rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md">
-  <a href={`/blog/${id}/`} class="flex h-full w-full flex-col gap-2 p-6 text-xl md:p-8">
-    <h2 class="text-zmoki-stone-900 pb-2 text-2xl leading-normal font-semibold xl:text-3xl">
-      <span set:html={title} />
-    </h2>
-    <p class="text-zmoki-stone-600" set:html={description} />
-    <p class="text-zmoki-stone-500 order-first text-sm">
-      <Time datetime={contentModifiedDate} />
-    </p>
-  </a>
+<!-- The title link stretches over the card (after:inset-0), so the category badge can be its own link. -->
+<article
+  class:list={[
+    "border-zmoki-stone-200 relative flex flex-col gap-2 overflow-hidden rounded-2xl border bg-white p-6 text-xl shadow-sm transition-shadow hover:shadow-md md:p-8",
+    featured && "border-zmoki-indigo-100 md:p-12",
+  ]}
+>
+  <p class="text-zmoki-stone-500 order-first flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+    {featured && <span class="text-zmoki-indigo-700 font-semibold">Featured</span>}
+    <Time datetime={contentModifiedDate} />
+    {category && (
+      <a
+        href={categoryPagePath(category.id, 1)}
+        class="bg-zmoki-indigo-50 text-zmoki-indigo-700 hover:bg-zmoki-indigo-100 relative z-10 rounded-full px-2.5 py-0.5 font-medium"
+      >
+        {category.data.label}
+      </a>
+    )}
+  </p>
+  <h2
+    class:list={[
+      "text-zmoki-stone-900 pb-2 leading-normal font-semibold",
+      featured ? "text-3xl xl:text-4xl" : "text-2xl xl:text-3xl",
+    ]}
+  >
+    <a href={`/blog/${post.id}/`} class="after:absolute after:inset-0" set:html={title} />
+  </h2>
+  <p class="text-zmoki-stone-600" set:html={description} />
 </article>
