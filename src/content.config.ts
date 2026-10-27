@@ -1,4 +1,4 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection, reference, z } from "astro:content";
 import { glob } from "astro/loaders";
 
 // Per-entry <meta name="robots"> directives, e.g. ["noindex"]. noindex also
@@ -24,14 +24,9 @@ const blog = defineCollection({
       .optional(),
     // Set on cross-posted content so search engines credit the original.
     canonical: z.url().optional(),
-    // The post's byline: header credit, author bio, schema.org author and OG card.
-    author: z.object({
-      name: z.string(),
-      /** The author's site — linked from the byline. */
-      url: z.string(),
-      /** Short first-person blurb shown in the post's author bio. */
-      bio: z.string(),
-    }),
+    // The post's author, by id in src/content/people/: the byline, author bio,
+    // schema.org author and OG card. A typo fails the build.
+    author: reference("people"),
     robots,
   }),
 });
@@ -76,6 +71,35 @@ const resources = defineCollection({
   }),
 });
 
+// One record per person, referenced by id from other entries (a post's `author`),
+// so a name, role or bio is written once. See src/lib/people.ts.
+const people = defineCollection({
+  loader: glob({ pattern: "**/*.yaml", base: "./src/content/people" }),
+  schema: z.object({
+    name: z.string(),
+    /** Their title alone, e.g. "Founder". */
+    role: z.string(),
+    company: z.string().optional(),
+    /** Their own site. */
+    url: z.url().optional(),
+    /** A short first-person blurb: the author box under posts and the profile page. */
+    bio: z.string().optional(),
+    /** A photo: a full URL on the image origin or another host. */
+    image: z.object({ src: z.string(), alt: z.string().min(1) }).optional(),
+    /** Profiles elsewhere (GitHub, LinkedIn, …), shown on the profile page and as sameAs. */
+    socials: z.array(z.object({ label: z.string(), url: z.url() })).optional(),
+    /** Turns on /people/{id}/ (with its sitemap entry and OG card). */
+    profile: z
+      .object({
+        description: z.string(),
+        publishDate: z.coerce.date(),
+        contentModifiedDate: z.coerce.date(),
+        robots,
+      })
+      .optional(),
+  }),
+});
+
 const legal = defineCollection({
   loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/legal" }),
   schema: z.object({
@@ -91,4 +115,5 @@ export const collections = {
   blog,
   resources,
   legal,
+  people,
 };

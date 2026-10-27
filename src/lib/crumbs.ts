@@ -8,3 +8,7 @@ const navLabel = (href: string, fallback: string) =>
 
 export const homeCrumb: BreadcrumbItem = { name: "Home", href: "/" };
 export const blogCrumb: BreadcrumbItem = { name: navLabel("/blog/", "Blog"), href: "/blog/" };
+export const peopleCrumb: BreadcrumbItem = {
+  name: navLabel("/people/", "People"),
+  href: "/people/",
+};

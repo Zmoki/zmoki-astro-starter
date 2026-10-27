@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Added
 
+- A `people` collection: one yaml per person, referenced by id from a post's `author`, so a person is written once and a typo fails the build. A `profile` block turns on `/people/{id}/` with the person's posts, a sitemap entry, an OG card and `ProfilePage` JSON-LD; `/people/` lists everyone with one. ([#73](https://github.com/Zmoki/zmoki-astro-starter/pull/73))
+  **Breaking:** replace each post's `author: { name, url, bio }` with a person's id, and add that person to `src/content/people/`.
 - Structured data: a builder per type in `src/lib/structured-data.ts`; a visible breadcrumb with its `BreadcrumbList` on posts, resources and legal pages; `WebSite` and `Organization` on the home page for Google's site name; and `src/STRUCTURED-DATA.md`, listing every type and what is left out on purpose. ([#72](https://github.com/Zmoki/zmoki-astro-starter/pull/72))
 - Social meta: a square 1200×1200 OG card beside each landscape one, listed as a second `og:image`; `twitter:title` and `twitter:description`; and a `head` slot on `BaseLayout` for page-specific tags. ([#71](https://github.com/Zmoki/zmoki-astro-starter/pull/71))
 - Analytics you can check locally: with analytics off or no provider configured, a console provider logs every `track` and `identify` call. New site-wide events: `cta_clicked` for any link to a standing ask in `site.asks`, and every click event now carries a `location` (the closest `data-band`). `trackWhenVisible()` fires an event once an element is seen. `src/ANALYTICS.md` lists every event. ([#70](https://github.com/Zmoki/zmoki-astro-starter/pull/70))

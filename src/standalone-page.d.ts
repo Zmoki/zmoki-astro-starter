@@ -9,4 +9,6 @@ interface StandalonePageMeta {
   description?: string;
   publishDate?: Date;
   contentModifiedDate?: Date;
+  /** Path prefix of the collection pages it lists, e.g. "blog/": its sitemap <lastmod> follows their newest change. */
+  lists?: string;
 }

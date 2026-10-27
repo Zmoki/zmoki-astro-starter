@@ -3,6 +3,7 @@ import { isoDate } from "@/lib/dates";
 import { getPageRecords } from "@/lib/page-collections";
 import { meta as homeMeta } from "@/pages/index.astro";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
+import { meta as peopleIndexMeta } from "@/pages/people/index.astro";
 import { isNoindex } from "@/lib/robots";
 import { isNoindexPath } from "@/lib/noindex";
 import { publishedImageUrl } from "@/lib/images";
@@ -16,7 +17,7 @@ const xmlEscape = (s: string) =>
 
 export const GET: APIRoute = async ({ site }) => {
   // Read inside GET, not at module top level: the pages and the OG manifest import each other.
-  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta];
+  const standalonePages: StandalonePageMeta[] = [homeMeta, blogIndexMeta, peopleIndexMeta];
   const records = await getPageRecords();
 
   // Drops content-level noindex. Path-level noindex is filtered from the whole list below.
@@ -30,19 +31,20 @@ export const GET: APIRoute = async ({ site }) => {
       })),
   );
 
-  // Home and the blog index list recent posts, so their <lastmod> is the newest
-  // of their own dates and any post's.
-  const standaloneLatestDate = new Date(
-    Math.max(
-      ...standalonePages
-        .flatMap((page) => [page.publishDate, page.contentModifiedDate])
-        .filter((date): date is Date => date !== undefined)
-        .map((date) => date.getTime()),
-      ...records
-        .filter((record) => record.path.startsWith("blog/"))
-        .map((record) => record.contentModifiedDate.getTime()),
-    ),
-  );
+  // A page that lists collection pages (home and the blog index list posts, the
+  // people index lists profiles) changes when they do, so its <lastmod> is the newest
+  // of its own dates and theirs.
+  const standaloneLastmod = (page: StandalonePageMeta) =>
+    new Date(
+      Math.max(
+        ...[page.publishDate, page.contentModifiedDate]
+          .filter((date): date is Date => date !== undefined)
+          .map((date) => date.getTime()),
+        ...records
+          .filter((record) => page.lists !== undefined && record.path.startsWith(page.lists))
+          .map((record) => record.contentModifiedDate.getTime()),
+      ),
+    );
 
   // <image:loc> ties the cover to the page. It is the only image-sitemap tag
   // Google still reads.
@@ -62,7 +64,7 @@ export const GET: APIRoute = async ({ site }) => {
 
   // isNoindexPath applies the X-Robots-Tag header rules.
   const urls: SitemapEntry[] = [
-    ...standalonePages.map((page) => ({ path: page.path, lastmod: standaloneLatestDate })),
+    ...standalonePages.map((page) => ({ path: page.path, lastmod: standaloneLastmod(page) })),
     ...collectionEntries,
   ].filter((url) => !isNoindexPath(`/${url.path}`));
 

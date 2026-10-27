@@ -8,6 +8,7 @@ import JsonLd from "@/components/JsonLd.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { blogPosting } from "@/lib/structured-data";
 import { blogCrumb, homeCrumb } from "@/lib/crumbs";
+import type { PersonProps } from "@/lib/people";
 import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
 import { publishedImageUrl } from "@/lib/images";
@@ -19,7 +20,7 @@ export interface Props {
   description?: string;
   publishDate: Date;
   contentModifiedDate: Date;
-  author: CollectionEntry<"blog">["data"]["author"];
+  author: PersonProps;
   cover?: CollectionEntry<"blog">["data"]["cover"];
   /** Canonical URL override for cross-posted content. See the blog schema. */
   canonical?: string;
@@ -53,7 +54,11 @@ const blogPostingLd = blogPosting({
   description,
   publishDate,
   contentModifiedDate,
-  author,
+  // The profile page when there is one, else their own site.
+  author: {
+    name: author.name,
+    url: author.profilePath ? urls.absoluteUrl(author.profilePath) : author.url,
+  },
   image: schemaImage,
   url: canonical ?? urls.absoluteUrl(Astro.url.pathname),
 });
@@ -113,16 +118,31 @@ const blogPostingLd = blogPosting({
     </Prose>
 
     <aside class="border-zmoki-stone-200 text-zmoki-stone-900 md:border-zmoki-indigo-600 md:bg-zmoki-indigo-600 space-y-2 rounded-2xl border bg-white px-4 py-8 leading-normal shadow-sm md:p-16 md:text-white lg:p-20">
-      <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">Written by {author.name}</h2>
+      <h2 class="pb-4 text-3xl font-semibold xl:text-4xl">
+        Written by{" "}
+        {author.profilePath ? (
+          <a href={author.profilePath} class="underline underline-offset-4">
+            {author.name}
+          </a>
+        ) : (
+          author.name
+        )}
+      </h2>
       <p>
-        {author.bio} Find more of my work at{" "}
-        <a
-          href={author.url}
-          class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
-        >
-          {new URL(author.url).host}
-        </a>
-        .
+        {author.bio}
+        {author.url && (
+          <>
+            {" "}
+            Find more of my work at{" "}
+            <a
+              href={author.url}
+              class="text-zmoki-indigo-600 font-medium underline underline-offset-2 md:text-white"
+            >
+              {new URL(author.url).host}
+            </a>
+            .
+          </>
+        )}
       </p>
     </aside>
 
