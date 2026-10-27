@@ -117,6 +117,54 @@ function rehypeDefinitionListIds() {
   };
 }
 
+// Tables: a `: Caption` paragraph right after a table becomes its <caption> (Pandoc's
+// syntax; remark-definition-list needs a term line above the `:`, so they don't clash).
+// Every table is wrapped in a focusable scroll box, so a wide one scrolls instead of
+// widening the page. Walks every parent, so tables inside MDX JSX blocks are covered.
+// Styles: src/styles/global.css.
+function rehypeTables() {
+  return (tree) => {
+    let captions = 0;
+    visit(tree, (node) => {
+      if (!node.children || node.properties?.dataTableScroll) return;
+      node.children.forEach((table, i) => {
+        if (table.type !== "element" || table.tagName !== "table") return;
+        let next = i + 1;
+        while (node.children[next]?.type === "text" && !node.children[next].value.trim()) next++;
+        const paragraph = node.children[next];
+        const first = paragraph?.tagName === "p" ? paragraph.children[0] : undefined;
+        let captionId;
+        if (first?.type === "text" && first.value.startsWith(": ")) {
+          captionId = `table-caption-${++captions}`;
+          first.value = first.value.slice(2);
+          table.children.unshift({
+            type: "element",
+            tagName: "caption",
+            properties: { id: captionId },
+            // The span stays in view while the table scrolls (global.css).
+            children: [
+              { type: "element", tagName: "span", properties: {}, children: paragraph.children },
+            ],
+          });
+          node.children.splice(i + 1, next - i);
+        }
+        // A focusable region needs a name: the caption, or a generic one.
+        node.children[i] = {
+          type: "element",
+          tagName: "div",
+          properties: {
+            dataTableScroll: true,
+            tabIndex: 0,
+            role: "region",
+            ...(captionId ? { ariaLabelledBy: captionId } : { ariaLabel: "Table" }),
+          },
+          children: [table],
+        };
+      });
+    });
+  };
+}
+
 // Open external links in a new tab, and add the data-* attributes prose styles key on.
 function rehypeExternalLinks() {
   return (tree) => {
@@ -260,7 +308,12 @@ export default defineConfig({
     processor: unified({
       remarkPlugins: [remarkDefinitionList, remarkImgTags],
       remarkRehype: { handlers: defListHastHandlers },
-      rehypePlugins: [rehypeDefinitionListIds, rehypeExternalLinks, rehypeCodeBlockCopy],
+      rehypePlugins: [
+        rehypeDefinitionListIds,
+        rehypeTables,
+        rehypeExternalLinks,
+        rehypeCodeBlockCopy,
+      ],
     }),
     shikiConfig: {
       // A dark theme for WCAG AA contrast; `catppuccin-latte` fails on several token colors.

@@ -132,6 +132,7 @@ Every absolute URL (canonical, `og:url`, OG image, JSON-LD) comes from `siteUrls
 - `remark-definition-list` for `<dl>` lists;
 - `remarkImgTags`: a raw `<img>` is treated like `![]()`, so origin images are optimized (`/images`);
 - `rehypeDefinitionListIds`: an `id` on every `<dt>`, for anchor links;
+- `rehypeTables`: a `: Caption` line right after a pipe table becomes its `<caption>`, and every table sits in a focusable scroll box (`[data-table-scroll]`, styled in `global.css`), so a wide one scrolls instead of widening the page;
 - `rehypeExternalLinks`: `target="_blank"` and `data-external` on outbound links, `data-resource` on `/resources/` links, `data-anchor` on `#` links (the prose styles key off these);
 - `rehypeCodeBlockCopy`: a Copy button on every code block, wired up in `Prose.astro`.
 

@@ -8,6 +8,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Added
 
+- Markdown tables: a `: Caption` line right after a table becomes its `<caption>`, and every table scrolls inside its own keyboard-reachable box instead of widening the page on a phone. ([#68](https://github.com/Zmoki/zmoki-astro-starter/pull/68))
 - Preview deploys are `noindex`: a PR or non-production branch build adds it to every page's robots meta, since a canonical pointing at production is only a hint. Amplify previews are now detected too, so their OG images use the preview's own URL. ([#67](https://github.com/Zmoki/zmoki-astro-starter/pull/67))
 
 ### Changed

@@ -10,3 +10,21 @@
 @source inline(
   "relative absolute top-2 right-2 rounded-lg bg-zmoki-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-zmoki-indigo-700 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500 focus:ring-offset-2 transition-colors duration-200"
 );
+
+/* Tables come wrapped by rehypeTables (astro.config.mjs). The box scrolls a wide table
+   and owns the vertical margin; it's focusable so keyboard users can scroll it.
+   Unlayered, so it beats the Typography plugin's table margin. */
+[data-table-scroll] {
+  container-type: inline-size;
+  @apply focus-visible:outline-zmoki-indigo-500 my-[2em] overflow-x-auto rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2;
+}
+[data-table-scroll] > table {
+  @apply my-0;
+}
+[data-table-scroll] caption {
+  @apply text-zmoki-stone-600 pb-2 text-left text-[0.875em];
+}
+/* The caption is as wide as the table; its text stays pinned to the visible box. */
+[data-table-scroll] caption > span {
+  @apply sticky left-0 block max-w-[100cqw];
+}
