@@ -1,0 +1,58 @@
+---
+// The visible breadcrumb and its BreadcrumbList JSON-LD, built from one trail so
+// they can't drift. Every crumb but the last links (href is required there); the
+// last is the current page and never links. Names may hold HTML (titles do), so
+// both use their plain text.
+import JsonLd from "@/components/JsonLd.astro";
+import { breadcrumbList } from "@/lib/structured-data";
+import { htmlToText } from "@/lib/html-text";
+import { siteUrls } from "@/lib/urls";
+
+export interface BreadcrumbItem {
+  name: string;
+  href?: string;
+}
+
+export interface Props {
+  crumbs: BreadcrumbItem[];
+  /** Emit the BreadcrumbList. Off for specimens on noindex pages. */
+  schema?: boolean;
+}
+
+const { crumbs, schema = true } = Astro.props;
+const { absoluteUrl } = siteUrls(Astro);
+
+const trail = crumbs.map((crumb, i) => {
+  const isCurrent = i === crumbs.length - 1;
+  if (!isCurrent && !crumb.href) {
+    throw new Error(`Breadcrumb "${crumb.name}" needs an href: only the last crumb may omit it.`);
+  }
+  return { name: htmlToText(crumb.name), href: isCurrent ? undefined : crumb.href };
+});
+const breadcrumbLd = breadcrumbList(
+  trail.map((crumb) => ({ name: crumb.name, url: crumb.href && absoluteUrl(crumb.href) })),
+);
+---
+
+<nav aria-label="Breadcrumb" class="text-zmoki-stone-600 px-1 text-sm">
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+    {trail.map((crumb, i) => (
+      <li class="flex items-center gap-x-2">
+        {i > 0 && <span aria-hidden="true">›</span>}
+        {crumb.href ? (
+          <a
+            href={crumb.href}
+            class="hover:text-zmoki-stone-900 underline-offset-2 hover:underline"
+          >
+            {crumb.name}
+          </a>
+        ) : (
+          <span aria-current="page" class="text-zmoki-stone-900">
+            {crumb.name}
+          </span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+{schema && <JsonLd schema={breadcrumbLd} />}

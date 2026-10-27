@@ -27,6 +27,11 @@ export const site = {
     name: "Zarema Khalilova",
     /** Personal/company site. */
     url: "https://zmoki.xyz",
+    /**
+     * The owner's logo, a site path to a square PNG of at least 112px: the home page's
+     * Organization markup. The starter uses its brand mark.
+     */
+    logo: "/icon-512.png",
   },
 
   contact: {

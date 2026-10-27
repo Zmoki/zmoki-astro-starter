@@ -1,6 +1,8 @@
 ---
 import BrandLayout from "@/layouts/BrandLayout.astro";
 import Button from "@/components/Button.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import { blogCrumb, homeCrumb } from "@/lib/crumbs";
 import { site } from "@/site.config";
 
 // The examples copy markup from BaseLayout, PostLayout and Form by hand, so
@@ -205,6 +207,14 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
         </span>
         <span>Privacy · Terms · Source</span>
       </div>
+    </div>
+    <p class="text-zmoki-stone-500 mt-8 mb-4 max-w-2xl">
+      Posts, resources and legal pages open with a breadcrumb (Breadcrumbs.astro), which also emits
+      the page's BreadcrumbList (off here, with schema=&#123;false&#125;). Earlier crumbs link; the
+      current page is plain.
+    </p>
+    <div class="bg-zmoki-cream-100 rounded-xl px-4 py-3">
+      <Breadcrumbs crumbs={[homeCrumb, blogCrumb, { name: "Post title" }]} schema={false} />
     </div>
   </section>
 

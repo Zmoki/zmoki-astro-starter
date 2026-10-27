@@ -26,52 +26,23 @@ Break these and Google can ignore the markup or issue a manual action:
 - **Most specific type** (`BlogPosting` over `Article`).
 - **Crawlable.** Pages and images in the markup must not be blocked. `/-/astro/*` and `/thank-you/*` are `noindex` (`src/headers/headers.config.ts`), so don't add rich-result markup there.
 
-## Types that fit this site
+## What the site emits
 
-| Google feature   | schema.org type          | Where it belongs                                           |
-| ---------------- | ------------------------ | ---------------------------------------------------------- |
-| **Article**      | `BlogPosting`            | Blog posts. Already emitted by `PostLayout.astro`          |
-| **Breadcrumb**   | `BreadcrumbList`         | Nested pages (Home › Blog › Post), built from the URL path |
-| **Organization** | `Organization`           | Once, on the home page: name, url, logo, `sameAs`, contact |
-| **Profile Page** | `ProfilePage` + `Person` | An author "about" page focused on one person               |
-| **Video**        | `VideoObject`            | Posts embedding a real video (raw `<video>` in MDX)        |
-
-`src/components/Image.astro` also emits an `ImageObject` license block for every content image (see `/images`).
+`src/STRUCTURED-DATA.md` lists every type, the pages that carry it, and what is left out on purpose. Read it first; update it in the same commit as any change. Still to add: `ProfilePage` + `Person` on author pages (needs the people collection) and `VideoObject` for embedded videos.
 
 If the user asks for a type not in the gallery, tell them it won't produce a Search feature, even if schema.org defines it.
 
 ## How to add it
 
-**Values.** Take text from `src/site.config.ts` (`site.name`, `site.domain`, `site.organization.*`, `site.contact.email`, `site.social.github`); never hard-code it. A post's author comes from its own frontmatter (`{ name, url, bio }`); there's no site-level author.
+**Builder.** Add one function per type to `src/lib/structured-data.ts`, next to `blogPosting`, `imageObject`, `breadcrumbList` and `siteIdentity`. It takes only facts the page shows and returns the schema object; the page passes it to `src/components/JsonLd.astro`, which takes one object or an array, escapes `<`, and works anywhere in the document. JSON-LD is data, so the CSP doesn't affect it.
 
-**URLs.** Build every absolute URL with `absoluteUrl(path)` from `siteUrls(Astro)` (`src/lib/urls.ts`), the same helper behind the canonical link and `og:image`. Use `absoluteUrl(Astro.url.pathname)` for the current page. For a page's OG card, use `getOgImage(pathname)` (`src/og/manifest.ts`). For a content image, use `publishedImageUrl(src)` (`src/lib/images.ts`), never the origin URL. Dates are ISO 8601 (`.toISOString()`).
+**Values.** Take text from `src/site.config.ts` (`site.name`, `site.organization.*`, …); never hard-code it. Pass titles and descriptions through `htmlToText` (`src/lib/html-text.ts`): pages render them as HTML. Reference the site owner through the builders' `owner()`, which carries its `@id`. A post's author comes from its own frontmatter (`{ name, url, bio }`); there's no site-level author.
 
-**Render** with `src/components/JsonLd.astro`. It takes one schema object or an array, escapes `<`, and works anywhere in the document, so no `<head>` edit is needed. JSON-LD is data, so the CSP doesn't affect it.
+**URLs.** The caller builds absolute URLs with `absoluteUrl(path)` from `siteUrls(Astro)` (`src/lib/urls.ts`), the same helper behind the canonical link and `og:image`, and passes them in. For a page's OG card, use `getOgImage(pathname)` (`src/og/manifest.ts`). For a content image, use `publishedImageUrl(src)` (`src/lib/images.ts`), never the origin URL. Dates are ISO 8601 (`.toISOString()`).
 
-`PostLayout.astro` (its `blogPostingLd`) is the worked example. The pattern, e.g. a breadcrumb added next to it:
+**Breadcrumbs.** Don't build `BreadcrumbList` by hand: `<Breadcrumbs crumbs={[{ name: "Home", href: "/" }, …, { name: title }]} />` renders the visible trail and its markup from one array. Every crumb but the last needs an `href` (the build fails otherwise); the last is the current page. Shared crumbs (`homeCrumb`, `blogCrumb`) live in `src/lib/crumbs.ts`. On a noindex page, pass `schema={false}`.
 
-```astro
----
-import JsonLd from "@/components/JsonLd.astro";
-import { siteUrls } from "@/lib/urls";
-
-const { absoluteUrl } = siteUrls(Astro);
-// Check the fields against the gallery's Breadcrumb reference.
-const breadcrumbLd = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
-    { "@type": "ListItem", position: 2, name: "Blog", item: absoluteUrl("/blog/") },
-    { "@type": "ListItem", position: 3, name: title },
-  ],
-};
----
-
-<JsonLd schema={[blogPostingLd, breadcrumbLd]} />
-```
-
-Pass an array for several graphs on one page, or a single object.
+`PostLayout.astro` is the worked example: `blogPosting({...})` plus `<Breadcrumbs>`.
 
 ## Verify (required)
 

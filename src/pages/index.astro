@@ -4,6 +4,9 @@ import Button from "@/components/Button.astro";
 import { site } from "@/site.config";
 import { fonts } from "@/design-tokens.mjs";
 import { commitHash } from "@/lib/version";
+import JsonLd from "@/components/JsonLd.astro";
+import { siteIdentity } from "@/lib/structured-data";
+import { siteUrls } from "@/lib/urls";
 import { ArrowRightLeft, Plus, Sparkles } from "@lucide/astro";
 // Each @thesvg/icons module has a default `.svg` plus `.variants`. Where the
 // default is drawn for a dark background, the pills use a light variant.
@@ -31,6 +34,13 @@ export const meta = {
   publishDate: new Date("2026-07-04"),
   contentModifiedDate: new Date("2026-07-05"),
 } satisfies StandalonePageMeta;
+
+// The site's name and publisher, for Google. Home page only.
+const { absoluteUrl } = siteUrls(Astro);
+const identityLd = siteIdentity({
+  home: absoluteUrl("/"),
+  logo: absoluteUrl(site.organization.logo),
+});
 
 // The scan is live: update the grade if the report changes.
 const securityReport =
@@ -238,6 +248,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
 ---
 
 <BaseLayout title={meta.title} description={meta.description} wide>
+  <JsonLd schema={identityLd} />
   <!-- Hero -->
   <section data-band="hero" class="px-4 py-12 lg:py-16">
     <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
