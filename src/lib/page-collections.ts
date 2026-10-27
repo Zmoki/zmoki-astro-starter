@@ -1,6 +1,17 @@
 import { getCollection, type CollectionEntry } from "astro:content";
 import { site } from "@/site.config";
 import { getPerson } from "@/lib/people";
+import {
+  blogPagePath,
+  categoryPagePath,
+  getCategories,
+  pageCount,
+  pageItems,
+  postsInCategory,
+  splitFeatured,
+  type Post,
+} from "@/lib/blog";
+import { meta as blogMeta } from "@/pages/blog/index.astro";
 
 type PageCollectionName = "blog" | "resources" | "legal" | "people";
 
@@ -113,8 +124,62 @@ const pageCollections = [
   }),
 ];
 
-/** Every collection-driven page, for the sitemap and OG manifest. */
+/** A listing page's record. Its dates are the span of the posts it shows. */
+function listingRecord(
+  path: string,
+  title: string,
+  description: string,
+  posts: Post[],
+): PageRecord {
+  const times = (pick: (post: Post) => Date) => posts.map((post) => pick(post).getTime());
+  return {
+    path: path.replace(/^\//, ""),
+    title,
+    description,
+    publishDate: new Date(Math.min(...times((post) => post.data.publishDate))),
+    contentModifiedDate: new Date(Math.max(...times((post) => post.data.contentModifiedDate))),
+    byline: site.name,
+    card: "site",
+  };
+}
+
+/**
+ * The blog's listing pages past /blog/ (a standalone page): /blog/page/{n}/ and every
+ * page of each category archive. Same rules as the routes (src/lib/blog.ts). An empty
+ * category has a noindex page and no record.
+ */
+async function archiveRecords(): Promise<PageRecord[]> {
+  const posts = await getPostsNewestFirst();
+  const { rest } = splitFeatured(posts);
+  const blogPages = Array.from({ length: pageCount(rest) - 1 }, (_, i) =>
+    listingRecord(
+      blogPagePath(i + 2),
+      `${blogMeta.title}, page ${i + 2}`,
+      blogMeta.description,
+      pageItems(rest, i + 2),
+    ),
+  );
+  const categoryPages = (await getCategories()).flatMap((category) => {
+    const listed = postsInCategory(posts, category.id);
+    if (listed.length === 0) return [];
+    const { label, description } = category.data;
+    return Array.from({ length: pageCount(listed) }, (_, i) =>
+      listingRecord(
+        categoryPagePath(category.id, i + 1),
+        i === 0 ? label : `${label}, page ${i + 1}`,
+        description,
+        pageItems(listed, i + 1),
+      ),
+    );
+  });
+  return [...blogPages, ...categoryPages];
+}
+
+/** Every collection-driven page (entries and the blog's archives), for the sitemap and OG manifest. */
 export async function getPageRecords(): Promise<PageRecord[]> {
-  const groups = await Promise.all(pageCollections.map((pc) => pc.records()));
+  const groups = await Promise.all([
+    ...pageCollections.map((pc) => pc.records()),
+    archiveRecords(),
+  ]);
   return groups.flat();
 }

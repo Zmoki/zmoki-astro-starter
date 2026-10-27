@@ -1,0 +1,43 @@
+---
+// Page links for a paginated list. `hrefs[i]` is page i + 1; `current` is 1-based.
+// Renders nothing for a single page.
+export interface Props {
+  hrefs: string[];
+  current: number;
+}
+
+const { hrefs, current } = Astro.props;
+const prev = current > 1 ? hrefs[current - 2] : undefined;
+const next = current < hrefs.length ? hrefs[current] : undefined;
+const link =
+  "border-zmoki-stone-200 hover:border-zmoki-indigo-600 rounded-lg border bg-white px-3 py-1.5 text-sm font-medium transition-colors";
+---
+
+{hrefs.length > 1 && (
+  <nav aria-label="Pagination" class="mt-10 flex flex-wrap items-center justify-center gap-2">
+    {prev && (
+      <a href={prev} rel="prev" class={link}>
+        ← Newer
+      </a>
+    )}
+    {hrefs.map((href, i) =>
+      i + 1 === current ? (
+        <span
+          aria-current="page"
+          class="bg-zmoki-indigo-600 rounded-lg px-3 py-1.5 text-sm font-medium text-white"
+        >
+          {i + 1}
+        </span>
+      ) : (
+        <a href={href} class={link}>
+          {i + 1}
+        </a>
+      ),
+    )}
+    {next && (
+      <a href={next} rel="next" class={link}>
+        Older →
+      </a>
+    )}
+  </nav>
+)}

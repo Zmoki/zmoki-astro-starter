@@ -8,6 +8,8 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Added
 
+- Blog categories as a taxonomy: one keyed file, `src/content/blog-categories.yaml`, referenced by a post's `category`, so a misspelled id fails the build. Post cards link to each category's paginated archive at `/blog/category/{id}/`. `featured: true` pins a post to the blog index's hero, and the blog paginates at `/blog/page/{n}/`. The archives are in the sitemap and have OG cards. ([#74](https://github.com/Zmoki/zmoki-astro-starter/pull/74))
+  **Breaking:** `PostCard` takes `post={entry}` instead of the entry spread as props.
 - A `people` collection: one file, `src/content/people.yaml`, keyed by id and referenced from a post's `author`, so a person is written once and a typo fails the build. A `profile` block turns on `/people/{id}/` with the person's posts, a sitemap entry, an OG card and `ProfilePage` JSON-LD; `/people/` lists everyone with one. ([#73](https://github.com/Zmoki/zmoki-astro-starter/pull/73))
   **Breaking:** replace each post's `author: { name, url, bio }` with a person's id, and add that person to `src/content/people.yaml`.
 - Structured data: a builder per type in `src/lib/structured-data.ts`; a visible breadcrumb with its `BreadcrumbList` on posts, resources and legal pages; `WebSite` and `Organization` on the home page for Google's site name; and `src/STRUCTURED-DATA.md`, listing every type and what is left out on purpose. ([#72](https://github.com/Zmoki/zmoki-astro-starter/pull/72))

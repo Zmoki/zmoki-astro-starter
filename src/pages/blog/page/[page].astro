@@ -1,0 +1,32 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
+import PostList from "@/components/PostList.astro";
+import { getPostsNewestFirst } from "@/lib/page-collections";
+import { blogPagePath, pageCount, pageItems, splitFeatured } from "@/lib/blog";
+import { blogCrumb, homeCrumb } from "@/lib/crumbs";
+import { meta as blogMeta } from "@/pages/blog/index.astro";
+
+// Blog index pages 2 and on. The featured post is pinned to page 1, so it's not listed.
+export async function getStaticPaths() {
+  const { rest } = splitFeatured(await getPostsNewestFirst());
+  return Array.from({ length: pageCount(rest) - 1 }, (_, i) => ({
+    params: { page: String(i + 2) },
+  }));
+}
+
+const current = Number(Astro.params.page);
+const { rest } = splitFeatured(await getPostsNewestFirst());
+const hrefs = Array.from({ length: pageCount(rest) }, (_, i) => blogPagePath(i + 1));
+const title = `${blogMeta.title}, page ${current}`;
+---
+
+<BaseLayout title={title} description={blogMeta.description}>
+  <div class="mb-6">
+    <Breadcrumbs crumbs={[homeCrumb, blogCrumb, { name: `Page ${current}` }]} />
+  </div>
+  <header class="mb-10">
+    <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{title}</h1>
+  </header>
+  <PostList posts={pageItems(rest, current)} hrefs={hrefs} current={current} />
+</BaseLayout>

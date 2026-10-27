@@ -90,7 +90,7 @@ const profileLd = profilePage({
         <h2 class="px-1 text-2xl font-semibold">Posts by {person.name}</h2>
         <div class="grid grid-cols-1 gap-6">
           {posts.map((post) => (
-            <PostCard {...post} />
+            <PostCard post={post} />
           ))}
         </div>
       </section>
