@@ -83,12 +83,17 @@ const { formId, buttonText = defaultButtonText, resourceSlug = "" } = Astro.prop
 </form>
 
 <script>
+  import { trackWhenVisible } from "@/lib/analytics";
+
   const form = document.getElementById("brevo-form");
   if (form) {
     const formId = form.dataset.formId ?? "";
     const resourceSlug = form.dataset.resourceSlug ?? "";
 
-    window.track?.("resource_gate_viewed", { resource_slug: resourceSlug, form_id: formId });
+    trackWhenVisible(form, "resource_gate_viewed", {
+      resource_slug: resourceSlug,
+      form_id: formId,
+    });
 
     form.addEventListener("submit", () => {
       const email = document.querySelector<HTMLInputElement>("#EMAIL")?.value ?? "";

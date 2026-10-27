@@ -1,14 +1,18 @@
 ---
 // Analytics dispatcher. Renders every provider whose config is set; each one
 // chains onto window.track/window.identify, so one call reaches all of them.
-// Off unless PUBLIC_ANALYTICS_ENABLED="true". See AGENTS.md → Swappable providers.
+// Off unless PUBLIC_ANALYTICS_ENABLED="true"; then the console provider logs every
+// call instead. See AGENTS.md → Swappable providers and src/ANALYTICS.md.
 import PostHog from "@/components/analytics/posthog.astro";
 import Gtm from "@/components/analytics/gtm.astro";
+import Console from "@/components/analytics/console.astro";
 import { posthogConfigured } from "@/components/analytics/posthog-config";
 import { gtmConfigured } from "@/components/analytics/gtm-config";
 
 const analyticsEnabled = import.meta.env.PUBLIC_ANALYTICS_ENABLED === "true";
+const vendors = analyticsEnabled && (gtmConfigured || posthogConfigured);
 ---
 
-{analyticsEnabled && gtmConfigured && <Gtm />}
-{analyticsEnabled && posthogConfigured && <PostHog />}
+{vendors && gtmConfigured && <Gtm />}
+{vendors && posthogConfigured && <PostHog />}
+{!vendors && <Console />}

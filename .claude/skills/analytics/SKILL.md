@@ -10,7 +10,7 @@ The pieces:
 
 - `src/components/analytics/<p>-config.ts`: the provider's committed constants (public values, not env vars), a `<p>Configured` flag, and a `<P>_CSP` record of the hosts it needs per CSP directive.
 - `src/components/analytics/<p>.astro`: loads the vendor and chains onto `window.track` from a bundled `<script>`.
-- `src/components/Analytics.astro`: the dispatcher. Renders each provider whose flag is set, and only when `PUBLIC_ANALYTICS_ENABLED === "true"`. That switch is off by default; it is set in the host's production env and in CI for pushes to `main`.
+- `src/components/Analytics.astro`: the dispatcher. Renders each provider whose flag is set, and only when `PUBLIC_ANALYTICS_ENABLED === "true"`. That switch is off by default; it is set in the host's production env and in CI for pushes to `main`. With it off, or no provider configured, it renders `analytics/console.astro`, which logs every call to the browser console.
 
 Built in: PostHog (`posthog-config.ts`) and Google Tag Manager (`gtm-config.ts`, empty by default).
 
@@ -105,31 +105,21 @@ Let `<p>` be the provider slug (e.g. `plausible`).
 Fire it from a bundled `<script>` through the facade. Never name a vendor:
 
 ```js
-window.track?.("event_name", { some_prop: value });
+window.track?.("event_name", { some_prop: value, location: bandOf(el) });
 ```
 
-Copy an existing call site, e.g. `contact_email_clicked` in `src/layouts/BaseLayout.astro` or `code_block_copied` in `src/components/Prose.astro`. Use `snake_case` names. Add a row to the catalog below. To tie the visitor to an id (e.g. after a form submit), call `window.identify?.(id)`.
+- **A click anywhere on the site** (a kind of link or button, not one page's element): add it to the delegated listener in `src/lib/site-events.ts`. For a new standing ask, add its link to `site.asks` in `src/site.config.ts`; `cta_clicked` picks it up.
+- **A click or load on one page**: a bundled `<script>` beside the markup, like `post_viewed` in `src/layouts/PostLayout.astro`.
+- **"Seen" events**: `trackWhenVisible(el, event, props)` from `src/lib/analytics.ts` fires once when half of `el` is on screen, like `resource_gate_viewed`.
+- **Location**: click events carry `location: bandOf(el)`, the closest `data-band`. Give a new page section a `data-band` name.
 
-## Tracked events (catalog)
+Use `snake_case` names. **Add the event to `src/ANALYTICS.md` in the same commit**; it's the list of every event the site fires. To tie the visitor to an id (e.g. after a form submit), call `window.identify?.(id)`.
 
-| Event                         | Where fired                 | Properties                      |
-| ----------------------------- | --------------------------- | ------------------------------- |
-| `contact_email_clicked`       | `BaseLayout.astro`          | `email`                         |
-| `post_viewed`                 | `PostLayout.astro`          | `post_slug`, `post_title`       |
-| `post_navigation_clicked`     | `PostLayout.astro`          | `direction`, `destination_slug` |
-| `code_block_copied`           | `Prose.astro`               | `snippet_length`                |
-| `resource_gate_viewed`        | `forms/brevo.astro`         | `resource_slug`, `form_id`      |
-| `resource_gate_submitted`     | `forms/brevo.astro`         | `form_id`, `resource_slug`      |
-| `resource_download_confirmed` | `thank-you/[...slug].astro` | `resource_name`, `resource_url` |
-| `resource_downloaded`         | `thank-you/[...slug].astro` | `resource_name`, `asset_url`    |
-
-`resource_gate_submitted` is preceded by `identify(email)`.
-
-Lead-magnet funnel: `resource_gate_viewed` → `resource_gate_submitted` → `resource_download_confirmed` (reached the thank-you page) → `resource_downloaded` (clicked the direct download).
+Check it with `npm run dev`: analytics is off there, so the console provider logs each call as `[analytics] track …`.
 
 ## Step 4 — Disable analytics
 
-- **Dev, PRs, previews**: already off. Nothing to do.
+- **Dev, PRs, previews**: already off; the console provider logs events instead. Nothing to do.
 - **Production**: unset `PUBLIC_ANALYTICS_ENABLED` in the host's env config.
 - **One provider**: blank its constant(s) (`GTM_CONTAINER_ID = ""`, or both PostHog constants). It then emits nothing. Run `npm run build:headers` so its hosts leave the CSP, and commit the artifact.
 

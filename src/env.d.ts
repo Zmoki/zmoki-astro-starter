@@ -14,8 +14,8 @@ interface ImportMeta {
 
 interface Window {
   /**
-   * Vendor-neutral analytics facade; every active provider chains onto it.
-   * Undefined when none is configured, so call it as `window.track?.(...)`.
+   * Vendor-neutral analytics facade; every active provider chains onto it. With
+   * analytics off it logs to the console. Call it as `window.track?.(...)`.
    */
   track?: (event: string, props?: Record<string, unknown>) => void;
   /** Associates the visitor with an id. Call it as `window.identify?.(...)`. */

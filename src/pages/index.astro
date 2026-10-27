@@ -239,7 +239,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
 
 <BaseLayout title={meta.title} description={meta.description} wide>
   <!-- Hero -->
-  <section class="px-4 py-12 lg:py-16">
+  <section data-band="hero" class="px-4 py-12 lg:py-16">
     <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2 lg:gap-16">
       <div>
         <h1 class="text-4xl font-semibold tracking-tight md:text-5xl">{site.name}</h1>
@@ -256,7 +256,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
           ask for changes in plain words.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-4">
-          <Button href={site.social.github} size="lg" class="pl-5">
+          <Button href={site.asks.use_template} size="lg" class="pl-5">
             <span
               class="flex [&>svg]:h-5 [&>svg]:w-5"
               aria-hidden="true"
@@ -298,7 +298,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
   </section>
 
   <!-- Technical SEO -->
-  <section id="seo" class="bg-zmoki-indigo-950 scroll-mt-20 px-4 py-16 lg:py-24">
+  <section id="seo" data-band="seo" class="bg-zmoki-indigo-950 scroll-mt-20 px-4 py-16 lg:py-24">
     <div class="mx-auto max-w-6xl">
       <div class="text-center">
         <p class="text-zmoki-indigo-300 text-sm font-semibold tracking-wide uppercase">
@@ -354,7 +354,11 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
   </section>
 
   <!-- Platform agnostic -->
-  <section id="platform-agnostic" class="scroll-mt-20 px-4 py-16 lg:py-24">
+  <section
+    id="platform-agnostic"
+    data-band="platform-agnostic"
+    class="scroll-mt-20 px-4 py-16 lg:py-24"
+  >
     <div class="mx-auto max-w-6xl">
       <div class="text-center">
         <p class="text-zmoki-indigo-700 text-sm font-semibold tracking-wide uppercase">
@@ -422,7 +426,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
   </section>
 
   <!-- Lighthouse scores -->
-  <section id="lighthouse" class="scroll-mt-20 px-4 py-16 lg:py-24">
+  <section id="lighthouse" data-band="lighthouse" class="scroll-mt-20 px-4 py-16 lg:py-24">
     <div class="mx-auto max-w-6xl text-center">
       <p class="text-zmoki-green-700 text-sm font-semibold tracking-wide uppercase">
         Fast &amp; accessible
@@ -475,7 +479,7 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
   </section>
 
   <!-- Brand system -->
-  <section id="brand" class="scroll-mt-20 px-4 py-16 lg:py-24">
+  <section id="brand" data-band="brand" class="scroll-mt-20 px-4 py-16 lg:py-24">
     <div class="mx-auto max-w-6xl">
       <div class="bg-zmoki-indigo-50 border-zmoki-indigo-100 rounded-3xl border p-8 md:p-12">
         <div class="grid gap-10 md:grid-cols-2 md:items-center">
@@ -522,13 +526,13 @@ const lighthouse = ["Performance", "Accessibility", "Best Practices", "SEO"];
   </section>
 
   <!-- Final CTA -->
-  <section id="cta" class="scroll-mt-20 px-4 pt-4 pb-20">
+  <section id="cta" data-band="cta" class="scroll-mt-20 px-4 pt-4 pb-20">
     <div class="bg-zmoki-indigo-950 mx-auto max-w-6xl rounded-3xl px-6 py-16 text-center text-white shadow-sm md:py-20">
       <h2 class="text-3xl font-semibold md:text-4xl">Ready to get started?</h2>
       <p class="mx-auto mt-4 max-w-xl text-lg text-white/90">
         Grab the template, tell your AI agent what you want, and deploy.
       </p>
-      <Button href={site.social.github} variant="inverse" size="lg" class="mt-8">
+      <Button href={site.asks.use_template} variant="inverse" size="lg" class="mt-8">
         <span
           class="flex [&>svg]:h-5 [&>svg]:w-5"
           aria-hidden="true"
