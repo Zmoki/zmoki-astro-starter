@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
+import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import Time from "@/components/Time.astro";
 import Prose from "@/components/Prose.astro";
 import Form from "@/components/Form.astro";
@@ -38,6 +39,7 @@ const isContentModified = contentModifiedDate.getTime() > publishDate.getTime();
 >
   <slot name="head" slot="head" />
   <article class="space-y-4">
+    <Breadcrumbs crumbs={[{ name: "Home", href: "/" }, { name: title }]} />
     <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">
       <h1 class="text-5xl font-semibold tracking-tight xl:text-6xl" set:html={title} />
       {description && (

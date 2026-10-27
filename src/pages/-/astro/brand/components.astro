@@ -206,6 +206,32 @@ const sectionLabel = "mb-4 px-1 text-sm font-medium tracking-normal text-zmoki-s
         <span>Privacy · Terms · Source</span>
       </div>
     </div>
+    <p class="text-zmoki-stone-500 mt-8 mb-4 max-w-2xl">
+      Posts, resources and legal pages open with a breadcrumb (Breadcrumbs.astro), which also emits
+      the page's BreadcrumbList. Earlier crumbs link; the current page is plain.
+    </p>
+    <nav
+      aria-label="Breadcrumb example"
+      class="text-zmoki-stone-600 bg-zmoki-cream-100 rounded-xl px-4 py-3 text-sm"
+    >
+      <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <li class="flex items-center gap-x-2">
+          <a href="/" class="hover:text-zmoki-stone-900 underline-offset-2 hover:underline">
+            Home
+          </a>
+        </li>
+        <li class="flex items-center gap-x-2">
+          <span aria-hidden="true">›</span>
+          <a href="/blog/" class="hover:text-zmoki-stone-900 underline-offset-2 hover:underline">
+            Blog
+          </a>
+        </li>
+        <li class="flex items-center gap-x-2">
+          <span aria-hidden="true">›</span>
+          <span class="text-zmoki-stone-900">Post title</span>
+        </li>
+      </ol>
+    </nav>
   </section>
 
   <h2 class={sectionLabel}>Landing blocks</h2>

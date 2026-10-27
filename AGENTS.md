@@ -121,7 +121,7 @@ Collections are defined in `src/content.config.ts` (Content Layer API, `glob()` 
 ### Layouts
 
 - **`BaseLayout`**: every page's shell (nav, footer, fonts, meta, analytics). Notable props: `wide` (full-width `<main>` for pages that manage their own sections; default is a centered reading column), `canonical` (`true` = own URL, `false` = none, a string = another URL), `robots`, `article` (`og:type="article"` and the `article:*_time` tags; posts set it, other dated pages stay `website`). A `head` slot (`<Fragment slot="head">`) adds page-specific tags, such as an LCP preload; the other layouts forward it.
-- **`PostLayout`**, **`ResourceLayout`**, **`LegalLayout`** wrap it. `PostLayout` adds the `BlogPosting` JSON-LD, author bio, prev/next links and the `post_viewed` event.
+- **`PostLayout`**, **`ResourceLayout`**, **`LegalLayout`** wrap it. `PostLayout` adds the `BlogPosting` JSON-LD, author bio, prev/next links and the `post_viewed` event. All three open with `<Breadcrumbs>`, which renders the trail and its `BreadcrumbList`. Every JSON-LD type and the pages that carry it: `src/STRUCTURED-DATA.md`.
 - **`BrandLayout`**: a bare, noindex canvas for the brand pages.
 
 Every absolute URL (canonical, `og:url`, OG image, JSON-LD) comes from `siteUrls(Astro)` in `src/lib/urls.ts`. `absoluteUrl()` uses the production origin. `currentAbsoluteUrl()` uses the origin of the current deployment, so OG images resolve on dev servers and preview deploys (`src/lib/deploy.ts` detects the host's preview URL).

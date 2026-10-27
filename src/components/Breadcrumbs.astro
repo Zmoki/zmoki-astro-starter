@@ -1,0 +1,40 @@
+---
+// The visible breadcrumb and its BreadcrumbList JSON-LD, built from one array so
+// they can't drift. Pass names and site paths; the last crumb is the current page.
+import JsonLd from "@/components/JsonLd.astro";
+import { breadcrumbList } from "@/lib/structured-data";
+import { siteUrls } from "@/lib/urls";
+
+export interface Props {
+  crumbs: { name: string; href?: string }[];
+}
+
+const { crumbs } = Astro.props;
+const { absoluteUrl } = siteUrls(Astro);
+const schema = breadcrumbList(
+  crumbs.map((crumb) => ({ name: crumb.name, url: crumb.href && absoluteUrl(crumb.href) })),
+);
+---
+
+<nav aria-label="Breadcrumb" class="text-zmoki-stone-600 px-1 text-sm">
+  <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
+    {crumbs.map((crumb, i) => (
+      <li class="flex items-center gap-x-2">
+        {i > 0 && <span aria-hidden="true">›</span>}
+        {crumb.href && i < crumbs.length - 1 ? (
+          <a
+            href={crumb.href}
+            class="hover:text-zmoki-stone-900 underline-offset-2 hover:underline"
+          >
+            {crumb.name}
+          </a>
+        ) : (
+          <span aria-current="page" class="text-zmoki-stone-900">
+            {crumb.name}
+          </span>
+        )}
+      </li>
+    ))}
+  </ol>
+</nav>
+<JsonLd schema={schema} />

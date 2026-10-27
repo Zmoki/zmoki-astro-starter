@@ -6,6 +6,7 @@
 // contentUrl is a rendition, never the origin. See the /images skill.
 import { Picture } from "astro:assets";
 import JsonLd from "@/components/JsonLd.astro";
+import { imageObject } from "@/lib/structured-data";
 import { isOnImageOrigin, publishedImageUrl, remoteImageSize } from "@/lib/images";
 import { site } from "@/site.config";
 
@@ -75,17 +76,11 @@ const shared = {
 
 const hasCaption = Astro.slots.has("default");
 const contentUrl = await publishedImageUrl(src);
-const credit = author ?? { name: site.organization.name, url: site.organization.url };
-const imageLd = {
-  "@context": "https://schema.org",
-  "@type": "ImageObject",
+const imageLd = imageObject({
   contentUrl,
   license: licenseUrl ?? site.copyright.images.license,
-  acquireLicensePage: licenseUrl ?? site.copyright.images.license,
-  creditText: credit.name,
-  copyrightNotice: `© ${site.copyright.year} ${credit.name}`,
-  creator: { "@type": author ? "Person" : "Organization", name: credit.name, url: credit.url },
-};
+  author,
+});
 
 // In a figure, <picture> is display: contents, so the <img> stays the centered flex item.
 const captionImgClasses =
