@@ -14,7 +14,7 @@ const base =
   "prose border-zmoki-stone-200 prose-headings:font-semibold max-w-none rounded-2xl border bg-white px-4 py-8 shadow-sm md:p-16";
 ---
 
-<div class:list={[base, extra]}>
+<div data-band="content" class:list={[base, extra]}>
   <slot />
 </div>
 
@@ -26,7 +26,7 @@ const base =
       const codeBlock = wrapper?.querySelector("pre code");
       const code = codeBlock?.textContent ?? "";
 
-      window.track?.("code_block_copied", { snippet_length: code.length });
+      // code_block_copied is tracked site-wide (src/lib/site-events.ts).
       if (!code) return;
 
       const original = btn.textContent;

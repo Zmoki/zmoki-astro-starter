@@ -89,7 +89,7 @@ Pick the version by the semver rule at the top of `CHANGELOG.md` (major = people
 
 ### Site config
 
-`src/site.config.ts` holds the domain, name, default description, nav links, site owner (`organization`), contact email, repo link, copyright, and `platform` (`deploy` target and `imagesCDNHost`). Layouts, the home page, RSS, the sitemap and `astro.config.mjs` read it. The brand pages read only `site.name`; their copy is written in the pages.
+`src/site.config.ts` holds the domain, name, default description, nav links, standing asks (`asks`, the CTA links), site owner (`organization`), contact email, repo link, copyright, and `platform` (`deploy` target and `imagesCDNHost`). Layouts, the home page, RSS, the sitemap and `astro.config.mjs` read it. The brand pages read only `site.name`; their copy is written in the pages.
 
 ### Content
 
@@ -158,7 +158,7 @@ Every text and background pair must pass WCAG AA. Font families are also in `des
 
 Analytics, forms and captcha follow the same pattern: a dispatcher component, one component per provider, and committed config (not env vars) in a `*-config.ts` module where the CSP needs the provider's hosts.
 
-- **Analytics** (`Analytics.astro`, `analytics/`): several providers at once. Call sites only use `window.track?.(event, props)` and `window.identify?.(id, props)`; each provider chains onto those, so a call reaches every provider. Built in: PostHog and Google Tag Manager. Off unless `PUBLIC_ANALYTICS_ENABLED=true`. Events and how to add a provider: `/analytics`.
+- **Analytics** (`Analytics.astro`, `analytics/`): several providers at once. Call sites only use `window.track?.(event, props)` and `window.identify?.(id, props)`; each provider chains onto those, so a call reaches every provider. Built in: PostHog and Google Tag Manager. Off unless `PUBLIC_ANALYTICS_ENABLED=true`; while off, a console provider logs every call instead. Every event the site fires: `src/ANALYTICS.md`. Adding an event or a provider: `/analytics`.
 - **Forms** (`Form.astro`, `forms/`): one provider, the first in `Form.astro`'s list. Built in: Brevo (`BREVO_ACCOUNT_ID` in `forms/brevo.astro`). The backend validates the captcha, stores the contact, emails the asset and redirects to the thank-you page, so swapping the frontend alone isn't enough.
 - **Captcha** (`Captcha.astro`, `captcha/`): one provider, since two widgets would send competing tokens. Built in: Cloudflare Turnstile. Off unless `PUBLIC_CAPTCHA_ENABLED=true`. It must match the captcha configured on the form backend; the widget's extra `g-recaptcha` class is what Brevo looks for.
 

@@ -15,6 +15,7 @@ In **`src/site.config.ts`**, set:
 - `organization.name` and `organization.url`: the site owner in the footer, also credited on content images
 - `contact.email`: the footer Contact link
 - `social.github`: the footer GitHub link
+- `asks`: your standing calls to action (the template's "Get started" buttons use `use_template`). A click on any link to one is tracked as `cta_clicked`
 - `copyright.year`: the first year in the footer copyright
 - `copyright.images.license`: the license URL for content images, e.g. your terms page
 

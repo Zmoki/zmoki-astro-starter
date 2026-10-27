@@ -34,6 +34,15 @@ export const site = {
     email: "hey@zmoki.xyz",
   },
 
+  /**
+   * Standing asks: a click on any link to one fires `cta_clicked` with its key,
+   * wherever the link sits (nav, a page, content). Routes or full URLs.
+   */
+  asks: {
+    use_template: "https://github.com/Zmoki/zmoki-astro-starter",
+    seo_checklist: "/resources/new-website-seo-checklist/",
+  },
+
   social: {
     /** "GitHub" link in the footer. */
     github: "https://github.com/Zmoki/zmoki-astro-starter",

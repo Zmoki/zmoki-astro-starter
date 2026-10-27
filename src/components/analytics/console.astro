@@ -1,0 +1,10 @@
+---
+// Logs every track and identify call to the browser console, so events can be
+// checked with analytics off (dev, PRs, previews). Analytics.astro renders it
+// instead of the vendors, never with them.
+---
+
+<script>
+  window.track = (event, props) => console.info("[analytics] track", event, props ?? {});
+  window.identify = (id, props) => console.info("[analytics] identify", id, props ?? {});
+</script>

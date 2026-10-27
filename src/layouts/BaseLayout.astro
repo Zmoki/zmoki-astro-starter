@@ -117,8 +117,14 @@ const ownerSiteLabel = new URL(site.organization.url).host;
 
     <Analytics />
   </head>
-  <body class="bg-zmoki-cream-100 text-zmoki-stone-900 flex min-h-full flex-col font-sans text-lg leading-normal tracking-tight xl:text-xl">
-    <header class="border-zmoki-stone-200 bg-zmoki-cream-100/80 sticky top-0 z-40 border-b backdrop-blur-md">
+  <body
+    data-asks={JSON.stringify(site.asks)}
+    class="bg-zmoki-cream-100 text-zmoki-stone-900 flex min-h-full flex-col font-sans text-lg leading-normal tracking-tight xl:text-xl"
+  >
+    <header
+      data-band="header"
+      class="border-zmoki-stone-200 bg-zmoki-cream-100/80 sticky top-0 z-40 border-b backdrop-blur-md"
+    >
       <nav class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 lg:px-8">
         <a href="/" class="flex items-center" aria-label={`${site.name} — home`}>
           <img
@@ -142,7 +148,7 @@ const ownerSiteLabel = new URL(site.organization.url).host;
               </li>
             ))}
           </ul>
-          <Button href={site.social.github}>Get started</Button>
+          <Button href={site.asks.use_template}>Get started</Button>
         </div>
       </nav>
     </header>
@@ -152,19 +158,10 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     </main>
 
     <script>
-      // Delegated, so every mailto: link counts, including ones in content.
-      document.addEventListener("click", (event) => {
-        const mailto = (event.target as Element | null)?.closest<HTMLAnchorElement>(
-          'a[href^="mailto:"]',
-        );
-        if (!mailto) return;
-        window.track?.("contact_email_clicked", {
-          email: (mailto.getAttribute("href") ?? "").replace("mailto:", ""),
-        });
-      });
+      import "@/lib/site-events";
     </script>
 
-    <footer class="border-zmoki-stone-200 border-t bg-white">
+    <footer data-band="footer" class="border-zmoki-stone-200 border-t bg-white">
       <div class="text-zmoki-stone-500 mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm md:flex-row md:items-center md:justify-between lg:px-8">
         <p>
           &copy; {site.copyright.year} · {site.organization.name} ·{" "}
