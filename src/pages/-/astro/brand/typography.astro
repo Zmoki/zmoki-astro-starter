@@ -338,6 +338,50 @@ const linkTreatments = [
         <dt>Definition list</dt>
         <dd>A term paired with its description, like this one.</dd>
       </dl>
+      <h2>Table</h2>
+      <p>
+        Write a pipe table with a <code>: Caption</code> line under it. Every table sits in a scroll
+        box, so on a phone a wide one scrolls instead of widening the page.
+      </p>
+      <div data-table-scroll tabindex="0" role="region" aria-labelledby="specimen-table-caption">
+        <table>
+          <caption id="specimen-table-caption">
+            <span>Core Web Vitals thresholds</span>
+          </caption>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Measures</th>
+              <th>Good</th>
+              <th>Needs improvement</th>
+              <th>Poor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>LCP</td>
+              <td>Loading</td>
+              <td>≤ 2.5 s</td>
+              <td>≤ 4 s</td>
+              <td>&gt; 4 s</td>
+            </tr>
+            <tr>
+              <td>INP</td>
+              <td>Responsiveness</td>
+              <td>≤ 200 ms</td>
+              <td>≤ 500 ms</td>
+              <td>&gt; 500 ms</td>
+            </tr>
+            <tr>
+              <td>CLS</td>
+              <td>Visual stability</td>
+              <td>≤ 0.1</td>
+              <td>≤ 0.25</td>
+              <td>&gt; 0.25</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <h2>Code block</h2>
       <p>
         Fenced blocks are highlighted with Shiki (<code>catppuccin-mocha</code>) and get a copy
