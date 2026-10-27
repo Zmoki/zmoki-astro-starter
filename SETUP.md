@@ -13,6 +13,7 @@ In **`src/site.config.ts`**, set:
 - `description`: the default meta description
 - `nav`: top-nav links (`/#features` anchors or `/blog/` routes)
 - `organization.name` and `organization.url`: the site owner in the footer, also credited on content images
+- `organization.logo`: the owner's logo for search engines (a square PNG, 112px or more); the default is the brand mark
 - `contact.email`: the footer Contact link
 - `social.github`: the footer GitHub link
 - `asks`: your standing calls to action (the template's "Get started" buttons use `use_template`). A click on any link to one is tracked as `cta_clicked`

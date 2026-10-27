@@ -35,10 +35,12 @@ export const meta = {
   contentModifiedDate: new Date("2026-07-05"),
 } satisfies StandalonePageMeta;
 
-// The site's name and publisher, for Google. Home page only. The logo is the
-// favicon set's 512px PNG, rendered from the brand mark.
+// The site's name and publisher, for Google. Home page only.
 const { absoluteUrl } = siteUrls(Astro);
-const identityLd = siteIdentity({ home: absoluteUrl("/"), logo: absoluteUrl("/icon-512.png") });
+const identityLd = siteIdentity({
+  home: absoluteUrl("/"),
+  logo: absoluteUrl(site.organization.logo),
+});
 
 // The scan is live: update the grade if the report changes.
 const securityReport =

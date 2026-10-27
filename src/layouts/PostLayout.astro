@@ -7,6 +7,7 @@ import Image from "@/components/Image.astro";
 import JsonLd from "@/components/JsonLd.astro";
 import Breadcrumbs from "@/components/Breadcrumbs.astro";
 import { blogPosting } from "@/lib/structured-data";
+import { blogCrumb, homeCrumb } from "@/lib/crumbs";
 import { getOgImage } from "@/og/manifest";
 import { siteUrls } from "@/lib/urls";
 import { publishedImageUrl } from "@/lib/images";
@@ -70,9 +71,7 @@ const blogPostingLd = blogPosting({
   <slot name="head" slot="head" />
   <JsonLd schema={blogPostingLd} />
   <article class="space-y-4" data-post-slug={slug} data-post-title={title}>
-    <Breadcrumbs
-      crumbs={[{ name: "Home", href: "/" }, { name: "Blog", href: "/blog/" }, { name: title }]}
-    />
+    <Breadcrumbs crumbs={[homeCrumb, blogCrumb, { name: title }]} />
     <header class="border-zmoki-stone-200 flex flex-col gap-6 rounded-2xl border bg-white px-4 py-8 shadow-sm md:items-center md:p-16 md:text-center lg:p-20">
       <h1 class="text-4xl font-semibold tracking-tight xl:text-6xl" set:html={title} />
       {description && (

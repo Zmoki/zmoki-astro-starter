@@ -1,6 +1,7 @@
 import type { Html, Image, Nodes, Paragraph, PhrasingContent, Root } from "mdast";
 import { SKIP, visit } from "unist-util-visit";
 import { IMAGE_ORIGIN, isOnImageOrigin } from "../lib/image-origin.ts";
+import { decodeEntities } from "../lib/html-text.ts";
 
 // Treat a raw <img> in content like Markdown `![]()`, so origin images are optimized
 // instead of published (the CSP blocks the origin). See the /images skill.
@@ -22,17 +23,6 @@ interface MdxJsxElement {
   name: string | null;
   data?: Record<string, unknown>;
 }
-
-const ENTITIES: Record<string, string> = { amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" };
-
-const decodeEntities = (text: string) =>
-  text.replace(/&(?:#(\d+)|#x([0-9a-f]+)|(amp|quot|apos|lt|gt));/gi, (_, dec, hex, name) =>
-    dec
-      ? String.fromCodePoint(Number(dec))
-      : hex
-        ? String.fromCodePoint(parseInt(hex, 16))
-        : ENTITIES[name.toLowerCase()],
-  );
 
 function attr(tag: string, name: string): string | undefined {
   const match = tag.match(

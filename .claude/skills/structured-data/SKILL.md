@@ -36,11 +36,11 @@ If the user asks for a type not in the gallery, tell them it won't produce a Sea
 
 **Builder.** Add one function per type to `src/lib/structured-data.ts`, next to `blogPosting`, `imageObject`, `breadcrumbList` and `siteIdentity`. It takes only facts the page shows and returns the schema object; the page passes it to `src/components/JsonLd.astro`, which takes one object or an array, escapes `<`, and works anywhere in the document. JSON-LD is data, so the CSP doesn't affect it.
 
-**Values.** Take text from `src/site.config.ts` (`site.name`, `site.organization.*`, …); never hard-code it. A post's author comes from its own frontmatter (`{ name, url, bio }`); there's no site-level author.
+**Values.** Take text from `src/site.config.ts` (`site.name`, `site.organization.*`, …); never hard-code it. Pass titles and descriptions through `htmlToText` (`src/lib/html-text.ts`): pages render them as HTML. Reference the site owner through the builders' `owner()`, which carries its `@id`. A post's author comes from its own frontmatter (`{ name, url, bio }`); there's no site-level author.
 
 **URLs.** The caller builds absolute URLs with `absoluteUrl(path)` from `siteUrls(Astro)` (`src/lib/urls.ts`), the same helper behind the canonical link and `og:image`, and passes them in. For a page's OG card, use `getOgImage(pathname)` (`src/og/manifest.ts`). For a content image, use `publishedImageUrl(src)` (`src/lib/images.ts`), never the origin URL. Dates are ISO 8601 (`.toISOString()`).
 
-**Breadcrumbs.** Don't build `BreadcrumbList` by hand: `<Breadcrumbs crumbs={[{ name: "Home", href: "/" }, …, { name: title }]} />` renders the visible trail and its markup from one array. The last crumb is the current page, with no `href`. The brand guide's specimen is hand-copied markup, so the noindex page carries no markup.
+**Breadcrumbs.** Don't build `BreadcrumbList` by hand: `<Breadcrumbs crumbs={[{ name: "Home", href: "/" }, …, { name: title }]} />` renders the visible trail and its markup from one array. Every crumb but the last needs an `href` (the build fails otherwise); the last is the current page. Shared crumbs (`homeCrumb`, `blogCrumb`) live in `src/lib/crumbs.ts`. On a noindex page, pass `schema={false}`.
 
 `PostLayout.astro` is the worked example: `blogPosting({...})` plus `<Breadcrumbs>`.
 

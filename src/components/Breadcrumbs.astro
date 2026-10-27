@@ -1,27 +1,45 @@
 ---
-// The visible breadcrumb and its BreadcrumbList JSON-LD, built from one array so
-// they can't drift. Pass names and site paths; the last crumb is the current page.
+// The visible breadcrumb and its BreadcrumbList JSON-LD, built from one trail so
+// they can't drift. Every crumb but the last links (href is required there); the
+// last is the current page and never links. Names may hold HTML (titles do), so
+// both use their plain text.
 import JsonLd from "@/components/JsonLd.astro";
 import { breadcrumbList } from "@/lib/structured-data";
+import { htmlToText } from "@/lib/html-text";
 import { siteUrls } from "@/lib/urls";
 
-export interface Props {
-  crumbs: { name: string; href?: string }[];
+export interface BreadcrumbItem {
+  name: string;
+  href?: string;
 }
 
-const { crumbs } = Astro.props;
+export interface Props {
+  crumbs: BreadcrumbItem[];
+  /** Emit the BreadcrumbList. Off for specimens on noindex pages. */
+  schema?: boolean;
+}
+
+const { crumbs, schema = true } = Astro.props;
 const { absoluteUrl } = siteUrls(Astro);
-const schema = breadcrumbList(
-  crumbs.map((crumb) => ({ name: crumb.name, url: crumb.href && absoluteUrl(crumb.href) })),
+
+const trail = crumbs.map((crumb, i) => {
+  const isCurrent = i === crumbs.length - 1;
+  if (!isCurrent && !crumb.href) {
+    throw new Error(`Breadcrumb "${crumb.name}" needs an href: only the last crumb may omit it.`);
+  }
+  return { name: htmlToText(crumb.name), href: isCurrent ? undefined : crumb.href };
+});
+const breadcrumbLd = breadcrumbList(
+  trail.map((crumb) => ({ name: crumb.name, url: crumb.href && absoluteUrl(crumb.href) })),
 );
 ---
 
 <nav aria-label="Breadcrumb" class="text-zmoki-stone-600 px-1 text-sm">
   <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
-    {crumbs.map((crumb, i) => (
+    {trail.map((crumb, i) => (
       <li class="flex items-center gap-x-2">
         {i > 0 && <span aria-hidden="true">›</span>}
-        {crumb.href && i < crumbs.length - 1 ? (
+        {crumb.href ? (
           <a
             href={crumb.href}
             class="hover:text-zmoki-stone-900 underline-offset-2 hover:underline"
@@ -37,4 +55,4 @@ const schema = breadcrumbList(
     ))}
   </ol>
 </nav>
-<JsonLd schema={schema} />
+{schema && <JsonLd schema={breadcrumbLd} />}

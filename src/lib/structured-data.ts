@@ -1,4 +1,5 @@
 import { site } from "@/site.config";
+import { htmlToText } from "@/lib/html-text";
 
 // One builder per schema.org type the site emits; JsonLd.astro renders the result.
 // Each takes only facts the page shows, and absolute URLs built by the caller
@@ -9,12 +10,19 @@ type Person = { name: string; url: string };
 
 const CONTEXT = "https://schema.org";
 
-/** The site owner (site.organization), as an author, publisher or image creator. */
+// One @id for the site owner on every page, so Google reads the home page's
+// Organization, every publisher and every image creator as one entity.
+const ORGANIZATION_ID = `${site.domain}/#organization`;
+
+/** The site owner (site.organization), as a publisher or image creator. */
 const owner = (): Schema => ({
   "@type": "Organization",
+  "@id": ORGANIZATION_ID,
   name: site.organization.name,
   url: site.organization.url,
 });
+
+const person = ({ name, url }: Person): Schema => ({ "@type": "Person", name, url });
 
 /** A blog post. `image` is the cover's published URL, or the OG card. */
 export function blogPosting(post: {
@@ -29,11 +37,11 @@ export function blogPosting(post: {
   return {
     "@context": CONTEXT,
     "@type": "BlogPosting",
-    headline: post.title,
-    ...(post.description ? { description: post.description } : {}),
+    headline: htmlToText(post.title),
+    ...(post.description ? { description: htmlToText(post.description) } : {}),
     datePublished: post.publishDate.toISOString(),
     dateModified: post.contentModifiedDate.toISOString(),
-    author: { "@type": "Person", name: post.author.name, url: post.author.url },
+    author: person(post.author),
     publisher: owner(),
     image: post.image,
     mainEntityOfPage: post.url,
@@ -55,7 +63,7 @@ export function imageObject(image: {
     acquireLicensePage: image.license,
     creditText: credit.name,
     copyrightNotice: `© ${site.copyright.year} ${credit.name}`,
-    creator: image.author ? { "@type": "Person", ...image.author } : owner(),
+    creator: image.author ? person(image.author) : owner(),
   };
 }
 
@@ -81,11 +89,10 @@ export function breadcrumbList(crumbs: Crumb[]): Schema {
 
 /**
  * The site's identity, for the home page only: WebSite (Google's site name) and the
- * Organization that publishes it, linked by @id. `home` is the absolute home URL
- * and `logo` the brand mark's absolute PNG URL.
+ * Organization that publishes it. `home` is the absolute home URL and `logo` the
+ * absolute URL of site.organization.logo.
  */
 export function siteIdentity({ home, logo }: { home: string; logo: string }): Schema[] {
-  const organizationId = `${home}#organization`;
   return [
     {
       "@context": CONTEXT,
@@ -93,12 +100,11 @@ export function siteIdentity({ home, logo }: { home: string; logo: string }): Sc
       "@id": `${home}#website`,
       name: site.name,
       url: home,
-      publisher: { "@id": organizationId },
+      publisher: { "@id": ORGANIZATION_ID },
     },
     {
       "@context": CONTEXT,
       ...owner(),
-      "@id": organizationId,
       logo,
     },
   ];
