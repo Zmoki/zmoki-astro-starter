@@ -85,9 +85,16 @@ const ownerSiteLabel = new URL(site.organization.url).host;
     <link rel="icon" type="image/svg+xml" href="/brand-mark.svg" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <!-- Preload only the upright sans (headings and body): a late swap re-wraps the hero
-         copy and pushes the LCP image down. Italic and mono load on use. -->
-    <Font cssVariable={fonts.sans.variable} preload={[{ style: "normal" }]} />
+    <!-- Preload only the body (400) and heading (600) faces: a late swap re-wraps the hero
+         copy and pushes the LCP image down. A variable font is one file for both; italic,
+         other weights and mono load on use. -->
+    <Font
+      cssVariable={fonts.sans.variable}
+      preload={[
+        { weight: 400, style: "normal" },
+        { weight: 600, style: "normal" },
+      ]}
+    />
     <Font cssVariable={fonts.mono.variable} />
 
     <title>{title}</title>

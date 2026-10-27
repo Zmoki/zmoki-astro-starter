@@ -111,7 +111,7 @@ export interface OgImage {
   path: string;
   alt: string;
   /** Every frame's card, landscape first. */
-  images: { path: string; width: number; height: number }[];
+  images: { name: string; path: string; width: number; height: number }[];
 }
 
 /**
@@ -123,9 +123,13 @@ export async function getOgImage(pathname: string): Promise<OgImage> {
   const match = routed.find((r) => r.route !== null && norm(r.route) === norm(pathname));
   const entry = match?.entry ?? DEFAULT_ENTRY;
   const images = OG_FRAMES.map((frame) => ({
+    name: frame.name,
     path: `/og/${frame.dir}${entry.key}.png`,
     width: frame.width,
     height: frame.height,
   }));
+  // Landscape first, by name, whatever the frame order: consumers take the first
+  // og:image, and twitter:image (summary_large_image) wants landscape.
+  images.sort((a, b) => Number(b.name === "landscape") - Number(a.name === "landscape"));
   return { path: images[0].path, alt: entry.alt, images };
 }

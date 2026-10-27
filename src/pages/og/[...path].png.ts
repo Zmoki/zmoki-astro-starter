@@ -12,12 +12,24 @@ import type { OgEntry } from "@/og/types";
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const entries = await getOgEntries();
-  return entries.flatMap((entry) =>
+  const paths = entries.flatMap((entry) =>
     OG_FRAMES.map((frame) => ({
       params: { path: `${frame.dir}${entry.key}` },
       props: { entry, frame },
     })),
   );
+  // A frame's folder shares the namespace with card keys (a collection named
+  // "square" would), so fail on a clash instead of overwriting a card.
+  const seen = new Set<string>();
+  for (const { params } of paths) {
+    if (seen.has(params.path)) {
+      throw new Error(
+        `Two OG cards render to /og/${params.path}.png. Rename the collection or the frame's dir in src/og/theme.ts.`,
+      );
+    }
+    seen.add(params.path);
+  }
+  return paths;
 };
 
 export const GET: APIRoute = async ({ props }) => {

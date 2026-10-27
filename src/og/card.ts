@@ -25,7 +25,7 @@ const brandMarkPng = new Resvg(brandMarkSvg, { fitTo: { mode: "width", value: 20
 const brandMarkUri = `data:image/png;base64,${Buffer.from(brandMarkPng).toString("base64")}`;
 
 /** The brand mark, rendered from public/brand-mark.svg with softly rounded corners. */
-const brandMark = (size = 56): Node => ({
+const brandMark = (size: number): Node => ({
   type: "img",
   props: {
     src: brandMarkUri,

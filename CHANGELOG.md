@@ -15,7 +15,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versions: [sem
 
 ### Changed
 
-- `og:type="article"` and the `article:*_time` tags now need the new `article` prop on `BaseLayout` (posts set it); resources and legal pages are `website`. The Twitter tags use `name=` instead of `property=`. Only the upright sans is preloaded, not its italic. ([#71](https://github.com/Zmoki/zmoki-astro-starter/pull/71))
+- `og:type="article"` and the `article:*_time` tags now need the new `article` prop on `BaseLayout` (posts set it); resources and legal pages are `website`. The Twitter tags use `name=` instead of `property=`. Only the body and heading faces are preloaded (weights 400 and 600, upright). ([#71](https://github.com/Zmoki/zmoki-astro-starter/pull/71))
   **Breaking:** a layout of yours that should read as an article must pass `article` to `BaseLayout`.
 - `resource_gate_viewed` fires when the gate form is half on screen, not on page load, so it counts people who saw the form. ([#70](https://github.com/Zmoki/zmoki-astro-starter/pull/70))
 - The Markdown plugins moved from `astro.config.mjs` to `src/markdown/`, one TypeScript file each with unit tests (`npm test`, run in CI). The output is unchanged. ([#69](https://github.com/Zmoki/zmoki-astro-starter/pull/69))

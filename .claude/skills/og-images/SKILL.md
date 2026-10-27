@@ -64,7 +64,7 @@ An entry's `key` is its filename stem under `/og/` (`"blog/<id>"` → `/og/blog/
 
 ### Dimensions and frames
 
-Each frame in `OG_FRAMES` (`src/og/theme.ts`) is rendered for every card: `width`, `height`, `dir` (its folder under `/og/`) and `scale` (type size against landscape). The meta tags and the endpoint read the list, so adding or resizing a frame is one edit. Keep landscape first and at 1.91:1.
+Each frame in `OG_FRAMES` (`src/og/theme.ts`) is rendered for every card: `width`, `height`, `dir` (its folder under `/og/`) and `scale` (type size against landscape). The meta tags and the endpoint read the list, so adding or resizing a frame is one edit. The `landscape` frame (keep it 1.91:1) is always listed first, by name. Each frame renders every card again, so it adds build time and files; on a very large site, drop the square frame. The build fails if a frame's `dir` clashes with a card key.
 
 ## Satori gotchas
 

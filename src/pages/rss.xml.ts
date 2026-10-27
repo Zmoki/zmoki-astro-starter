@@ -4,6 +4,7 @@ import MarkdownIt from "markdown-it";
 import { site } from "@/site.config";
 import { getPostsNewestFirst } from "@/lib/page-collections";
 import { isOnImageOrigin, publishedImageUrl } from "@/lib/images";
+import { getOgImage } from "@/og/manifest";
 import { meta as blogIndexMeta } from "@/pages/blog/index.astro";
 
 // HTML must stay enabled for the placeholders convertMdxComponentsToHtml emits.
@@ -97,7 +98,7 @@ export async function GET(context: { site: URL | undefined }) {
       contentHtml = await publishOriginImages(contentHtml);
 
       // The post's OG card is its feed image.
-      const ogImageUrl = `${siteUrl}/og/blog/${post.id}.png`;
+      const ogImageUrl = `${siteUrl}${(await getOgImage(`/blog/${post.id}/`)).path}`;
 
       // Drop leftover captions and the empty figures they leave.
       contentHtml = contentHtml.replace(/<figcaption[^>]*>[\s\S]*?<\/figcaption>/gi, "");
