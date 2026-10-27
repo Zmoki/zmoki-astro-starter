@@ -33,6 +33,7 @@ npm run build            # production build; also compiles redirects + headers a
 npm run preview          # serve dist/
 npm run check            # type check (astro check; plain tsc can't read .astro)
 npm run lint             # ESLint
+npm test                 # unit tests (node:test), today the Markdown plugins
 npm run format           # Prettier — run before every commit
 npm run favicons         # rasterize public/brand-mark.svg into the favicon set
 npm run build:redirects  # compile src/redirects/*.csv into the host's redirect file
@@ -51,7 +52,7 @@ From an agent or other non-interactive shell, Astro starts `dev` and `preview` i
 
 ## CI
 
-- **`ci.yml`** (every push and PR to `main`): format check, type check, lint, redirect and header drift checks, build, then `check:sd`, `check:links`, `check:sitemap` and `check:origin`. The build turns analytics and captcha on only for pushes to `main`, so that build matches production. No secrets are needed: provider config is committed.
+- **`ci.yml`** (every push and PR to `main`): format check, type check, lint, unit tests, redirect and header drift checks, build, then `check:sd`, `check:links`, `check:sitemap` and `check:origin`. The build turns analytics and captcha on only for pushes to `main`, so that build matches production. No secrets are needed: provider config is committed.
 - **`lighthouse.yml`**: Lighthouse CI on every push and PR, always with analytics and captcha off.
 - **`changelog.yml`**: a PR must change `CHANGELOG.md` unless it has the `no-changelog` label.
 
@@ -127,7 +128,7 @@ Every absolute URL (canonical, `og:url`, OG image, JSON-LD) comes from `siteUrls
 
 ### Markdown
 
-`astro.config.mjs` uses the unified processor, `unified({...})` from `@astrojs/markdown-remark`, for both `.md` and `.mdx`, with:
+`astro.config.mjs` uses the unified processor, `unified({...})` from `@astrojs/markdown-remark`, for both `.md` and `.mdx`. The plugins live in `src/markdown/`, one file each with a `*.test.ts` beside it (`npm test`); `index.ts` sets their order. They are:
 
 - `remark-definition-list` for `<dl>` lists;
 - `remarkImgTags`: a raw `<img>` is treated like `![]()`, so origin images are optimized (`/images`);

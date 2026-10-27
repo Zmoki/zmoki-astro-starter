@@ -5,13 +5,13 @@
 /* Loads the v3-style JS config (tokens, prose overrides, plugins) under Tailwind v4. */
 @config "../../tailwind.config.mjs";
 
-/* The copy button's classes come from a rehype plugin in astro.config.mjs, which
+/* The copy button's classes come from src/markdown/rehype-code-block-copy.ts, which
    the class scanner misses. Keep in sync with that markup. */
 @source inline(
   "relative absolute top-2 right-2 rounded-lg bg-zmoki-indigo-600 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-zmoki-indigo-700 focus:outline-none focus:ring-2 focus:ring-zmoki-indigo-500 focus:ring-offset-2 transition-colors duration-200"
 );
 
-/* Tables come wrapped by rehypeTables (astro.config.mjs). The box scrolls a wide table
+/* Tables come wrapped by src/markdown/rehype-tables.ts. The box scrolls a wide table
    and owns the vertical margin; it's focusable so keyboard users can scroll it.
    Unlayered, so it beats the Typography plugin's table margin. */
 [data-table-scroll] {
